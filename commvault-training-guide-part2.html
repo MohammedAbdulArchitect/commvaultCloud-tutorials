@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Backup Administration — Complete Technical Guide Part 2</title>
+<style>
+  /* PDF-friendly fonts — uses system fonts with no external dependency */
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1e2530;
+    --surface3: #252d3a;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent: #f0883e;
+    --accent2: #58a6ff;
+    --accent3: #3fb950;
+    --accent4: #bc8cff;
+    --accent5: #ff7b72;
+    --warn: #e3b341;
+    --warn-bg: rgba(227,179,65,0.08);
+    --note-bg: rgba(88,166,255,0.07);
+    --tip-bg: rgba(63,185,80,0.07);
+    --danger-bg: rgba(255,123,114,0.08);
+    --exam-bg: rgba(188,140,255,0.07);
+    --code-bg: #0d1117;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', Calibri, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #1a1f2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 72px 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(240,136,62,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(88,166,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(240,136,62,0.12); border: 1px solid rgba(240,136,62,0.3);
+    color: var(--accent); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(32px, 5vw, 58px);
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    color: var(--text-muted); font-size: 17px; max-width: 620px; margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+  .hero-meta-item {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--text-dim); font-size: 13px;
+  }
+  .hero-meta-item .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 8px rgba(63,185,80,0.5);
+  }
+
+  /* NAV */
+  .toc-nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 40px; position: sticky; top: 0; z-index: 100;
+    overflow-x: auto; white-space: nowrap;
+  }
+  .toc-nav ul { display: flex; list-style: none; gap: 4px; padding: 8px 0; }
+  .toc-nav a {
+    display: block; padding: 8px 14px; font-size: 13px; font-weight: 500;
+    color: var(--text-muted); text-decoration: none; border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .toc-nav a:hover { color: var(--text); background: var(--surface2); }
+
+  /* MAIN LAYOUT */
+  .main { max-width: 960px; margin: 0 auto; padding: 48px 40px 80px; }
+
+  /* SECTION */
+  .section { margin-bottom: 72px; }
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 32px; padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .icon-orange { background: rgba(240,136,62,0.15); border: 1px solid rgba(240,136,62,0.3); }
+  .icon-blue   { background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.3); }
+  .icon-green  { background: rgba(63,185,80,0.12);  border: 1px solid rgba(63,185,80,0.3); }
+  .icon-purple { background: rgba(188,140,255,0.12);border: 1px solid rgba(188,140,255,0.3);}
+  .icon-red    { background: rgba(255,123,114,0.12); border: 1px solid rgba(255,123,114,0.3);}
+  .icon-yellow { background: rgba(227,179,65,0.12);  border: 1px solid rgba(227,179,65,0.3); }
+
+  .section-header h2 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: 26px; color: var(--text); margin: 0;
+  }
+  .section-header p { color: var(--text-muted); font-size: 14px; margin: 4px 0 0; }
+  .section-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    color: var(--text-dim); text-transform: uppercase; margin-bottom: 2px;
+  }
+
+  /* SUBSECTIONS */
+  h3 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: 19px; color: var(--text);
+    margin: 40px 0 14px;
+  }
+  h4 {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;
+    margin: 28px 0 10px;
+  }
+  p { color: var(--text-muted); margin-bottom: 14px; }
+  strong { color: var(--text); font-weight: 600; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 16px;
+  }
+  .card-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;
+  }
+  @media (max-width: 640px) { .card-grid { grid-template-columns: 1fr; } }
+  .card-grid-3 {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 20px 0;
+  }
+  @media (max-width: 700px) { .card-grid-3 { grid-template-columns: 1fr; } }
+
+  .arch-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 22px;
+  }
+  .arch-card .tier-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+    display: inline-block; margin-bottom: 10px;
+  }
+  .tier-1 { background: rgba(240,136,62,0.15); color: var(--accent); }
+  .tier-2 { background: rgba(88,166,255,0.12); color: var(--accent2); }
+  .tier-3 { background: rgba(63,185,80,0.12);  color: var(--accent3); }
+  .arch-card h4 { font-size: 15px; margin: 0 0 8px; color: var(--text); text-transform: none; letter-spacing: 0; }
+  .arch-card p  { font-size: 13px; margin: 0; }
+
+  /* BULLET LISTS */
+  ul.list { list-style: none; padding: 0; margin: 12px 0 20px; }
+  ul.list li {
+    display: flex; gap: 10px; color: var(--text-muted);
+    font-size: 14px; padding: 6px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  ul.list li:last-child { border-bottom: none; }
+  ul.list li::before {
+    content: '›'; color: var(--accent); font-size: 16px;
+    flex-shrink: 0; margin-top: -1px;
+  }
+  ul.list li strong { color: var(--text); }
+
+  /* CODE */
+  .code-block {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin: 18px 0;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px; font-weight: 500; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .cd-r { background: #ff5f57; }
+  .cd-y { background: #febc2e; }
+  .cd-g { background: #28c840; }
+  pre {
+    font-family: 'Courier New', Courier, 'Lucida Console', monospace; font-size: 13px;
+    padding: 18px 20px; overflow-x: auto; line-height: 1.7;
+    color: #adbac7;
+  }
+  pre .cmd  { color: #79c0ff; }
+  pre .flag { color: #ffa657; }
+  pre .path { color: #56d364; }
+  pre .cmt  { color: #6e7681; font-style: italic; }
+  pre .val  { color: #f0883e; }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-radius: 10px; padding: 18px 22px; margin: 20px 0;
+    border-left: 3px solid;
+  }
+  .callout-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .callout p { margin: 0; font-size: 13.5px; }
+  .callout ul.list { margin: 8px 0 0; }
+  .callout ul.list li { font-size: 13px; }
+
+  .callout-warn   { background: var(--warn-bg);  border-color: var(--warn);   }
+  .callout-warn   .callout-header { color: var(--warn); }
+  .callout-note   { background: var(--note-bg);  border-color: var(--accent2); }
+  .callout-note   .callout-header { color: var(--accent2); }
+  .callout-tip    { background: var(--tip-bg);   border-color: var(--accent3); }
+  .callout-tip    .callout-header { color: var(--accent3); }
+  .callout-danger { background: var(--danger-bg);border-color: var(--accent5); }
+  .callout-danger .callout-header { color: var(--accent5); }
+  .callout-exam   { background: var(--exam-bg);  border-color: var(--accent4); }
+  .callout-exam   .callout-header { color: var(--accent4); }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex; align-items: center; gap: 0; margin: 24px 0;
+    overflow-x: auto; padding: 8px 0;
+  }
+  .flow-step {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; text-align: center;
+    min-width: 120px; flex-shrink: 0;
+  }
+  .flow-step .step-num {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 4px;
+  }
+  .flow-step .step-text { font-size: 13px; font-weight: 500; color: var(--text); }
+  .flow-arrow {
+    color: var(--text-dim); font-size: 20px; padding: 0 8px; flex-shrink: 0;
+  }
+
+  /* PORT TABLE (CSS-only, no table tag) */
+  .port-grid { margin: 16px 0; }
+  .port-row {
+    display: flex; gap: 16px; padding: 10px 14px; border-radius: 6px;
+    margin-bottom: 4px; align-items: center;
+  }
+  .port-row.header { background: var(--surface3); }
+  .port-row.header span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); }
+  .port-row:not(.header) { background: var(--surface2); }
+  .port-col-1 { width: 100px; flex-shrink: 0; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: var(--accent2); font-weight: 500; }
+  .port-col-2 { width: 100px; flex-shrink: 0; }
+  .port-col-3 { flex: 1; font-size: 13px; color: var(--text-muted); }
+  .port-col-4 { width: 90px; flex-shrink: 0; }
+  .port-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+  .pb-req { background: rgba(255,123,114,0.15); color: var(--accent5); }
+  .pb-opt { background: rgba(88,166,255,0.12); color: var(--accent2); }
+
+  /* Q&A */
+  .qa-block { margin: 16px 0; }
+  .qa-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin-bottom: 12px;
+  }
+  .qa-q {
+    padding: 16px 20px; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600; color: var(--text); font-size: 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .qa-q::before { content: 'Q'; color: var(--accent4); font-weight: 700; flex-shrink: 0; }
+  .qa-a {
+    padding: 14px 20px 14px 42px;
+    color: var(--text-muted); font-size: 13.5px;
+  }
+  .qa-a::before { content: 'A: '; color: var(--accent3); font-weight: 700; }
+
+  /* SUMMARY BOX */
+  .summary-box {
+    background: linear-gradient(135deg, rgba(240,136,62,0.07) 0%, rgba(88,166,255,0.05) 100%);
+    border: 1px solid rgba(240,136,62,0.2); border-radius: 12px;
+    padding: 22px 28px; margin: 28px 0;
+  }
+  .summary-box h4 { color: var(--accent); margin: 0 0 12px; }
+  .summary-box ul.list li { font-size: 13px; }
+
+  /* IMAGE PLACEHOLDER */
+  .img-placeholder {
+    background: var(--surface2); border: 2px dashed var(--border);
+    border-radius: 10px; padding: 32px; text-align: center;
+    color: var(--text-dim); font-size: 13px; margin: 20px 0;
+  }
+  .img-placeholder .icon { font-size: 32px; margin-bottom: 10px; }
+  .img-placeholder .caption {
+    font-size: 12px; color: var(--text-dim);
+    margin-top: 8px; font-style: italic;
+  }
+
+  /* STEP LIST */
+  .step-list { list-style: none; padding: 0; margin: 16px 0; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    display: flex; gap: 16px; margin-bottom: 14px; align-items: flex-start;
+  }
+  .step-list li::before {
+    content: counter(steps);
+    width: 28px; height: 28px; flex-shrink: 0;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--accent2); font-family: 'Courier New', Courier, monospace;
+    margin-top: 2px;
+  }
+  .step-list li p { margin: 0; font-size: 14px; color: var(--text-muted); }
+  .step-list li strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 2px; }
+
+  /* VERSION BADGE */
+  .ver-badge {
+    display: inline-block; font-family: 'Courier New', Courier, monospace;
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; background: rgba(63,185,80,0.12);
+    border: 1px solid rgba(63,185,80,0.3); color: var(--accent3); margin: 0 3px;
+  }
+  .ver-lts { background: rgba(240,136,62,0.12); border-color: rgba(240,136,62,0.3); color: var(--accent); }
+
+  /* ROLE CARD */
+  .role-list { list-style: none; padding: 0; margin: 16px 0; }
+  .role-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .role-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .role-title { font-weight: 600; color: var(--text); font-size: 14px; margin-bottom: 3px; }
+  .role-desc { font-size: 13px; color: var(--text-muted); }
+
+  /* DIVIDER */
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* FOOTER */
+  footer {
+    background: var(--surface); border-top: 1px solid var(--border);
+    text-align: center; padding: 28px; color: var(--text-dim); font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🛡️ Backup Administration Tutorials</div>
+    <h1>Commvault <span>Backup Administration</span><br>Complete Technical Guide <span style="color:var(--text-muted);font-size:0.65em;vertical-align:middle;background:rgba(240,136,62,0.12);border:1px solid rgba(240,136,62,0.3);padding:3px 12px;border-radius:20px;font-family:'Segoe UI',Arial,sans-serif;font-weight:600;letter-spacing:0.04em;">Part 2</span></h1>
+    <p>A comprehensive, self-paced technical training covering architecture, installation, configuration, and day-to-day operations for Commvault Version <span class="ver-badge ver-lts">11.32 LTS</span></p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><div class="dot"></div>Platform: Windows / Linux</div>
+      <div class="hero-meta-item"><div class="dot" style="background:var(--accent2);box-shadow:0 0 8px rgba(88,166,255,0.5)"></div>Level: L1 → L2+</div>
+      <div class="hero-meta-item"><div class="dot" style="background:var(--accent4);box-shadow:0 0 8px rgba(188,140,255,0.5)"></div>Includes Lab Walkthroughs</div>
+      <div class="hero-meta-item"><div class="dot" style="background:var(--warn);box-shadow:0 0 8px rgba(227,179,65,0.5)"></div>Interview Prep Included</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="toc-nav">
+  <ul>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#environment">Environment Setup</a></li>
+    <li><a href="#packages">Package Management</a></li>
+    <li><a href="#commserve">CommServe Install</a></li>
+    <li><a href="#mediagent">Media Agent</a></li>
+    <li><a href="#storage">Storage & Libraries</a></li>
+    <li><a href="#agents">Agent Installation</a></li>
+    <li><a href="#consoles">Consoles & UI</a></li>
+    <li><a href="#daytoday">Daily Operations</a></li>
+    <li><a href="#ports">Ports & Networking</a></li>
+    <li><a href="#interview">Interview Q&A</a></li>
+  </ul>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 1: ARCHITECTURE -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="architecture">
+    <div class="section-header">
+      <div class="section-icon icon-orange">🏗️</div>
+      <div>
+        <div class="section-num">Section 01</div>
+        <h2>Commvault Architecture</h2>
+        <p>The three-tier model that powers every Commvault deployment</p>
+      </div>
+    </div>
+
+    <p>Commvault operates on a <strong>three-tier architecture</strong>: a central management server, one or more data-movement nodes, and the client machines whose data needs protection. Understanding how these tiers interact is the foundation for every configuration and troubleshooting task a backup administrator will encounter.</p>
+
+    <div class="card-grid-3">
+      <div class="arch-card">
+        <span class="tier-badge tier-1">Tier 1</span>
+        <h4>CommServe (CS)</h4>
+        <p>The administrative brain of the environment. Coordinates all backup, restore, and management activities. Houses the SQL Server-backed CommServe database. Strongly recommended on <strong>Windows Server</strong>.</p>
+      </div>
+      <div class="arch-card">
+        <span class="tier-badge tier-2">Tier 2</span>
+        <h4>Media Agent (MA)</h4>
+        <p>The data mover. Receives backup data from clients and writes it to storage (disk, tape, or cloud). Communicates results and metadata back to the CommServe. Can run on <strong>Windows or Linux</strong>.</p>
+      </div>
+      <div class="arch-card">
+        <span class="tier-badge tier-3">Tier 3</span>
+        <h4>Client / Agent</h4>
+        <p>Any server whose data is being protected. Can be <strong>agent-based</strong> (file system, database, etc.) or <strong>agentless</strong> (VMware vSphere, Hyper-V). The installed package is called an <em>iDataAgent (iDA)</em>.</p>
+      </div>
+    </div>
+
+    <div class="img-placeholder">
+      <div class="icon">🖼️</div>
+      <div>Commvault Three-Tier Architecture Diagram</div>
+      <div class="caption">CommServe ↔ Media Agent ↔ Client Machines — with storage (Disk / Tape / Cloud) attached to the Media Agent layer</div>
+    </div>
+
+    <h3>Deployment Models</h3>
+    <p>Commvault supports all major deployment patterns, making it one of the most versatile enterprise backup platforms in the market.</p>
+    <div class="card-grid">
+      <div class="card">
+        <h4>🏢 On-Premise</h4>
+        <p>All infrastructure resides in the customer's own data center. CommServe, Media Agents, and clients are physical or virtual servers within the corporate network.</p>
+      </div>
+      <div class="card">
+        <h4>☁️ Cloud-Only</h4>
+        <p>All components are hosted on a cloud provider (Azure, AWS, GCP). The architecture and operations remain identical — only the underlying infrastructure changes.</p>
+      </div>
+      <div class="card">
+        <h4>🔀 Hybrid</h4>
+        <p>Some workloads run on-premise, others in the cloud. Commvault supports unified management of both from a single CommServe.</p>
+      </div>
+      <div class="card">
+        <h4>🤖 Agentless Backup</h4>
+        <p>Used for VMware and Hyper-V environments. No agent is installed inside the virtual machine; instead a <strong>Virtual Server Agent (VSA)</strong> on a proxy server handles data capture.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-note">
+      <div class="callout-header">📝 Trainer Note — Agent vs. Agentless</div>
+      <p>For VMware, the VSA proxy can be a dedicated VM or physical server that has network connectivity to the ESXi hosts. For Hyper-V, the VSA is installed directly on the Hyper-V node. In both cases, <strong>no agent is installed inside the guest VM</strong>.</p>
+    </div>
+
+    <h3>Backup Types Reference</h3>
+    <ul class="list">
+      <li><strong>File System Backup</strong> — protects files, folders, and directory trees on Windows or Linux servers</li>
+      <li><strong>Database Backup</strong> — application-aware protection for Oracle, SQL Server, MySQL, PostgreSQL, etc.</li>
+      <li><strong>Virtual Server Backup</strong> — agentless protection for VMware vSphere and Microsoft Hyper-V environments</li>
+      <li><strong>Cloud Workload Backup</strong> — native integration with Azure, AWS, and GCP services</li>
+    </ul>
+
+    <div class="summary-box">
+      <h4>Section Summary</h4>
+      <ul class="list">
+        <li><strong>CommServe</strong> = management brain (Tier 1), always Windows in most environments</li>
+        <li><strong>Media Agent</strong> = data mover (Tier 2), Windows or Linux</li>
+        <li><strong>Client / Agent</strong> = the protected machine (Tier 3), agent-based or agentless</li>
+        <li>Commvault supports on-prem, cloud, and hybrid deployments with identical operational procedures</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 2: ENVIRONMENT SETUP -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="environment">
+    <div class="section-header">
+      <div class="section-icon icon-blue">🖥️</div>
+      <div>
+        <div class="section-num">Section 02</div>
+        <h2>Lab Environment Setup</h2>
+        <p>Provisioning infrastructure on Azure Cloud and VMware Workstation</p>
+      </div>
+    </div>
+
+    <p>Before deploying Commvault software, infrastructure must be provisioned. This section covers two approaches: building a lab environment in <strong>Microsoft Azure</strong> and building a fully local lab with <strong>VMware Workstation Pro</strong>. The Commvault installation process is identical on both.</p>
+
+    <h3>Option A — Microsoft Azure Cloud Lab</h3>
+    <p>Azure provides a free trial subscription with <strong>$200 USD of credits</strong> valid for 30 days — sufficient to deploy and practice with a complete Commvault environment at no immediate cost.</p>
+
+    <h4>Virtual Machine Sizing Guide</h4>
+    <div class="card-grid-3">
+      <div class="card">
+        <h4>CommServe VM</h4>
+        <ul class="list">
+          <li><strong>OS:</strong> Windows Server 2022</li>
+          <li><strong>vCPU:</strong> 4 cores</li>
+          <li><strong>RAM:</strong> 16 GB minimum</li>
+          <li><strong>Disk:</strong> 127 GB (OS) + dedicated data disk recommended</li>
+          <li><strong>Port:</strong> RDP 3389 open</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Media Agent VM</h4>
+        <ul class="list">
+          <li><strong>OS:</strong> Windows or Linux</li>
+          <li><strong>vCPU:</strong> 2 cores</li>
+          <li><strong>RAM:</strong> 8 GB</li>
+          <li><strong>Disk:</strong> 127 GB</li>
+          <li><strong>Port:</strong> RDP 3389 or SSH 22</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Client VMs (x2)</h4>
+        <ul class="list">
+          <li><strong>Windows Client:</strong> 2 vCPU / 4 GB / W2019</li>
+          <li><strong>Linux Client:</strong> 2 vCPU / 8 GB / Ubuntu 22</li>
+          <li><strong>Disk:</strong> 64 GB</li>
+          <li><strong>Ports:</strong> RDP 3389 / SSH 22</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>Azure VM Deployment Checklist</h4>
+    <ol class="step-list">
+      <li>
+        <strong>Create Resource Group</strong>
+        <p>Group all lab VMs under a single resource group (e.g., <code>commvault-lab-rg</code>) for easy management and cleanup.</p>
+      </li>
+      <li>
+        <strong>Deploy VMs in the Same VNet & Subnet</strong>
+        <p>All VMs must share the same Virtual Network and subnet so they can communicate using private IP addresses.</p>
+      </li>
+      <li>
+        <strong>Set Static Private IP Addresses</strong>
+        <p>Navigate to: VM → Networking → Network Interface → IP Configuration → Change to <strong>Static</strong>. This prevents IP changes on reboot — critical for Commvault hostname/IP resolution.</p>
+      </li>
+      <li>
+        <strong>Disable Windows Firewall (Lab Only)</strong>
+        <p>For lab simplicity, disable the Windows Defender Firewall on all VMs. In production, configure specific firewall rules instead.</p>
+      </li>
+      <li>
+        <strong>Verify Connectivity</strong>
+        <p>From each VM, ping the private IPs of all other VMs. Successful ping replies confirm network connectivity is working.</p>
+      </li>
+    </ol>
+
+    <div class="callout callout-warn">
+      <div class="callout-header">⚠️ Azure Cost Warning</div>
+      <p>Azure bills per hour of runtime. <strong>Always stop VMs when not in use.</strong> A CommServe VM (4 vCPU, 16 GB) costs approximately ₹40/hour. Leaving all VMs running overnight can consume a significant portion of your trial credits.</p>
+    </div>
+
+    <div class="callout callout-note">
+      <div class="callout-header">📌 Private vs. Public IP in Azure</div>
+      <p>When connecting from your laptop, use the <strong>public IP</strong> via RDP/SSH. Inside the Azure environment, all VM-to-VM communication uses <strong>private IPs</strong> only. The public IP is not visible from within the VM (use <code>ipconfig</code> to see only the private IP).</p>
+    </div>
+
+    <h3>Option B — VMware Workstation Pro (Home Lab)</h3>
+    <p>VMware Workstation Pro is <strong>free for personal use</strong> and available at <a href="https://support.broadcom.com" style="color:var(--accent2)">access.broadcom.com</a> after free registration. Minimum requirement: <strong>16 GB RAM</strong> on the host machine.</p>
+
+    <h4>Key Configuration Steps</h4>
+    <ul class="list">
+      <li>Select <strong>Bridge Network</strong> mode — this allows VMs to communicate with each other and with your host machine using real IPs on your LAN</li>
+      <li>Install <strong>VMware Tools</strong> inside each Windows VM immediately after OS installation — enables file copy between host and VM</li>
+      <li>Assign <strong>static IPs</strong> via Network Settings → IPv4 → Manual; use IPs in the same subnet as your home router (e.g., 192.168.0.200, .201, .202)</li>
+      <li>Enable <strong>ICMP (ping) inbound firewall rule</strong> or disable firewall entirely for lab use</li>
+      <li>Mount the Windows Server ISO via VM Settings → CD/DVD to install the operating system</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Windows — Verify Connectivity</span>
+        <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+      </div>
+      <pre><span class="cmd">ipconfig</span>                         <span class="cmt"># Show IP address of current machine</span>
+<span class="cmd">ping</span> <span class="val">192.168.0.200</span>               <span class="cmt"># Test connectivity to CommServe VM</span>
+<span class="cmd">ping</span> <span class="val">192.168.0.201</span>               <span class="cmt"># Test connectivity to Media Agent VM</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Linux (Ubuntu) — Essential Commands</span>
+        <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+      </div>
+      <pre><span class="cmd">sudo su -</span>                        <span class="cmt"># Elevate to root shell</span>
+<span class="cmd">ip a</span>                             <span class="cmt"># Display network interfaces and IP addresses</span>
+<span class="cmd">hostname</span>                         <span class="cmt"># Display the machine's hostname</span>
+<span class="cmd">ping</span> <span class="val">10.0.0.4</span>                   <span class="cmt"># Test network connectivity to CommServe</span>
+<span class="cmd">whoami</span>                           <span class="cmt"># Display current user</span></pre>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 3: PACKAGE MANAGEMENT -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="packages">
+    <div class="section-header">
+      <div class="section-icon icon-green">📦</div>
+      <div>
+        <div class="section-num">Section 03</div>
+        <h2>Package Download & Versioning</h2>
+        <p>Obtaining Commvault software and understanding release strategy</p>
+      </div>
+    </div>
+
+    <p>Commvault software is downloaded from the official portal. Understanding versioning strategy is essential because most enterprise customers intentionally remain one release behind the latest version.</p>
+
+    <h3>Version Strategy</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4>🎯 N-1 Principle</h4>
+        <p>Most production environments run the version <em>one behind</em> the latest release. If <span class="ver-badge">11.36</span> is current, production runs <span class="ver-badge">11.34</span>. This avoids exposure to bugs in newly released versions.</p>
+      </div>
+      <div class="card">
+        <h4>📅 LTS — Long-Term Support</h4>
+        <p>Version <span class="ver-badge ver-lts">11.32</span> is the current <strong>Long-Term Support</strong> release. Commvault guarantees approximately 5 years of patches and support. This is the most common version in enterprise environments.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-header">💡 Release Cadence</div>
+      <p>Commvault releases new feature versions <strong>twice per year</strong> (bi-annually). They also publish hotfixes and service packs for supported versions on a more frequent basis. Always check the Commvault documentation for the support lifecycle of any version you are deploying.</p>
+    </div>
+
+    <h3>Download Methods</h3>
+    <p>There are two methods to obtain Commvault packages. Access requires a Commvault Support Account (provided by your employer or Commvault representative).</p>
+
+    <h4>Method 1 — Full Media Kit</h4>
+    <ol class="step-list">
+      <li><strong>Navigate to the portal</strong><p>Go to <code>store.commvault.com</code> (redirects to <code>cloud.commvault.com</code>). Log in with Commvault credentials.</p></li>
+      <li><strong>Select version and platform</strong><p>Media Kit → Version 11.32 → Search "Full". Choose the correct variant: <strong>Windows x64</strong> (for CommServe/Windows MA), <strong>Unix/Linux x64</strong> (for Linux clients/MA).</p></li>
+      <li><strong>Download the package (~10–15 GB)</strong><p>The full package contains all possible agent types and installers bundled together.</p></li>
+    </ol>
+
+    <h4>Method 2 — Download Manager (Selective)</h4>
+    <ol class="step-list">
+      <li><strong>Download the Download Manager executable</strong><p>A small ~30 MB launcher from <code>cloud.commvault.com</code>.</p></li>
+      <li><strong>Run Download Manager and select packages</strong><p>Choose only the packages needed (e.g., Linux x64 File System only), reducing download size significantly.</p></li>
+      <li><strong>Specify download location</strong><p>The manager downloads the selected packages as a <code>.tar</code> archive (Linux) or folder structure (Windows).</p></li>
+    </ol>
+
+    <div class="callout callout-note">
+      <div class="callout-header">📌 Package File Naming</div>
+      <p><strong>winx64</strong> = Windows 64-bit package &nbsp;|&nbsp; <strong>dm.tar</strong> = Linux/Unix package &nbsp;|&nbsp; Always choose <strong>x64</strong> (64-bit) unless specifically targeting 32-bit legacy systems.</p>
+    </div>
+
+    <h3>Software Cache</h3>
+    <p>The <strong>software cache</strong> is a repository on the CommServe that stores all downloaded Commvault packages. When performing remote (push) installations, packages are pushed from this cache to target machines — eliminating the need to manually copy installers to each server.</p>
+
+    <h4>Building the Cache</h4>
+    <div class="flow">
+      <div class="flow-step"><div class="step-num">Step 1</div><div class="step-text">Download full package to workstation</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 2</div><div class="step-text">Copy extracted folder to CommServe Desktop</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 3</div><div class="step-text">Run Copy Software job from Console</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 4</div><div class="step-text">Verify cache via Tools → Add/Remove → Cache Details</div></div>
+    </div>
+
+    <p>Alternatively, if the CommServe has internet access, use <strong>Tools → Add/Remove Software → Download and Sync Cache</strong> to download directly from Commvault's cloud CDN.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Console Console — Cache Location</span>
+        <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+      </div>
+      <pre><span class="cmt"># Default Software Cache location on CommServe</span>
+<span class="path">C:\Commvault\ContentStore\SoftwareCache\</span>
+
+<span class="cmt"># Verify via Console Console:</span>
+<span class="val">Tools</span> → <span class="val">Add or Remove Software</span> → <span class="val">Software Cache Configuration</span> → <span class="val">Cache Details</span></pre>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 4: COMMSERVE INSTALLATION -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="commserve">
+    <div class="section-header">
+      <div class="section-icon icon-orange">⚙️</div>
+      <div>
+        <div class="section-num">Section 04</div>
+        <h2>CommServe Installation & Configuration</h2>
+        <p>Installing the Commvault management server from scratch</p>
+      </div>
+    </div>
+
+    <p>The CommServe package is installed using the <strong>setup.exe</strong> wizard included in the full media kit. As part of this installation, SQL Server is automatically installed and configured — you do not need to pre-install it.</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-header">⚠️ Drive Selection — Critical</div>
+      <p>In Azure VMs, the <strong>D: drive is temporary storage</strong> — all data is wiped on reboot. Always use the <strong>C: drive</strong> (or provision a dedicated data disk) for CommServe database and installation paths. In VMware home labs, adding a dedicated virtual disk (e.g., E:) and using it for data directories is strongly recommended by Commvault.</p>
+    </div>
+
+    <h3>Installation Wizard Walkthrough</h3>
+    <ol class="step-list">
+      <li>
+        <strong>Extract the package and launch Setup</strong>
+        <p>Right-click <code>setup.exe</code> → <em>Run as Administrator</em>. Select language and accept the license agreement.</p>
+      </li>
+      <li>
+        <strong>Select "Install package on this computer" and create a new CommCell</strong>
+        <p>Choose <em>Create a new CommCell</em>. Select <em>All In One</em> or specific roles as needed.</p>
+      </li>
+      <li>
+        <strong>Installation Path</strong>
+        <p>Use a drive that is NOT the OS drive where possible. In Azure lab, use C: (only available drive). In VMware lab, add a dedicated virtual disk first.</p>
+      </li>
+      <li>
+        <strong>Data Directory Path</strong>
+        <p>Set to a dedicated non-OS drive (E: or D: if not Azure). This is where backup job results and working data are stored.</p>
+      </li>
+      <li>
+        <strong>SQL Server Installation Path</strong>
+        <p>Default: <code>C:\Program Files\Microsoft SQL Server\</code>. Accept default or redirect to data drive.</p>
+      </li>
+      <li>
+        <strong>CommServe Database Path</strong>
+        <p>Ideally on a dedicated drive, separate from the OS and SQL Server binaries.</p>
+      </li>
+      <li>
+        <strong>Disaster Recovery (DR) Backup Path</strong>
+        <p>Location where DR metadata files are stored. Use a local path for lab; use a network path in production for true disaster recovery.</p>
+      </li>
+      <li>
+        <strong>Set Client Hostname</strong>
+        <p>When prompted, enter the <strong>private IP address</strong> of the CommServe VM as the hostname (e.g., <code>10.0.0.4</code>). This is required when DNS is not configured to resolve hostnames.</p>
+      </li>
+      <li>
+        <strong>Set Admin Credentials</strong>
+        <p>Create the primary admin account (username: <code>admin</code>). Record this password — it is used to log into the Command Center and Console.</p>
+      </li>
+    </ol>
+
+    <h4>Third-Party Software Installed Automatically</h4>
+    <ul class="list">
+      <li><strong>Microsoft SQL Server</strong> — hosts the CommServe database (CommServe DB)</li>
+      <li><strong>IIS (Internet Information Services)</strong> — serves the Command Center web interface</li>
+      <li><strong>Microsoft .NET Framework</strong> — required by CommServe services</li>
+      <li><strong>VC++ Redistributable</strong> — C++ runtime libraries</li>
+    </ul>
+
+    <h3>Post-Installation Verification</h3>
+    <p>After installation, verify the environment is healthy before proceeding to Media Agent configuration.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Commvault Process Manager — Services to Verify</span>
+        <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+      </div>
+      <pre><span class="cmt"># Open via: Start → Commvault → Commvault Process Manager</span>
+<span class="cmt"># Services tab — all should show GREEN status:</span>
+
+<span class="val">Base Services</span>       <span class="cmt">→ Core CommServe functionality</span>
+<span class="val">CommServe Services</span>  <span class="cmt">→ Job Manager, Event Manager, CommServe DB</span>
+<span class="val">Media Agent Service</span> <span class="cmt">→ If MA package installed on same box</span>
+<span class="val">Messaging Queue</span>     <span class="cmt">→ Internal message bus</span>
+<span class="val">Web Console</span>         <span class="cmt">→ Command Center web service (IIS)</span>
+<span class="val">Workflow Service</span>    <span class="cmt">→ Automation engine</span></pre>
+    </div>
+
+    <h4>Stopping and Starting Services Safely</h4>
+    <div class="callout callout-warn">
+      <div class="callout-header">⚠️ Important — Graceful Service Management</div>
+      <p>Always use <strong>Commvault Process Manager → Select All Services → Stop</strong> before rebooting or patching the CommServe. Do NOT forcefully kill services with Task Manager. After the server comes back up, use <strong>Start All Services</strong> to bring them online in the correct dependency order.</p>
+    </div>
+
+    <h3>Accessing the CommServe After Installation</h3>
+    <ul class="list">
+      <li><strong>Java Console (CommCell Console)</strong> — installed locally, launch from Start → Commvault → CommCell Console</li>
+      <li><strong>Command Center (Web UI)</strong> — open browser to <code>https://&lt;CommServe-IP&gt;/commandcenter</code></li>
+    </ul>
+
+    <div class="callout callout-note">
+      <div class="callout-header">📌 Trial License</div>
+      <p>A freshly installed CommServe operates in <strong>trial mode for 60 days</strong>. All features are functional during this period. After 60 days, a valid license file must be applied to continue operations. Production environments require a license file provided by the Commvault sales team.</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 5: MEDIA AGENT -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="mediagent">
+    <div class="section-header">
+      <div class="section-icon icon-blue">🚀</div>
+      <div>
+        <div class="section-num">Section 05</div>
+        <h2>Media Agent Deployment</h2>
+        <p>Installing and verifying the Commvault data mover component</p>
+      </div>
+    </div>
+
+    <p>The Media Agent is responsible for <strong>all data movement</strong> in the Commvault environment — it receives backup streams from clients and writes them to storage. It can also read from storage during restore operations. Large environments may have multiple Media Agents for load distribution or geographic placement.</p>
+
+    <h3>Push Install (Remote Installation)</h3>
+    <p>The recommended and most common method. You install the Media Agent package directly from the CommCell Console — the CommServe uses the Software Cache to push packages over the network to the target server.</p>
+
+    <div class="flow">
+      <div class="flow-step"><div class="step-num">Step 1</div><div class="step-text">Verify Windows x64 package in Software Cache</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 2</div><div class="step-text">Tools → Add/Remove Software → Install Software</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 3</div><div class="step-text">Enter MA IP, credentials, select MediaAgent package</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 4</div><div class="step-text">Monitor job in Job Controller until success</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 5</div><div class="step-text">Verify MA appears in Storage Resources</div></div>
+    </div>
+
+    <div class="callout callout-note">
+      <div class="callout-header">📌 Credential Format for Windows</div>
+      <p>When entering credentials for push install on a Windows machine, use the format: <code>.\username</code> (dot-backslash prefix). For example: <code>.\cvadmin</code>. The dot represents "local machine" scope when no Active Directory domain is present. For domain-joined machines, use: <code>DOMAIN\username</code>.</p>
+    </div>
+
+    <h3>Verifying Media Agent Installation</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">CommCell Console — Verification</span>
+        <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+      </div>
+      <pre><span class="cmt"># Verify in CommCell Console:</span>
+<span class="val">Console Browser</span> → <span class="val">Storage Resources</span> → <span class="val">Media Agents</span>
+<span class="cmt"># New MA should appear with status: Ready</span>
+
+<span class="cmt"># Check installed packages on MA:</span>
+<span class="cmt"># Right-click MA → View Installed Software
+# Expected: MediaAgent, Windows File System (auto-added as dependency)</span></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-header">💡 Automatic Dependency Packages</div>
+      <p>When selecting only the <strong>MediaAgent</strong> package in the install wizard, Commvault automatically selects dependent packages (such as VSS Provider). This is expected behavior — do not deselect these auto-selected dependencies.</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 6: STORAGE LIBRARIES & POLICIES -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="storage">
+    <div class="section-header">
+      <div class="section-icon icon-yellow">💾</div>
+      <div>
+        <div class="section-num">Section 06</div>
+        <h2>Storage Libraries &amp; Storage Policies</h2>
+        <p>Defining where backup data lives and how long it's retained</p>
+      </div>
+    </div>
+
+    <h3>Disk Library</h3>
+    <p>A <strong>disk library</strong> is the logical representation of a storage destination in Commvault. It is backed by physical disk space on the Media Agent server (or a network share). The library is made up of one or more <strong>mount paths</strong> — folder locations where backup data is actually written.</p>
+
+    <h4>Storage Types in Commvault</h4>
+    <div class="card-grid-3">
+      <div class="card">
+        <h4>💽 Disk Library</h4>
+        <p>Most common. Backup data written to local or NAS disk attached to the Media Agent. Fast, easy to configure.</p>
+      </div>
+      <div class="card">
+        <h4>📼 Tape Library</h4>
+        <p>Physical tape drives/autoloaders. Preferred by highly secure environments (government, compliance-heavy sectors). Slow access but low cost for large archives.</p>
+      </div>
+      <div class="card">
+        <h4>☁️ Cloud Library</h4>
+        <p>Direct-to-cloud backup (Azure Blob, AWS S3, GCP Storage). Elastic capacity, no hardware to manage.</p>
+      </div>
+    </div>
+
+    <h4>Creating a Disk Library</h4>
+    <ol class="step-list">
+      <li><strong>Console Browser → Storage Resources → Libraries → Right-click → Add → Disk Library</strong><p>Assign a friendly name (e.g., <code>DiskLib_MA01</code>).</p></li>
+      <li><strong>Select the Media Agent</strong><p>Choose the MA server that will host this library.</p></li>
+      <li><strong>Add Mount Path</strong><p>Provide a folder path on the MA server (non-temporary drive). Example: <code>C:\CVMountPath1\</code>. Avoid D: on Azure VMs (temporary).</p></li>
+      <li><strong>Validate Mount Path</strong><p>Right-click mount path → Check Status (verifies online/offline) → Check Throughput (measures actual write speed). Values above 100 MB/s are excellent.</p></li>
+    </ol>
+
+    <div class="callout callout-tip">
+      <div class="callout-header">💡 Mount Path Best Practice</div>
+      <p>Add multiple mount paths from <strong>different drives</strong> when available (e.g., E: and F:). This distributes I/O load across spindles, improving throughput and providing redundancy. In a lab with only one drive, multiple mount paths on the same drive are acceptable.</p>
+    </div>
+
+    <h3>Storage Policies</h3>
+    <p>A <strong>storage policy</strong> is a logical construct that defines three key parameters for backup data:</p>
+
+    <div class="card-grid-3">
+      <div class="card">
+        <h4>📌 What to back up</h4>
+        <p>Associates with sub-clients/backup sets that define the source data (files, databases, VMs).</p>
+      </div>
+      <div class="card">
+        <h4>📌 Where to store it</h4>
+        <p>Points to a specific disk, tape, or cloud library via a storage pool.</p>
+      </div>
+      <div class="card">
+        <h4>📌 How long to keep it</h4>
+        <p>Retention rules — e.g., 30 days or 1 month. After expiry, data is automatically removed from storage.</p>
+      </div>
+    </div>
+
+    <h3>Deduplication vs. Non-Deduplication</h3>
+    <p>Deduplication is a data reduction technique that eliminates redundant blocks before writing to storage. It operates at the block level, comparing content hashes rather than filenames.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>🔴 Non-Dedup Policy</h4>
+        <p>Every backup job is written in full, regardless of content similarity. Two identical 124 MB files are stored as <strong>248 MB</strong> of backup data. Simpler, lower CPU overhead, faster restores.</p>
+      </div>
+      <div class="card">
+        <h4>🟢 Dedup Policy</h4>
+        <p>Unique blocks are written once; duplicate blocks are referenced via pointers in the Deduplication Database (DDB). Two identical 124 MB files are stored as <strong>~124 MB</strong>. Significant storage savings for environments with repetitive data.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-note">
+      <div class="callout-header">📝 Deduplication Database (DDB) Partition</div>
+      <p>The DDB must be hosted on a <strong>fast, dedicated disk partition</strong> on the Media Agent. A separate SSD or dedicated volume is strongly recommended in production. Never place the DDB on a temporary drive (Azure D: drive).</p>
+    </div>
+
+    <div class="summary-box">
+      <h4>Storage Policy Summary</h4>
+      <ul class="list">
+        <li><strong>Disk Library</strong> = physical storage location managed by a Media Agent</li>
+        <li><strong>Mount Path</strong> = actual folder on disk where backup data is written</li>
+        <li><strong>Storage Pool</strong> = groups one or more libraries; can be dedup or non-dedup</li>
+        <li><strong>Storage Policy</strong> = defines what, where, and how long; links clients to storage pools</li>
+        <li><strong>Retention</strong> = configured in days (e.g., 7, 30 days); after expiry, data is pruned</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 7: AGENT INSTALLATION -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="agents">
+    <div class="section-header">
+      <div class="section-icon icon-purple">🔌</div>
+      <div>
+        <div class="section-num">Section 07</div>
+        <h2>Agent Installation Methods</h2>
+        <p>Push install and interactive install for Windows and Linux clients</p>
+      </div>
+    </div>
+
+    <p>Commvault agents (iDataAgents) can be installed using two primary methods. Understanding both is important because the appropriate method depends on network access, firewall configuration, and client operating system.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>🔄 Push Install (Remote)</h4>
+        <p>Initiated from the CommCell Console or Command Center. CommServe pushes the package from its Software Cache to the target machine over the network. Requires open firewall ports and valid credentials. Fastest for bulk deployments.</p>
+      </div>
+      <div class="card">
+        <h4>💻 Local/Interactive Install</h4>
+        <p>Package is manually copied to the target machine and the setup wizard is run locally. Used when firewall ports are closed between CommServe and client, or for isolated environments. Also called "interactive install" or "manual install."</p>
+      </div>
+    </div>
+
+    <h3>Push Install — Linux File System Agent</h3>
+    <ol class="step-list">
+      <li><strong>Verify Linux package in Software Cache</strong><p>Console Console → Tools → Add/Remove → Cache Details → confirm Unix/Linux x64 is present.</p></li>
+      <li><strong>Command Center → Manage → Servers → Add Server</strong><p>Enter private IP of the Linux client, select OS type as <em>Unix/Linux</em>.</p></li>
+      <li><strong>Enter Linux credentials</strong><p>Username (e.g., <code>cvadmin</code>) and password. For Linux, <strong>no dot-slash prefix</strong> is needed — just the plain username. Ensure the user has sudo/root-level access.</p></li>
+      <li><strong>Select package: File System</strong><p>Commvault will also auto-select dependent packages.</p></li>
+      <li><strong>Click Install and monitor the job</strong><p>Navigate to Jobs → Active Jobs to watch progress. Installation typically takes 10–15 minutes.</p></li>
+    </ol>
+
+    <h3>Push Install — Windows File System Agent (Command Center)</h3>
+    <ol class="step-list">
+      <li><strong>Command Center → Manage → Servers → Add Server</strong><p>Enter private IP of the Windows client, select OS type as <em>Windows</em>.</p></li>
+      <li><strong>Provide Windows admin credentials</strong><p>Format: <code>.\administrator</code> (local account) or <code>DOMAIN\username</code> (domain). Enter the Windows VM's admin password.</p></li>
+      <li><strong>Select package: File System</strong><p>Click Install and monitor the resulting installation job.</p></li>
+    </ol>
+
+    <h3>Local / Interactive Install — Windows (Console Wizard)</h3>
+    <ol class="step-list">
+      <li><strong>Copy the full media kit zip to the client machine</strong><p>Use RDP file copy (drag-and-drop) or WinSCP. Extract the zip before running setup.</p></li>
+      <li><strong>Run <code>setup.exe</code> as Administrator</strong><p>Wizard starts — select <em>Install package on this computer</em> → <em>Advanced Selection</em> → select only <em>File System</em>.</p></li>
+      <li><strong>Enter client hostname (use IP)</strong><p>Set the hostname field to the client's private IP address (e.g., <code>10.0.0.7</code>).</p></li>
+      <li><strong>Enter CommServe IP address</strong><p>The wizard asks which CommServe to register with. Enter the CommServe private IP (e.g., <code>10.0.0.4</code>).</p></li>
+      <li><strong>Authenticate with CommServe console credentials</strong><p>⚠️ These are the CommCell Console login credentials (e.g., <code>admin</code> + password), <strong>NOT</strong> the Windows server credentials.</p></li>
+      <li><strong>Complete the wizard and verify registration</strong><p>Go back to CommCell Console → Client Computers → View → Refresh. The new client should appear.</p></li>
+    </ol>
+
+    <h3>Local Install — Linux (WinSCP + Interactive)</h3>
+    <ol class="step-list">
+      <li><strong>Download the Linux base package</strong><p>From <code>cloud.commvault.com</code> — download the Unix/Linux variant.</p></li>
+      <li><strong>Transfer to Linux client using WinSCP</strong><p>WinSCP is a free SFTP client for Windows. Connect using the Linux client's public IP (or private IP if on same network), username, and password. Transfer the package to <code>/tmp/</code>.</p></li>
+      <li><strong>Connect to Linux via PuTTY and extract</strong><p>Open PuTTY, enter the Linux public IP, and log in. Use <code>sudo su -</code> to become root. Navigate to <code>/tmp</code> and extract the package.</p></li>
+      <li><strong>Run the Commvault installer script</strong><p>Follow the interactive prompts to install the File System agent and register with the CommServe.</p></li>
+    </ol>
+
+    <div class="callout callout-tip">
+      <div class="callout-header">💡 WinSCP vs PuTTY</div>
+      <p><strong>WinSCP</strong> = GUI SFTP client used to <em>transfer files</em> between Windows and Linux. <strong>PuTTY</strong> = SSH terminal client used to <em>execute commands</em> on a Linux server. Both are free to download. Use WinSCP first to upload the package, then PuTTY to install it.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Linux — Package Extract &amp; Verify</span>
+        <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+      </div>
+      <pre><span class="cmd">cd</span> <span class="path">/tmp</span>
+<span class="cmd">ls</span> <span class="flag">-la</span>                             <span class="cmt"># Verify the package is present</span>
+<span class="cmd">unzip</span> <span class="val">cv_package_linux.zip</span>        <span class="cmt"># Extract the package</span>
+<span class="cmt"># If unzip is not installed:</span>
+<span class="cmd">apt-get install</span> <span class="flag">-y</span> <span class="val">unzip</span>          <span class="cmt"># Ubuntu/Debian</span>
+<span class="cmd">yum install</span> <span class="flag">-y</span> <span class="val">unzip</span>              <span class="cmt"># RHEL/CentOS</span>
+
+<span class="cmt"># Verify installed agent after push install:</span>
+<span class="cmd">ps aux | grep</span> <span class="val">cv</span>                   <span class="cmt"># Commvault processes should appear</span></pre>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 8: CONSOLES -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="consoles">
+    <div class="section-header">
+      <div class="section-icon icon-green">🖥️</div>
+      <div>
+        <div class="section-num">Section 08</div>
+        <h2>Commvault Consoles</h2>
+        <p>Working with CommCell Console (Java) and Command Center (Web)</p>
+      </div>
+    </div>
+
+    <p>Commvault provides two administrative interfaces. Understanding when to use each is important because their availability depends on the deployed version.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>☕ CommCell Console (Java)</h4>
+        <p>The legacy desktop Java application. Present in all deployments running v11.32 and older. Provides deep access to all configuration options. Being phased out for new deployments in v11.34+.</p>
+        <div style="margin-top:12px;font-size:12px;color:var(--text-dim)">Launch: Start → Commvault → CommCell Console</div>
+      </div>
+      <div class="card">
+        <h4>🌐 Command Center (Web)</h4>
+        <p>The modern web-based interface. <strong>The only option for new deployments on v11.34+</strong>. Browser-based, no Java required. Uses simplified terminology (Servers vs. Client Computers, Plans vs. Storage Policies).</p>
+        <div style="margin-top:12px;font-family:'Courier New',Courier,monospace;font-size:12px;color:var(--accent2)">https://&lt;CommServe-IP&gt;/commandcenter</div>
+      </div>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-header">⚠️ Console Availability by Version</div>
+      <p>Commvault has <strong>deprecated CommCell Console for new deployments</strong> on v11.34 and later. If deploying a fresh environment, only Command Center is available. Existing environments upgrading from v11.32 → v11.36 retain CommCell Console access. As a backup admin, you must know both interfaces.</p>
+    </div>
+
+    <h3>CommCell Console — Key Navigation Areas</h3>
+    <ul class="list">
+      <li><strong>Console Browser</strong> — left panel; hierarchical tree of all environment objects (clients, storage, policies, security)</li>
+      <li><strong>Work Area</strong> — main right panel; context-sensitive windows open here (Job Controller, Library details, etc.)</li>
+      <li><strong>Menu Bar</strong> — Tools menu for software installation, cache management, and system operations</li>
+      <li><strong>Status Bar</strong> — bottom; shows currently logged-in user, version, running/pending/waiting job counts</li>
+      <li><strong>Job Controller</strong> — Home → Job Controller; real-time view of all active and queued jobs</li>
+    </ul>
+
+    <h3>Command Center — Key Navigation Areas</h3>
+    <ul class="list">
+      <li><strong>Dashboard</strong> — environment health overview; jobs in last 24h, SLA status, storage utilization</li>
+      <li><strong>Protect</strong> — configure new backups; file servers, VMs, databases, cloud workloads</li>
+      <li><strong>Jobs</strong> — active jobs and full job history with filtering</li>
+      <li><strong>Storage</strong> — configure and manage disk, tape, and cloud libraries</li>
+      <li><strong>Manage → Servers</strong> — equivalent to "Client Computers" in CommCell Console</li>
+      <li><strong>Manage → Plans</strong> — equivalent to "Storage Policies" in CommCell Console</li>
+      <li><strong>Reports</strong> — generate operational and compliance reports</li>
+    </ul>
+
+    <h4>Terminology Mapping</h4>
+    <div class="port-grid">
+      <div class="port-row header">
+        <span class="port-col-1">CommCell Console</span>
+        <span class="port-col-3">Command Center</span>
+        <span class="port-col-4">Notes</span>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1" style="color:var(--text)">Client Computers</div>
+        <div class="port-col-3">Servers</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Renamed</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1" style="color:var(--text)">Client Computer Group</div>
+        <div class="port-col-3">Server Group</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Renamed</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1" style="color:var(--text)">Storage Policy</div>
+        <div class="port-col-3">Plan</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Renamed</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1" style="color:var(--text)">Schedule Policy</div>
+        <div class="port-col-3">Plan (Schedule tab)</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Merged</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1" style="color:var(--text)">iDataAgent (iDA)</div>
+        <div class="port-col-3">Agent / Package</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Renamed</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 9: DAY-TO-DAY OPERATIONS -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="daytoday">
+    <div class="section-header">
+      <div class="section-icon icon-red">📋</div>
+      <div>
+        <div class="section-num">Section 09</div>
+        <h2>Day-to-Day Backup Admin Operations</h2>
+        <p>Roles, responsibilities, and daily workflow for a Commvault administrator</p>
+      </div>
+    </div>
+
+    <p>Understanding daily operational responsibilities is essential for both job interviews and for planning your learning path. The backup admin's scope spans incident response, configuration management, user administration, and capacity planning.</p>
+
+    <h3>Daily Workflow</h3>
+    <ul class="role-list">
+      <li class="role-item">
+        <span class="role-icon">📧</span>
+        <div>
+          <div class="role-title">Email Triage &amp; Communication</div>
+          <div class="role-desc">Review incoming requests and alerts from customers, application owners (DBA teams, Windows admins, Linux admins, cloud teams), and internal backup team. Respond to SLA inquiries, backup failure notices, and configuration requests.</div>
+        </div>
+      </li>
+      <li class="role-item">
+        <span class="role-icon">🔴</span>
+        <div>
+          <div class="role-title">Incident Management</div>
+          <div class="role-desc">Immediate response to broken functionality: failed backup jobs, restore failures, CommServe downtime, Media Agent offline, performance degradation. Incidents require rapid investigation and resolution.</div>
+        </div>
+      </li>
+      <li class="role-item">
+        <span class="role-icon">📝</span>
+        <div>
+          <div class="role-title">Service Request (SR) Fulfillment</div>
+          <div class="role-desc">Planned configuration work requested by customers or other teams: configure new backup jobs (file system, DB, VM), report on retention status, add storage, create user accounts, adjust backup schedules.</div>
+        </div>
+      </li>
+      <li class="role-item">
+        <span class="role-icon">🔧</span>
+        <div>
+          <div class="role-title">Change Request (CR) Implementation</div>
+          <div class="role-desc">Scheduled maintenance: Commvault patching/upgrades (monthly or bi-annual), infrastructure changes. Requires documented action plan, rollback plan, and scheduled downtime window (typically weekends).</div>
+        </div>
+      </li>
+      <li class="role-item">
+        <span class="role-icon">👥</span>
+        <div>
+          <div class="role-title">Daily Team Review Meeting</div>
+          <div class="role-desc">Internal standup with backup team lead and manager. Discuss open incidents, pending SRs, upcoming changes, action items, and any immediate-attention issues.</div>
+        </div>
+      </li>
+      <li class="role-item">
+        <span class="role-icon">🛡️</span>
+        <div>
+          <div class="role-title">Security &amp; Compliance Administration</div>
+          <div class="role-desc">Ensure encryption is enabled for backup data, ransomware protection features (WORM, immutability) are configured, and audit requirements are met. Internal and external audits will verify these configurations.</div>
+        </div>
+      </li>
+      <li class="role-item">
+        <span class="role-icon">👤</span>
+        <div>
+          <div class="role-title">User Administration</div>
+          <div class="role-desc">Create and manage user accounts in the CommCell Console/Command Center. Apply role-based access control (RBAC) — new users (especially junior staff) should have restricted roles, not admin-level access.</div>
+        </div>
+      </li>
+      <li class="role-item">
+        <span class="role-icon">💾</span>
+        <div>
+          <div class="role-title">Library &amp; Storage Management</div>
+          <div class="role-desc">Monitor disk utilization in libraries, add mount paths when capacity is low, manage tape media rotation (if applicable), and manage cloud storage bucket settings.</div>
+        </div>
+      </li>
+    </ul>
+
+    <h3>Ticketing System Integration</h3>
+    <p>Most mid-to-large organizations use a ticketing tool (ServiceNow, HP Service Manager, Salesforce, Jira Service Management). Backup admins monitor these queues for new incidents, SRs, and change requests. Typical ticket types and response priorities:</p>
+    <div class="port-grid">
+      <div class="port-row header">
+        <span class="port-col-1">Ticket Type</span>
+        <span class="port-col-2">Priority</span>
+        <span class="port-col-3">Description</span>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1" style="color:var(--accent5)">Incident</div>
+        <div class="port-col-2"><span class="port-badge pb-req">Immediate</span></div>
+        <div class="port-col-3">Something is broken — failed jobs, service outages, restore failures</div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1" style="color:var(--warn)">Service Request</div>
+        <div class="port-col-2"><span class="port-badge pb-opt">Planned</span></div>
+        <div class="port-col-3">New configuration request — add backup, check retention, create user</div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1" style="color:var(--accent3)">Change Request</div>
+        <div class="port-col-2"><span class="port-badge pb-opt">Scheduled</span></div>
+        <div class="port-col-3">Patching, upgrades, infrastructure modifications with downtime window</div>
+      </div>
+    </div>
+
+    <div class="callout callout-exam">
+      <div class="callout-header">🎓 Exam / Interview Tip — Patching</div>
+      <p>Commvault patching is a common interview topic. Key points: <br>• Security patches are typically applied <strong>monthly</strong><br>• Feature version upgrades are <strong>bi-annual</strong><br>• Always follow the upgrade order: CommServe first → Media Agents → Clients<br>• Prepare a detailed Change Request with action plan and rollback procedure before any patch activity</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 10: PORTS & NETWORKING -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="ports">
+    <div class="section-header">
+      <div class="section-icon icon-yellow">🔒</div>
+      <div>
+        <div class="section-num">Section 10</div>
+        <h2>Ports &amp; Networking Requirements</h2>
+        <p>Firewall rules required for Commvault communication</p>
+      </div>
+    </div>
+
+    <p>Networking knowledge is essential for a backup admin. Commvault components communicate over specific TCP ports, and these must be open in corporate firewalls. The following ports apply to all Commvault deployments.</p>
+
+    <h3>Mandatory Ports</h3>
+    <div class="port-grid">
+      <div class="port-row header">
+        <span class="port-col-1">Port</span>
+        <span class="port-col-2">Protocol</span>
+        <span class="port-col-3">Purpose</span>
+        <span class="port-col-4">Required</span>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1">8400</div>
+        <div class="port-col-2">TCP</div>
+        <div class="port-col-3">Commvault base communication between all components</div>
+        <div class="port-col-4"><span class="port-badge pb-req">Mandatory</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1">8403</div>
+        <div class="port-col-2">TCP</div>
+        <div class="port-col-3">Commvault base communication (secondary port)</div>
+        <div class="port-col-4"><span class="port-badge pb-req">Mandatory</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1">8401</div>
+        <div class="port-col-2">TCP</div>
+        <div class="port-col-3">Tunnel communications (special cases only)</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Conditional</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1">22</div>
+        <div class="port-col-2">TCP/SSH</div>
+        <div class="port-col-3">Required on Linux clients for push installation from CommServe</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Linux only</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1">135</div>
+        <div class="port-col-2">TCP/RPC</div>
+        <div class="port-col-3">Required on Windows clients for push installation</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Windows push</span></div>
+      </div>
+      <div class="port-row">
+        <div class="port-col-1">139 / 445</div>
+        <div class="port-col-2">TCP/SMB</div>
+        <div class="port-col-3">Required on Windows clients for push installation</div>
+        <div class="port-col-4"><span class="port-badge pb-opt">Windows push</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-exam">
+      <div class="callout-header">🎓 Interview Tip — Base Ports</div>
+      <p>A very common interview question: <em>"What are the mandatory ports for Commvault?"</em><br>Answer: <strong>8400 and 8403</strong> must be open on ALL servers where any Commvault component is installed — CommServe, Media Agents, AND all client machines. This is the universal baseline requirement.</p>
+    </div>
+
+    <div class="callout callout-note">
+      <div class="callout-header">📌 Reboot After Installation?</div>
+      <p>Another common interview question: <em>"Is a server reboot required after installing Commvault packages?"</em><br>Answer: <strong>No, reboot is generally NOT required</strong> for package installation. A reboot may only be required in specific exceptional cases (e.g., Windows updates pending or when installing certain kernel-level components). This applies to both Windows and Linux agents.</p>
+    </div>
+
+    <h3>Push Install Requirements Summary</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4>🪟 Windows Client — Push Install</h4>
+        <ul class="list">
+          <li>Ports 135, 139, 445 open on client</li>
+          <li>Ports 8400, 8403 open on client</li>
+          <li>Local Administrator credentials required</li>
+          <li>Format: <code>.\Administrator</code> or <code>DOMAIN\user</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🐧 Linux Client — Push Install</h4>
+        <ul class="list">
+          <li>Port 22 (SSH) open on client</li>
+          <li>Ports 8400, 8403 open on client</li>
+          <li>Root or sudo-capable user credentials required</li>
+          <li>No dot-slash prefix for Linux usernames</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- SECTION 11: INTERVIEW Q&A -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section" id="interview">
+    <div class="section-header">
+      <div class="section-icon icon-purple">🎓</div>
+      <div>
+        <div class="section-num">Section 11</div>
+        <h2>Scenario-Based Interview Q&amp;A</h2>
+        <p>Common technical questions with detailed answers for L1/L2 Commvault roles</p>
+      </div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-item">
+        <div class="qa-q">Explain the three-tier Commvault architecture and the role of each component.</div>
+        <div class="qa-a">Commvault uses a three-tier model. The <strong>CommServe</strong> (Tier 1) is the administrative hub — it coordinates all jobs, stores metadata in a SQL Server database, and manages licensing and configuration. The <strong>Media Agent</strong> (Tier 2) is the data mover — it receives backup streams from clients and writes data to storage (disk, tape, cloud). The <strong>Client/Agent</strong> (Tier 3) is the source machine whose data is being protected. An iDataAgent installed on the client communicates with the CommServe for job coordination and sends data to the Media Agent. In agentless scenarios (VMware/Hyper-V), no agent is on the target — a Virtual Server Agent proxy handles data capture.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">What is the difference between a push install and a local (interactive) install?</div>
+        <div class="qa-a">A <strong>push install</strong> (also called remote install) is initiated from the CommCell Console or Command Center. The CommServe pushes the Commvault package from its Software Cache to the target machine over the network using administrative credentials. It requires specific firewall ports (8400, 8403, and 135/139/445 for Windows or 22 for Linux). A <strong>local install</strong> (interactive install) requires manually copying the package to the target machine and running the setup wizard on that machine. It's used when firewall restrictions prevent push installation. The local install wizard asks for CommServe connection details and CommCell Console credentials to register the client.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">What are the mandatory firewall ports for Commvault, and where must they be open?</div>
+        <div class="qa-a">The mandatory base ports are <strong>8400</strong> and <strong>8403</strong> (TCP). These must be open on ALL machines where any Commvault component is installed — CommServe, Media Agents, and all client machines. For push installation of Linux clients, port <strong>22</strong> (SSH) must be open on the client. For push installation of Windows clients, ports <strong>135, 139, and 445</strong> must be open on the client. Port 8401 is only required for specific tunnel communication scenarios.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">Is a server reboot required after installing a Commvault package?</div>
+        <div class="qa-a">No — a reboot is generally <strong>not required</strong> after Commvault package installation. Services start automatically after the installation wizard completes. A reboot may be required in exceptional cases (e.g., pending Windows OS updates, or specific kernel-level driver installations on Linux), but this is the exception, not the rule.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">What is the Software Cache, and why is it important?</div>
+        <div class="qa-a">The Software Cache is a local repository on the CommServe that stores all Commvault installation packages (Windows, Linux, Solaris, etc.). It is essential for remote/push installations — when you install a package on a remote client from the CommCell Console, the CommServe pulls the appropriate package from the cache and pushes it to the target machine. Without a populated cache, push installations will fail. The cache can be built by copying packages manually to the CommServe and running a "Copy Software" job, or by using the "Download and Sync Cache" feature if the CommServe has internet access.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">Explain deduplication and when you would use a dedup storage policy vs. a non-dedup policy.</div>
+        <div class="qa-a">Deduplication is a data reduction technique that writes only <strong>unique blocks</strong> to storage. The Deduplication Database (DDB) maintains a hash index of all written blocks; when a duplicate block is encountered, only a pointer is written instead of the full block. This significantly reduces storage consumption in environments with high data repetition (e.g., multiple VMs with the same OS, regular full backups of slowly changing file systems). A <strong>non-dedup policy</strong> writes all data in full, regardless of duplicate content — it's simpler and imposes less CPU overhead on the Media Agent, making it better for high-throughput environments or data that is already compressed/encrypted. Use dedup when storage savings outweigh the CPU cost of the DDB lookups.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">What is the difference between CommCell Console (Java) and Command Center?</div>
+        <div class="qa-a">The <strong>CommCell Console</strong> is the legacy Java-based desktop application. It provides deep access to all configuration options and is present in deployments on Commvault v11.32 and earlier. The <strong>Command Center</strong> is the modern, browser-based web interface accessible at <code>https://CommServe-IP/commandcenter</code>. For new deployments on v11.34 and later, Command Center is the <strong>only supported interface</strong>. Commvault has deprecated CommCell Console for new environments. As a backup admin, you need familiarity with both because existing customers running older versions or upgrading still use the Java console.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">You have been asked to configure a new file system backup for a Windows server. Walk me through the process.</div>
+        <div class="qa-a">First, I verify that port 8400 and 8403 are open on the target server and confirm network connectivity with a ping test. In Command Center, I navigate to <strong>Manage → Servers → Add Server</strong>, enter the server's IP address, select Windows as the OS, and provide the administrator credentials. I select the File System package and click Install, monitoring the installation job to completion. Once the agent is installed, I create a <strong>Storage Policy (Plan)</strong> if one doesn't exist — defining the destination disk library and retention period. Then I navigate to the client's File System agent in Command Center, configure the <strong>backup set and subclient</strong> to include the desired folder paths (e.g., D:\Data), associate the storage policy, and schedule the backup. Finally, I run a manual backup job to validate the configuration before handing it over.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">What is the difference between agent-based and agentless backup in Commvault?</div>
+        <div class="qa-a"><strong>Agent-based backup</strong> requires installing a Commvault iDataAgent (package) inside the target machine — this applies to file system servers, database servers, physical machines, etc. The agent communicates directly with the CommServe and Media Agent. <strong>Agentless backup</strong> is used for virtual machines in VMware or Hyper-V environments — no agent is installed inside the guest VM. Instead, a <strong>Virtual Server Agent (VSA)</strong> is installed on a proxy server (for VMware) or directly on the Hyper-V node. The VSA communicates with the hypervisor API to snapshot and back up the VM at the disk level. Agentless backup is simpler to manage at scale (no agents to maintain per VM) but provides less granular control compared to agent-based approaches.</div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">Explain the role of a Disk Library and a Mount Path in Commvault.</div>
+        <div class="qa-a">A <strong>Disk Library</strong> is the logical storage entity in Commvault that represents a collection of disk-based storage. It is associated with a specific Media Agent and tells Commvault "this is where you can write backup data on this MA." A <strong>Mount Path</strong> is a physical folder path on the Media Agent's disk that is configured within a Disk Library — it is the actual destination where backup data blocks are written. A single Disk Library can have multiple mount paths across different drives, providing storage pooling and I/O distribution. Commvault writes to mount paths in a round-robin fashion when multiple are configured. Before using a library, you should validate mount paths to confirm they are online and measure their write throughput.</div>
+      </div>
+    </div>
+
+    <div class="callout callout-exam">
+      <div class="callout-header">🎓 Final Exam Prep — Key Terms to Know</div>
+      <ul class="list">
+        <li><strong>CommCell</strong> — the complete Commvault environment (CommServe + all MAs + all clients)</li>
+        <li><strong>iDA / iDataAgent</strong> — the Commvault agent package installed on a client machine</li>
+        <li><strong>Subclient</strong> — the basic unit of backup; defines the actual content to back up within an agent</li>
+        <li><strong>Backup Set</strong> — a logical container for subclients; default backup sets are created automatically</li>
+        <li><strong>LTS</strong> — Long-Term Support release; currently v11.32; backed by ~5 years of Commvault support</li>
+        <li><strong>VSA</strong> — Virtual Server Agent; enables agentless backup of VMware and Hyper-V environments</li>
+        <li><strong>WORM</strong> — Write Once Read Many; prevents backup data modification; key for ransomware protection</li>
+        <li><strong>DR Backup</strong> — CommServe disaster recovery backup; stores metadata needed to rebuild the CommServe</li>
+        <li><strong>DDB</strong> — Deduplication Database; stores block-level hash index for dedup storage pools</li>
+        <li><strong>Command Center URL</strong> — <code>https://&lt;CommServe-IP&gt;/commandcenter</code></li>
+        <li><strong>Support portal</strong> — <code>support.commvault.com</code> &nbsp;|&nbsp; <strong>Download portal</strong> — <code>cloud.commvault.com</code></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ABOUT SECTION -->
+<div style="background:#161b22;border-top:1px solid #30363d;padding:56px 40px;">
+  <div style="max-width:960px;margin:0 auto;">
+
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid #30363d;">
+      <div style="width:44px;height:44px;border-radius:10px;background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👨‍💼</div>
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:#6e7681;text-transform:uppercase;margin-bottom:2px;">About the Trainer</div>
+        <h2 style="font-family:Georgia,'Times New Roman',Cambria,serif;font-size:24px;color:#e6edf3;margin:0;">About the Training</h2>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+      <!-- Bio Card -->
+      <div style="background:#1e2530;border:1px solid #30363d;border-radius:12px;padding:28px 30px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,rgba(240,136,62,0.3),rgba(88,166,255,0.3));border:2px solid rgba(240,136,62,0.4);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">👤</div>
+          <div>
+            <div style="font-size:17px;font-weight:700;color:#e6edf3;">Mohammed Abdul</div>
+            <div style="font-size:13px;color:#f0883e;font-weight:500;margin-top:2px;">Data Protection Architect</div>
+          </div>
+        </div>
+        <p style="color:#8b949e;font-size:14px;line-height:1.7;margin-bottom:14px;">Mohammed Abdul is a Data Protection Architect with more than <strong style="color:#e6edf3;">15 years of experience</strong> in Hybrid Cloud and has worked with global clients across various industries.</p>
+        <p style="color:#8b949e;font-size:14px;line-height:1.7;margin:0;">With extensive expertise in enterprise backup and recovery solutions, Mohammed specializes in <strong style="color:#e6edf3;">Commvault, Veeam, NetBackup, and NetApp</strong> technologies, helping organizations design and implement robust data protection strategies.</p>
+      </div>
+
+      <!-- Contact + Disclaimer -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- Contact -->
+        <div style="background:#1e2530;border:1px solid #30363d;border-radius:12px;padding:22px 24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#58a6ff;margin-bottom:14px;display:flex;align-items:center;gap:8px;">📬 For Any Queries</div>
+          <div style="display:flex;align-items:center;gap:12px;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px 16px;">
+            <span style="font-size:20px;">📧</span>
+            <div>
+              <div style="font-size:11px;color:#6e7681;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Email</div>
+              <span style="color:#58a6ff;font-size:14px;font-weight:500;font-family:'Courier New',Courier,monospace;">abdul.md.20000102&#64;gmail&#46;com</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+            <span style="background:rgba(240,136,62,0.12);border:1px solid rgba(240,136,62,0.3);color:#f0883e;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;">Commvault</span>
+            <span style="background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);color:#58a6ff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;">Veeam</span>
+            <span style="background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.3);color:#3fb950;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;">NetBackup</span>
+            <span style="background:rgba(188,140,255,0.12);border:1px solid rgba(188,140,255,0.3);color:#bc8cff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;">NetApp</span>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div style="background:rgba(227,179,65,0.06);border:1px solid rgba(227,179,65,0.25);border-left:3px solid #e3b341;border-radius:10px;padding:18px 20px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#e3b341;margin-bottom:8px;display:flex;align-items:center;gap:6px;">⚠️ Disclaimer</div>
+          <p style="color:#8b949e;font-size:13px;line-height:1.65;margin:0;">This content is for <strong style="color:#e6edf3;">educational purposes and training material</strong>. Always refer to official Commvault documentation and follow your organization's procedures for production implementations.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Commvault Backup Administration Training Guide &nbsp;·&nbsp; Version 11.32 LTS &nbsp;·&nbsp; Self-Paced Technical Reference</p>
+  <p style="margin-top:6px">Authored by <strong>Mohammed Abdul</strong> — Da

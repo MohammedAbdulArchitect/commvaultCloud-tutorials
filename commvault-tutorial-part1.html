@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Cloud Tutorial — Part 1: Complete Guide to Enterprise Backup Operations</title>
+<style>
+  /* PDF-safe system fonts only */
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --surface2:  #1e2530;
+    --surface3:  #252d3a;
+    --border:    #30363d;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --dim:       #6e7681;
+    --orange:    #f0883e;
+    --blue:      #58a6ff;
+    --green:     #3fb950;
+    --purple:    #bc8cff;
+    --red:       #ff7b72;
+    --yellow:    #e3b341;
+    --font-body: 'Segoe UI', Calibri, Arial, Helvetica, sans-serif;
+    --font-head: Georgia, 'Times New Roman', Cambria, serif;
+    --font-code: 'Courier New', Courier, 'Lucida Console', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1f2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 72px 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -80px; right: -80px;
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(240,136,62,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -60px; left: -60px;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(88,166,255,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(240,136,62,0.12); border: 1px solid rgba(240,136,62,0.30);
+    color: var(--orange); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px; margin-bottom: 22px;
+  }
+  .part-pill {
+    display: inline-block;
+    background: rgba(240,136,62,0.12); border: 1px solid rgba(240,136,62,0.30);
+    color: var(--orange); font-size: 14px; font-weight: 700;
+    letter-spacing: 0.04em; padding: 3px 14px; border-radius: 20px;
+    vertical-align: middle; margin-left: 12px;
+    font-family: var(--font-body);
+  }
+
+  .hero h1 {
+    font-family: var(--font-head);
+    font-size: clamp(30px, 4.5vw, 52px);
+    line-height: 1.15; color: var(--text); margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--orange); }
+  .hero-sub {
+    color: var(--muted); font-size: 17px; max-width: 600px; margin-bottom: 30px;
+  }
+  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .meta-item {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--dim); font-size: 13px;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 8px rgba(63,185,80,0.5);
+    flex-shrink: 0;
+  }
+
+  /* ── STICKY NAV ── */
+  .toc {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 40px; position: sticky; top: 0; z-index: 100;
+    overflow-x: auto; white-space: nowrap;
+  }
+  .toc ul { display: flex; list-style: none; gap: 4px; padding: 8px 0; }
+  .toc a {
+    display: block; padding: 7px 13px; font-size: 13px; font-weight: 500;
+    color: var(--muted); text-decoration: none; border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--text); background: var(--surface2); }
+
+  /* ── MAIN ── */
+  .main { max-width: 860px; margin: 0 auto; padding: 52px 40px 80px; }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 72px; }
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px; padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sec-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .ic-or { background: rgba(240,136,62,0.14); border: 1px solid rgba(240,136,62,0.30); }
+  .ic-bl { background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.28); }
+  .ic-gr { background: rgba(63,185,80,0.12);  border: 1px solid rgba(63,185,80,0.28); }
+  .ic-pu { background: rgba(188,140,255,0.12);border: 1px solid rgba(188,140,255,0.28);}
+  .ic-ye { background: rgba(227,179,65,0.12); border: 1px solid rgba(227,179,65,0.28); }
+  .ic-re { background: rgba(255,123,114,0.12);border: 1px solid rgba(255,123,114,0.28);}
+
+  .sec-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--dim); margin-bottom: 2px;
+  }
+  .section-header h2 {
+    font-family: var(--font-head);
+    font-size: 25px; color: var(--text); margin: 0;
+  }
+  .section-header p { color: var(--muted); font-size: 13px; margin: 3px 0 0; }
+
+  h3 {
+    font-family: var(--font-head);
+    font-size: 19px; color: var(--text); margin: 36px 0 13px;
+  }
+  h4 {
+    font-size: 13px; font-weight: 700; color: var(--muted);
+    letter-spacing: 0.07em; text-transform: uppercase; margin: 24px 0 10px;
+  }
+  p { color: var(--muted); margin-bottom: 14px; }
+  strong { color: var(--text); font-weight: 600; }
+  a { color: var(--blue); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 26px; margin-bottom: 14px;
+  }
+  .card-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+  .card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 18px 0; }
+  @media(max-width:640px){ .card-grid,.card-grid-3 { grid-template-columns:1fr; } }
+
+  /* tier cards */
+  .tier-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 22px;
+    border-top: 3px solid;
+  }
+  .tc-red    { border-top-color: var(--red); }
+  .tc-green  { border-top-color: var(--green); }
+  .tc-blue   { border-top-color: var(--blue); }
+  .tier-pill {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 2px 10px; border-radius: 20px; margin-bottom: 10px;
+  }
+  .tp-red   { background:rgba(255,123,114,0.14); color:var(--red); }
+  .tp-green { background:rgba(63,185,80,0.13);  color:var(--green); }
+  .tp-blue  { background:rgba(88,166,255,0.12); color:var(--blue); }
+  .tier-card h4 { font-size:15px; color:var(--text); text-transform:none; letter-spacing:0; margin:0 0 10px; }
+  .tier-card p  { font-size:13px; margin:0 0 8px; }
+  .tier-card ul { padding-left:18px; margin:0; }
+  .tier-card li { font-size:13px; color:var(--muted); margin:5px 0; }
+  .tier-analogy {
+    margin-top:12px; padding:10px 12px;
+    background:rgba(255,255,255,0.03); border-radius:6px;
+    font-size:13px; color:var(--dim); border-left:3px solid var(--border);
+  }
+
+  /* ── BULLET LISTS ── */
+  ul.list { list-style:none; padding:0; margin:12px 0 18px; }
+  ul.list li {
+    display:flex; gap:10px; color:var(--muted);
+    font-size:14px; padding:6px 0;
+    border-bottom:1px solid rgba(48,54,61,0.5);
+  }
+  ul.list li:last-child { border-bottom:none; }
+  ul.list li::before { content:'›'; color:var(--orange); font-size:16px; flex-shrink:0; }
+  ul.list li strong { color:var(--text); }
+
+  ol.steps { list-style:none; padding:0; margin:14px 0; counter-reset:st; }
+  ol.steps li {
+    counter-increment:st;
+    display:flex; gap:14px; margin-bottom:13px; align-items:flex-start;
+  }
+  ol.steps li::before {
+    content:counter(st);
+    width:26px; height:26px; flex-shrink:0;
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:var(--blue);
+    font-family:var(--font-code); margin-top:2px;
+  }
+  ol.steps li p { margin:0; font-size:14px; color:var(--muted); }
+  ol.steps li strong { display:block; font-size:14px; color:var(--text); margin-bottom:2px; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius:10px; padding:18px 22px; margin:20px 0; border-left:3px solid;
+  }
+  .callout-head {
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:700; letter-spacing:0.08em;
+    text-transform:uppercase; margin-bottom:8px;
+  }
+  .callout p  { margin:0 0 6px; font-size:14px; }
+  .callout p:last-child { margin:0; }
+  .callout ul.list { margin:8px 0 0; }
+  .callout ul.list li { font-size:13px; }
+  .callout ol.steps li p  { font-size:13px; }
+
+  .c-tip  { background:rgba(63,185,80,0.07);   border-color:var(--green);  }
+  .c-tip  .callout-head { color:var(--green); }
+  .c-warn { background:rgba(227,179,65,0.08);  border-color:var(--yellow); }
+  .c-warn .callout-head { color:var(--yellow); }
+  .c-int  { background:rgba(88,166,255,0.07);  border-color:var(--blue);   }
+  .c-int  .callout-head { color:var(--blue); }
+  .c-scen { background:rgba(188,140,255,0.07); border-color:var(--purple); }
+  .c-scen .callout-head { color:var(--purple); }
+  .c-key  { background:rgba(240,136,62,0.07);  border-color:var(--orange); }
+  .c-key  .callout-head { color:var(--orange); }
+
+  /* ── FLOW ── */
+  .flow {
+    display:flex; align-items:stretch; gap:0; margin:22px 0;
+    overflow-x:auto; padding:4px 0;
+  }
+  .flow-step {
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:8px; padding:14px 16px; text-align:center;
+    min-width:110px; flex-shrink:0; display:flex; flex-direction:column; gap:4px;
+  }
+  .flow-step .fn { font-size:10px; font-weight:700; text-transform:uppercase;
+                   letter-spacing:0.08em; color:var(--orange); }
+  .flow-step .ft { font-size:13px; font-weight:500; color:var(--text); }
+  .flow-arrow { color:var(--dim); font-size:20px; padding:0 6px;
+                display:flex; align-items:center; flex-shrink:0; }
+
+  /* ── LEADERS GRID ── */
+  .leaders {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:12px; margin:20px 0;
+  }
+  .leader {
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:8px; padding:14px 12px; text-align:center;
+  }
+  .leader .lname { font-size:14px; font-weight:700; color:var(--text); }
+  .leader .lrole { font-size:12px; color:var(--muted); margin-top:3px; }
+
+  /* ── SCALE TABLE (CSS only, no <table>) ── */
+  .scale-grid { margin:18px 0; }
+  .scale-row {
+    display:flex; gap:0; margin-bottom:3px; border-radius:6px; overflow:hidden;
+  }
+  .scale-row.hdr { background:var(--surface3); }
+  .scale-row:not(.hdr) { background:var(--surface2); }
+  .sc1 { width:28%; padding:10px 14px; font-size:13px; font-weight:600; color:var(--text); }
+  .sc2 { width:36%; padding:10px 14px; font-size:13px; color:var(--muted); border-left:1px solid var(--border); }
+  .sc3 { flex:1; padding:10px 14px; font-size:13px; color:var(--muted); border-left:1px solid var(--border); }
+  .scale-row.hdr .sc1,
+  .scale-row.hdr .sc2,
+  .scale-row.hdr .sc3 {
+    font-size:11px; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--dim);
+  }
+
+  /* ── SUMMARY BOX ── */
+  .summary-box {
+    background:linear-gradient(135deg,rgba(240,136,62,0.07),rgba(88,166,255,0.05));
+    border:1px solid rgba(240,136,62,0.20); border-radius:12px;
+    padding:22px 26px; margin:28px 0;
+  }
+  .summary-box h4 { color:var(--orange); text-transform:none; letter-spacing:0;
+                    font-size:15px; margin:0 0 12px; }
+  .summary-box ul.list li { font-size:13px; }
+
+  /* ── Q&A ── */
+  .qa-item {
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:10px; overflow:hidden; margin-bottom:12px;
+  }
+  .qa-q {
+    padding:15px 20px; background:var(--surface);
+    border-bottom:1px solid var(--border);
+    font-weight:600; color:var(--text); font-size:14px;
+    display:flex; gap:10px; align-items:flex-start;
+  }
+  .qa-q::before { content:'Q'; color:var(--purple); font-weight:700; flex-shrink:0; }
+  .qa-a { padding:13px 20px 13px 42px; color:var(--muted); font-size:14px; }
+  .qa-a::before { content:'A: '; color:var(--green); font-weight:700; }
+
+  /* ── ABOUT ── */
+  .about-wrap {
+    background:var(--surface); border-top:1px solid var(--border);
+    padding:56px 40px;
+  }
+  .about-inner { max-width:860px; margin:0 auto; }
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:28px; }
+  @media(max-width:640px){ .about-grid { grid-template-columns:1fr; } }
+
+  /* ── FOOTER ── */
+  footer {
+    background:var(--bg); border-top:1px solid var(--border);
+    text-align:center; padding:26px 20px;
+    color:var(--dim); font-size:12px; line-height:1.7;
+  }
+
+  hr { border:none; border-top:1px solid var(--border); margin:40px 0; }
+  code {
+    font-family:var(--font-code); font-size:13px;
+    background:var(--surface2); border:1px solid var(--border);
+    padding:2px 6px; border-radius:4px; color:var(--orange);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="badge">🛡️ Backup Administration Tutorials</div>
+    <h1>Commvault <span>Cloud Tutorial</span>
+      <span class="part-pill">Part 1</span>
+    </h1>
+    <p class="hero-sub">Your complete introduction to enterprise backup operations — architecture, market landscape, backup types, and career pathways in data protection.</p>
+    <div class="hero-meta">
+      <div class="meta-item"><div class="dot"></div>Platform: Enterprise / Cloud</div>
+      <div class="meta-item"><div class="dot" style="background:var(--blue);box-shadow:0 0 8px rgba(88,166,255,0.5)"></div>Level: Beginner → L1</div>
+      <div class="meta-item"><div class="dot" style="background:var(--purple);box-shadow:0 0 8px rgba(188,140,255,0.5)"></div>Architecture Deep-Dive</div>
+      <div class="meta-item"><div class="dot" style="background:var(--yellow);box-shadow:0 0 8px rgba(227,179,65,0.5)"></div>Interview Prep Included</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ NAV -->
+<nav class="toc">
+  <ul>
+    <li><a href="#landscape">Backup Landscape</a></li>
+    <li><a href="#prereqs">Prerequisites</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#commcell">CommCell</a></li>
+    <li><a href="#deployment">Deployment Scenarios</a></li>
+    <li><a href="#scale">Scale</a></li>
+    <li><a href="#backuptypes">Backup Types</a></li>
+    <li><a href="#takeaways">Key Takeaways</a></li>
+    <li><a href="#interview">Interview Q&amp;A</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════════════════ MAIN -->
+<div class="main">
+
+  <!-- INTRO -->
+  <p style="font-size:17px;color:var(--muted);margin-bottom:32px;">Whether you're new to IT or looking to transition into enterprise backup administration, understanding Commvault is your ticket to a career in data protection. This guide covers everything you need to know about Commvault, the enterprise backup landscape, and the three-tier architecture that powers Fortune 500 companies.</p>
+
+  <div class="callout c-tip">
+    <div class="callout-head">💡 Who This Is For</div>
+    <ul class="list">
+      <li>IT professionals looking to specialise in backup and recovery</li>
+      <li>System administrators wanting to expand their skill set</li>
+      <li>Fresh graduates seeking entry into enterprise IT operations</li>
+      <li>Engineers from storage or virtualisation backgrounds transitioning to backup</li>
+    </ul>
+  </div>
+
+  <!-- ───────── SECTION 1: LANDSCAPE -->
+  <div class="section" id="landscape">
+    <div class="section-header">
+      <div class="sec-icon ic-or">🌍</div>
+      <div>
+        <div class="sec-num">Section 01</div>
+        <h2>The Enterprise Backup Landscape</h2>
+        <p>Why enterprise backup matters and who the major players are</p>
+      </div>
+    </div>
+
+    <h3>Why Enterprise Backup?</h3>
+    <p>Major banks, large healthcare organisations, and Fortune 500 companies have <strong>critical data that cannot be lost</strong> — customer transactions, patient records, financial data. Their infrastructure spans on-premise data centres and cloud environments, subject to strict compliance and disaster recovery requirements.</p>
+    <p>Unlike personal backups (copying files to an external hard drive), enterprise backup tools must handle:</p>
+    <ul class="list">
+      <li>Petabytes of data across thousands of servers simultaneously</li>
+      <li>Automated, scheduled operations with minimal human intervention</li>
+      <li><strong>Deduplication</strong> — reducing storage requirements by 50–90% by eliminating redundant data</li>
+      <li>Complex recovery scenarios including granular file-level and application-level restores</li>
+    </ul>
+
+    <div class="callout c-scen">
+      <div class="callout-head">🏢 Real-World Example — XYZ Bank</div>
+      <p>XYZ Bank operates globally with data centres in India, China, Europe, and the United States. Each region may have its own Commvault environment (CommCell), managing tens of thousands of servers and protecting petabytes of critical banking data. One hour of unplanned downtime could cost millions and permanently damage customer trust.</p>
+    </div>
+
+    <h3>Market Leaders in Enterprise Backup</h3>
+    <p>According to Gartner's Magic Quadrant, the leading enterprise backup platforms are:</p>
+    <div class="leaders">
+      <div class="leader"><div class="lname">Commvault</div><div class="lrole">30+ year track record</div></div>
+      <div class="leader"><div class="lname">Veeam</div><div class="lrole">Virtual-first</div></div>
+      <div class="leader"><div class="lname">Rubrik</div><div class="lrole">Cloud-native</div></div>
+      <div class="leader"><div class="lname">Cohesity</div><div class="lrole">Data management</div></div>
+      <div class="leader"><div class="lname">Veritas</div><div class="lrole">NetBackup</div></div>
+    </div>
+
+    <h4>Why Commvault Stands Out</h4>
+    <ul class="list">
+      <li><strong>Established since the 1990s</strong> — over 30 years of proven reliability in the enterprise space</li>
+      <li><strong>Mature, feature-rich product</strong> — the broadest agent coverage of any backup platform</li>
+      <li><strong>Enterprise focus</strong> — trusted by Fortune 500 companies and major global banks</li>
+      <li><strong>Hybrid cloud support</strong> — seamlessly handles on-premise and cloud workloads in one platform</li>
+      <li><strong>Strong job market</strong> — high demand for Commvault skills in banking, healthcare, and government</li>
+    </ul>
+
+    <div class="callout c-int">
+      <div class="callout-head">💼 Career Insight</div>
+      <p>Commvault skills are in high demand, especially in banking, healthcare, and large enterprises. Many companies specifically seek candidates with Commvault experience for L1 and L2 backup engineer positions. The knowledge you gain from these tutorials can be your entry point into enterprise IT operations.</p>
+    </div>
+  </div>
+
+  <!-- ───────── SECTION 2: PREREQUISITES -->
+  <div class="section" id="prereqs">
+    <div class="section-header">
+      <div class="sec-icon ic-gr">✅</div>
+      <div>
+        <div class="sec-num">Section 02</div>
+        <h2>Prerequisites</h2>
+        <p>What background knowledge you need before starting</p>
+      </div>
+    </div>
+
+    <p>You don't need to be an expert — these tutorials are designed to take you from foundational knowledge to job-ready skills. However, you should be comfortable with the following:</p>
+
+    <div class="card-grid-3">
+      <div class="card">
+        <h4>🖥️ Basic IT</h4>
+        <p style="font-size:14px;">General understanding of how computer systems, servers, and IT infrastructure operate.</p>
+      </div>
+      <div class="card">
+        <h4>🪟 Operating Systems</h4>
+        <p style="font-size:14px;">Familiarity with Windows (knowing what C: and D: drives are). Linux basics are a bonus.</p>
+      </div>
+      <div class="card">
+        <h4>🌐 Networking Overview</h4>
+        <p style="font-size:14px;">Basic understanding of LAN, IP addressing, and what a server is. Expert-level networking is not required.</p>
+      </div>
+    </div>
+
+    <div class="callout c-tip">
+      <div class="callout-head">💡 You're Ready to Start If…</div>
+      <p>You understand what a server is, you've used Windows before, and you know roughly what a network is. That's enough. Everything else will be explained as we go.</p>
+    </div>
+  </div>
+
+  <!-- ───────── SECTION 3: ARCHITECTURE -->
+  <div class="section" id="architecture">
+    <div class="section-header">
+      <div class="sec-icon ic-or">🏗️</div>
+      <div>
+        <div class="sec-num">Section 03</div>
+        <h2>Commvault Architecture</h2>
+        <p>The three-tier model — the most important concept in every Commvault interview</p>
+      </div>
+    </div>
+
+    <div class="callout c-int">
+      <div class="callout-head">💼 #1 Interview Question</div>
+      <p><strong>Q: "What is the architecture of Commvault?"</strong> — This is the most common opening question in any Commvault interview. You must be able to explain it clearly, confidently, and from memory.</p>
+    </div>
+
+    <h3>The Three-Tier Architecture</h3>
+    <p>Commvault is built on a <strong>three-tier architecture</strong>. Each tier has a distinct, non-overlapping role. Understanding this separation is key to understanding how the product scales and how to troubleshoot it.</p>
+
+    <div class="card-grid-3" style="margin-top:20px;">
+      <div class="tier-card tc-red">
+        <span class="tier-pill tp-red">Tier 1</span>
+        <h4>CommServe (CommCell Manager)</h4>
+        <p><strong>Role:</strong> Master controller — the brain of the operation.</p>
+        <ul>
+          <li>Coordinates all backup and restore jobs</li>
+          <li>Stores metadata and job history in SQL Server database</li>
+          <li>Provides the management consoles (Command Center + CommCell Console)</li>
+          <li>Schedules jobs, manages licenses, users, and policies</li>
+          <li>Recommended OS: <strong>Windows Server</strong></li>
+        </ul>
+        <div class="tier-analogy">✈️ Think of it as the <em>air traffic controller</em> — directing all operations but never touching the actual data.</div>
+      </div>
+
+      <div class="tier-card tc-green">
+        <span class="tier-pill tp-green">Tier 2</span>
+        <h4>Media Agent</h4>
+        <p><strong>Role:</strong> Data mover — physically moves all backup data.</p>
+        <ul>
+          <li>Transfers data streams from clients to storage</li>
+          <li>Performs deduplication, compression, and encryption</li>
+          <li>Manages disk libraries, cloud storage, and tape</li>
+          <li>Retrieves and rehydrates data during restores</li>
+          <li>Supported OS: <strong>Windows or Linux</strong></li>
+        </ul>
+        <div class="tier-analogy">🚚 Think of it as the <em>cargo truck</em> — physically moving data from source to destination.</div>
+      </div>
+
+      <div class="tier-card tc-blue">
+        <span class="tier-pill tp-blue">Tier 3</span>
+        <h4>Client (iDataAgent)</h4>
+        <p><strong>Role:</strong> Source of backup data — the protected machine.</p>
+        <ul>
+          <li>Any server or workstation requiring backup protection</li>
+          <li>Runs agent software specific to the data type</li>
+          <li>Sends data stream to the Media Agent during backup</li>
+          <li>Can be agent-based <em>or</em> agentless (VMs)</li>
+          <li>Examples: File servers, Oracle DB, SQL Server, VMs</li>
+        </ul>
+        <div class="tier-analogy">🏭 Think of it as the <em>warehouse</em> — the source of all goods being shipped.</div>
+      </div>
+    </div>
+
+    <h3>How the Three Tiers Work Together</h3>
+
+    <h4>Backup Process Flow</h4>
+    <div class="flow">
+      <div class="flow-step"><div class="fn">Step 1</div><div class="ft">CommServe triggers job per schedule</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 2</div><div class="ft">Client agent gathers source data</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 3</div><div class="ft">Data stream sent to Media Agent</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 4</div><div class="ft">MA deduplicates, compresses, encrypts</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 5</div><div class="ft">MA writes to storage (disk / cloud / tape)</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 6</div><div class="ft">CommServe records metadata &amp; job status</div></div>
+    </div>
+
+    <h4>Restore Process Flow</h4>
+    <div class="flow">
+      <div class="flow-step"><div class="fn">Step 1</div><div class="ft">User requests restore via Command Center</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 2</div><div class="ft">CommServe queries metadata to locate data</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 3</div><div class="ft">MA retrieves data from storage</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 4</div><div class="ft">MA rehydrates, decrypts data</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 5</div><div class="ft">Data returned to client target</div></div>
+    </div>
+
+    <div class="callout c-key">
+      <div class="callout-head">🔑 Critical Architecture Insight</div>
+      <p><strong>CommServe never touches the actual backup data.</strong> It only manages metadata and orchestrates operations. All data movement occurs directly between the Client and the Media Agent. This design is what allows Commvault to scale to tens of thousands of clients without the CommServe becoming a bottleneck.</p>
+    </div>
+  </div>
+
+  <!-- ───────── SECTION 4: COMMCELL -->
+  <div class="section" id="commcell">
+    <div class="section-header">
+      <div class="sec-icon ic-bl">⚡</div>
+      <div>
+        <div class="sec-num">Section 04</div>
+        <h2>The CommCell Environment</h2>
+        <p>Understanding the complete Commvault deployment unit</p>
+      </div>
+    </div>
+
+    <p>When you combine all three components — CommServe + Media Agents + Clients + Storage — the resulting environment is called a <strong>CommCell</strong>. This is the fundamental deployment unit of Commvault.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>🔢 CommCell Components at a Glance</h4>
+        <ul class="list">
+          <li><strong>CommServe</strong> — exactly one per CommCell (single management point)</li>
+          <li><strong>Media Agents</strong> — 2 to 100+ depending on scale and throughput needs</li>
+          <li><strong>Clients</strong> — 100 to 50,000+ servers and workstations</li>
+          <li><strong>Storage</strong> — disk arrays, cloud buckets (AWS/Azure/GCP), tape libraries</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🌐 Storage Types Supported</h4>
+        <ul class="list">
+          <li><strong>Disk Library</strong> — most common; local or NAS-attached disk on the Media Agent</li>
+          <li><strong>Cloud Library</strong> — Azure Blob, AWS S3, GCP Storage; elastic capacity</li>
+          <li><strong>Tape Library</strong> — preferred in high-security environments (government, compliance)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── SECTION 5: DEPLOYMENT SCENARIOS -->
+  <div class="section" id="deployment">
+    <div class="section-header">
+      <div class="sec-icon ic-pu">🗺️</div>
+      <div>
+        <div class="sec-num">Section 05</div>
+        <h2>Deployment Scenarios</h2>
+        <p>Single CommCell vs. Multi-CommCell for global organisations</p>
+      </div>
+    </div>
+
+    <h3>Single CommCell Approach</h3>
+    <div class="card">
+      <p><strong>One CommServe managing all global locations.</strong></p>
+      <div class="card-grid" style="margin:14px 0 0;">
+        <div>
+          <h4 style="color:var(--green);">✅ Advantages</h4>
+          <ul class="list">
+            <li>Centralised management — single console for all regions</li>
+            <li>Lower licensing costs (one CommServe license)</li>
+            <li>Unified reporting and administration</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color:var(--red);">⚠️ Considerations</h4>
+          <ul class="list">
+            <li>Single point of failure risk</li>
+            <li>WAN latency for geographically dispersed deployments</li>
+            <li>All regions dependent on one control point</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <h3>Multiple CommCell Approach</h3>
+    <div class="card">
+      <p><strong>A separate CommServe deployed per region or location.</strong></p>
+      <div class="card-grid" style="margin:14px 0 0;">
+        <div>
+          <h4 style="color:var(--green);">✅ Advantages</h4>
+          <ul class="list">
+            <li>Regional independence and resilience</li>
+            <li>Better local performance — no WAN dependency</li>
+            <li>Compliance with data sovereignty laws</li>
+            <li>Isolated failure domains — one region's outage doesn't affect others</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color:var(--red);">⚠️ Considerations</h4>
+          <ul class="list">
+            <li>Higher licensing costs (multiple CommServe licenses)</li>
+            <li>Separate management consoles per region</li>
+            <li>Greater administrative overhead</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout c-scen">
+      <div class="callout-head">🌍 Real-World Example — XYZ Global Bank</div>
+      <p>XYZ Bank operates across four continents with a multi-CommCell deployment:</p>
+      <ul class="list">
+        <li><strong>CommCell 1 — India</strong>: Managing Asia-Pacific backup operations</li>
+        <li><strong>CommCell 2 — China</strong>: Managing China HQ and regional offices</li>
+        <li><strong>CommCell 3 — Europe</strong>: Managing European data centres (GDPR compliance)</li>
+        <li><strong>CommCell 4 — USA</strong>: Managing North American operations</li>
+      </ul>
+      <p style="margin-top:8px;">Each CommCell operates independently, potentially managing 50,000+ clients with hundreds of Media Agents in that region.</p>
+    </div>
+  </div>
+
+  <!-- ───────── SECTION 6: SCALE -->
+  <div class="section" id="scale">
+    <div class="section-header">
+      <div class="sec-icon ic-ye">📊</div>
+      <div>
+        <div class="sec-num">Section 06</div>
+        <h2>Scalability</h2>
+        <p>Understanding how large a Commvault environment can grow</p>
+      </div>
+    </div>
+
+    <p>Understanding enterprise scale is what separates candidates who can discuss Commvault at a conceptual level from those who can speak credibly about real-world deployments.</p>
+
+    <div class="scale-grid">
+      <div class="scale-row hdr">
+        <div class="sc1">Component</div>
+        <div class="sc2">Typical Range</div>
+        <div class="sc3">Large Enterprise</div>
+      </div>
+      <div class="scale-row">
+        <div class="sc1"><strong>CommServe</strong></div>
+        <div class="sc2">1 per CommCell</div>
+        <div class="sc3">1 per region (multiple CommCells)</div>
+      </div>
+      <div class="scale-row">
+        <div class="sc1"><strong>Media Agents</strong></div>
+        <div class="sc2">2 – 10</div>
+        <div class="sc3">50 – 100+</div>
+      </div>
+      <div class="scale-row">
+        <div class="sc1"><strong>Clients</strong></div>
+        <div class="sc2">100 – 1,000</div>
+        <div class="sc3">10,000 – 50,000+</div>
+      </div>
+      <div class="scale-row">
+        <div class="sc1"><strong>Storage</strong></div>
+        <div class="sc2">10 – 100 TB</div>
+        <div class="sc3">1 – 10+ PB</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── SECTION 7: BACKUP TYPES -->
+  <div class="section" id="backuptypes">
+    <div class="section-header">
+      <div class="sec-icon ic-gr">💾</div>
+      <div>
+        <div class="sec-num">Section 07</div>
+        <h2>Backup Types You Need to Learn</h2>
+        <p>The main workload categories covered in this training series</p>
+      </div>
+    </div>
+
+    <div class="card-grid-3">
+      <div class="card">
+        <h4 style="color:var(--red);text-transform:none;letter-spacing:0;font-size:15px;">📁 File System Backups</h4>
+        <ul class="list">
+          <li><strong>Windows File System</strong> — NTFS, file servers, user data shares</li>
+          <li><strong>Linux File System</strong> — ext4, XFS, application data directories</li>
+          <li>Agent-based approach with granular file-level recovery</li>
+          <li>Full lab demonstrations included in this series</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--green);text-transform:none;letter-spacing:0;font-size:15px;">🗄️ Database Backups</h4>
+        <ul class="list">
+          <li><strong>Oracle Database</strong> — application-consistent, RMAN integration</li>
+          <li><strong>SQL Server</strong> — full, differential, and transaction log backups</li>
+          <li>Hot backups — no application downtime required</li>
+          <li>Covered in depth in later parts of this series</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--blue);text-transform:none;letter-spacing:0;font-size:15px;">🖥️ VM Backups (Agentless)</h4>
+        <ul class="list">
+          <li><strong>Hyper-V</strong> — full lab demonstrations in this series</li>
+          <li><strong>VMware vSphere</strong> — theory and screenshots covered</li>
+          <li>VM-level and granular file-level recovery options</li>
+          <li>No agent installed inside the guest VM</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout c-tip">
+      <div class="callout-head">💡 Why Agentless Matters</div>
+      <p>Agentless backup for virtual machines means no Commvault agent is installed inside individual VMs. Instead, Commvault uses hypervisor APIs (Hyper-V VSS / VMware VADP) to snapshot and capture entire VMs. This means:</p>
+      <ul class="list">
+        <li>No per-VM agent to install, patch, or maintain — critical at scale (hundreds of VMs)</li>
+        <li>Application-consistent backups through native hypervisor integration</li>
+        <li>Instant VM recovery and granular file restoration from the same backup</li>
+        <li>Once you understand Hyper-V agentless backup, VMware operates very similarly</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ───────── SECTION 8: KEY TAKEAWAYS -->
+  <div class="section" id="takeaways">
+    <div class="section-header">
+      <div class="sec-icon ic-ye">⭐</div>
+      <div>
+        <div class="sec-num">Section 08</div>
+        <h2>Key Takeaways</h2>
+        <p>Everything you must remember from Part 1</p>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h4>Part 1 — Core Concepts Summary</h4>
+      <ul class="list">
+        <li><strong>Three-tier architecture</strong> — CommServe (controller) + Media Agent (data mover) + Client (source) + Storage</li>
+        <li><strong>CommServe never moves data</strong> — it only manages metadata and orchestrates jobs; all data flows Client → Media Agent → Storage</li>
+        <li><strong>CommCell</strong> — the complete deployment unit: one CommServe + all Media Agents + all Clients + all Storage</li>
+        <li><strong>Enterprise scale</strong> — one CommCell can manage 50,000+ clients with hundreds of Media Agents and petabytes of storage</li>
+        <li><strong>Deployment options</strong> — single CommCell (centralised) or multi-CommCell (regional independence) depending on business needs</li>
+        <li><strong>Backup types</strong> — File System (Windows/Linux), Database (Oracle/SQL), VM (Hyper-V/VMware agentless)</li>
+        <li><strong>Market leaders</strong> — Commvault, Veeam, Rubrik, Cohesity, Veritas; Commvault leads in enterprise complexity</li>
+        <li><strong>Storage types</strong> — Disk Library (most common), Cloud Library (Azure/AWS/GCP), Tape Library (high-security)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ───────── SECTION 9: INTERVIEW Q&A -->
+  <div class="section" id="interview">
+    <div class="section-header">
+      <div class="sec-icon ic-pu">🎓</div>
+      <div>
+        <div class="sec-num">Section 09</div>
+        <h2>Interview Q&amp;A</h2>
+        <p>Scenario-based answers for common Commvault architecture questions</p>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">What is the architecture of Commvault? Explain each component.</div>
+      <div class="qa-a">Commvault uses a three-tier architecture. The <strong>CommServe</strong> is the master controller — it coordinates all backup and restore operations, stores metadata in a SQL Server database, and provides centralised management through the Command Center web console. The <strong>Media Agent</strong> is the data mover — it physically transfers data from clients to storage, performs deduplication, compression, and encryption, and retrieves data during restores. The <strong>Client</strong> is the protected machine — it runs an iDataAgent appropriate for its data type (file system, database, VM) and sends data to the Media Agent. Together, CommServe + Media Agents + Clients + Storage form a <strong>CommCell</strong> environment.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Does the CommServe handle any backup data directly?</div>
+      <div class="qa-a">No — the CommServe <strong>never touches the actual backup data</strong>. Its sole responsibility is metadata management and job orchestration. All data movement happens directly between the Client and the Media Agent. This architectural decision is what allows CommCells to scale to tens of thousands of clients without the CommServe becoming a performance bottleneck.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">What is a CommCell? How large can it get?</div>
+      <div class="qa-a">A CommCell is the complete Commvault deployment unit — one CommServe managing all associated Media Agents, Clients, and Storage targets. In small environments, a CommCell might have 2 Media Agents and 100–500 clients. In large enterprise deployments, a single CommCell can have <strong>50–100+ Media Agents and 10,000–50,000+ clients</strong> protecting petabytes of data. Very large organisations (global banks, telcos) often deploy multiple CommCells — one per region — and may use Commvault's CommCell Router or Orchestrate for unified reporting across all regions.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">When would you recommend a multi-CommCell deployment vs. a single CommCell?</div>
+      <div class="qa-a">A <strong>single CommCell</strong> suits organisations where all infrastructure is geographically co-located or where centralised management is the priority — it reduces licensing costs and simplifies administration. A <strong>multi-CommCell</strong> approach is better when: (1) data sovereignty or regulations require data to remain within a specific country, (2) the organisation has multiple large data centres and WAN latency would affect backup windows, or (3) fault isolation is required so one region's CommServe failure doesn't impact all other regions. The most common pattern in global enterprises is a CommCell per region.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">What is agentless backup and when is it used in Commvault?</div>
+      <div class="qa-a">Agentless backup refers to protecting <strong>virtual machines without installing a Commvault iDataAgent inside the guest VM</strong>. For VMware, Commvault uses the VMware VADP (vStorage API for Data Protection) through a dedicated proxy server running the Virtual Server Agent (VSA). For Hyper-V, the VSA is installed on the Hyper-V node itself. The hypervisor API provides application-consistent snapshots. Agentless backup is preferred for VM environments because: it eliminates the overhead of managing hundreds of in-guest agents, supports instant VM recovery, and enables granular file-level restores from a single backup image.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Name the enterprise backup market leaders and explain why Commvault is the focus for L2 roles.</div>
+      <div class="qa-a">The Gartner Magic Quadrant leaders are <strong>Commvault, Veeam, Rubrik, Cohesity, and Veritas</strong>. Commvault is the most commonly required skill at the L2 level for several reasons: it has the broadest agent coverage (Oracle, SAP, Exchange, file systems, VMs, cloud), a 30+ year installed base in enterprise banking and healthcare, and the most complex configuration model — meaning L2 engineers need deeper knowledge than with simpler products. Many large global enterprises have significant legacy Commvault deployments that require experienced administrators for day-to-day operations, incident management, and upgrades.</div>
+    </div>
+
+    <div class="callout c-int">
+      <div class="callout-head">🎯 Model Interview Answer — Architecture</div>
+      <p>When asked to explain Commvault's architecture, structure your answer as: <em>"Commvault uses a three-tier architecture. Tier 1 is the CommServe — the master controller that orchestrates all jobs and stores metadata in SQL Server, but never moves data itself. Tier 2 is the Media Agent — the data mover that transfers backup streams from clients to storage, performing deduplication and encryption. Tier 3 is the Client — any server running a Commvault iDataAgent appropriate for the data type being protected. Together they form a CommCell, which scales from hundreds to tens of thousands of clients in enterprise environments."</em></p>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════ ABOUT -->
+<div class="about-wrap">
+  <div class="about-inner">
+
+    <div class="section-header" style="margin-bottom:0;padding-bottom:20px;">
+      <div class="sec-icon ic-bl">👨‍💼</div>
+      <div>
+        <div class="sec-num">About the Trainer</div>
+        <h2 style="font-family:var(--font-head);">About the Training</h2>
+      </div>
+    </div>
+
+    <div class="about-grid">
+
+      <!-- Bio -->
+      <div class="card" style="padding:26px 28px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+          <div style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,rgba(240,136,62,0.3),rgba(88,166,255,0.3));border:2px solid rgba(240,136,62,0.4);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">👤</div>
+          <div>
+            <div style="font-size:17px;font-weight:700;color:var(--text);">Mohammed Abdul</div>
+            <div style="font-size:13px;color:var(--orange);font-weight:500;margin-top:2px;">Data Protection Architect</div>
+          </div>
+        </div>
+        <p style="font-size:14px;margin-bottom:12px;">Data Protection Architect with more than <strong>15 years of experience</strong> in Hybrid Cloud, working with global clients across banking, healthcare, and enterprise IT.</p>
+        <p style="font-size:14px;margin:0;">Specialises in <strong>Commvault, Veeam, NetBackup, and NetApp</strong> — helping organisations design and implement robust data protection strategies.</p>
+      </div>
+
+      <!-- Contact + Disclaimer -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <div class="card" style="padding:20px 22px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--blue);margin-bottom:12px;">📬 For Any Queries</div>
+          <div style="display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;">
+            <span style="font-size:18px;">📧</span>
+            <div>
+              <div style="font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Email</div>
+              <span style="color:var(--blue);font-size:14px;font-weight:500;font-family:var(--font-code);">abdul.md.20000102&#64;gmail&#46;com</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:rgba(240,136,62,0.12);border:1px solid rgba(240,136,62,0.3);color:var(--orange);font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">Commvault</span>
+            <span style="background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);color:var(--blue);font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">Veeam</span>
+            <span style="background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.3);color:var(--green);font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">NetBackup</span>
+            <span style="background:rgba(188,140,255,0.12);border:1px solid rgba(188,140,255,0.3);color:var(--purple);font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">NetApp</span>
+          </div>
+        </div>
+
+        <div class="callout c-warn" style="margin:0;">
+          <div class="callout-head">⚠️ Disclaimer</div>
+          <p>This content is for <strong>educational purposes and training material</strong>. Always refer to official Commvault documentation and follow your organisation's procedures for production implementations.</p>
+          <p style="margin-top:8px;">Official docs: <a href="https://documentation.commvault.com/" target="_blank">documentation.commvault.com</a></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ FOOTER -->
+<footer>
+  <p>Commvault Cloud Tutorial — Part 1 &nbsp;·&nbsp; Complete Guide to Enterprise Backup Operations</p>
+  <p>Authored by <strong>Mohammed Abdul</strong> — Data Protection Architect &nbsp;·&nbsp; Version 11.32 LTS Reference</p>
+</footer>
+
+</body>
+</html>
