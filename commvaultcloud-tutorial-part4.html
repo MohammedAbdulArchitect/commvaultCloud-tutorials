@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Cloud Administration Tutorial 4</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #2f81f7;
+    --accent2: #3fb950;
+    --accent3: #f78166;
+    --accent4: #d2a8ff;
+    --accent5: #ffa657;
+    --warn: #f85149;
+    --tip: #3fb950;
+    --note: #2f81f7;
+    --exam: #d2a8ff;
+    --radius: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Calibri, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 1.5rem;
+    height: 56px; overflow-x: auto; white-space: nowrap;
+  }
+  nav .brand {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700; font-size: 1.05rem;
+    color: var(--accent); flex-shrink: 0;
+    margin-right: 1rem;
+  }
+  nav a {
+    font-size: 0.82rem; color: var(--text-muted);
+    padding: 4px 10px; border-radius: 20px;
+    transition: all .2s; flex-shrink: 0;
+  }
+  nav a:hover { color: var(--text); background: var(--surface2); text-decoration: none; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, rgba(47,129,247,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(63,185,80,0.06) 0%, transparent 60%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(47,129,247,0.15);
+    border: 1px solid rgba(47,129,247,0.4);
+    color: var(--accent); font-size: 0.75rem;
+    padding: 4px 14px; border-radius: 20px;
+    margin-bottom: 1.5rem; letter-spacing: 1px;
+    text-transform: uppercase; font-weight: 600;
+  }
+  .hero h1 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700; line-height: 1.2;
+    margin-bottom: 1rem; position: relative;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    color: var(--text-muted); max-width: 700px;
+    margin: 0 auto 2rem; font-size: 1rem;
+  }
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 1rem;
+    justify-content: center; position: relative;
+  }
+  .hero-meta span {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 0.8rem; color: var(--text-muted);
+  }
+  .hero-meta span strong { color: var(--text); }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 3rem 0 1.5rem;
+  }
+  .section-num {
+    background: var(--accent); color: #fff;
+    font-size: 0.75rem; font-weight: 700;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; letter-spacing: .5px;
+  }
+  h2 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--text);
+  }
+  h3 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: 1.1rem; color: var(--accent4);
+    margin: 1.8rem 0 0.7rem;
+  }
+  h4 {
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--accent5); margin: 1.2rem 0 0.5rem;
+  }
+  p { margin-bottom: 0.9rem; color: var(--text); }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.4rem; color: var(--text); }
+  li::marker { color: var(--accent); }
+
+  /* ── CONTENT CARD ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.8rem;
+    margin-bottom: 1.5rem; box-shadow: var(--shadow);
+  }
+  .card-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.2rem; margin-bottom: 1.5rem;
+  }
+  .mini-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem;
+  }
+  .mini-card .mc-title {
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--accent5); margin-bottom: 0.5rem;
+  }
+
+  /* ── CODE BLOCKS ── */
+  code {
+    font-family: 'Courier New', Courier, 'Lucida Console', monospace;
+    font-size: 0.88em;
+    background: rgba(47,129,247,0.1); border: 1px solid rgba(47,129,247,0.2);
+    padding: 2px 6px; border-radius: 4px; color: #79c0ff;
+  }
+  pre {
+    background: #0d1117; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem 1.5rem;
+    overflow-x: auto; margin: 1rem 0;
+    position: relative;
+  }
+  pre::before {
+    content: '$ TERMINAL'; font-size: 0.7rem;
+    color: var(--text-muted); letter-spacing: 1px;
+    display: block; margin-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border); padding-bottom: 0.6rem;
+  }
+  pre code {
+    background: none; border: none; padding: 0;
+    font-size: 0.88rem; color: #7ee787; line-height: 1.8;
+  }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: var(--radius); padding: 1.2rem 1.4rem;
+    margin: 1.2rem 0; border-left: 4px solid;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .callout-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+  .callout-body { flex: 1; }
+  .callout-body strong { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; letter-spacing: .5px; text-transform: uppercase; }
+  .callout-body p { margin: 0; font-size: 0.92rem; }
+  .callout-body ul { margin: 0.4rem 0 0; }
+  .callout-body li { font-size: 0.92rem; }
+  .callout.warning { background: rgba(248,81,73,0.08); border-color: var(--warn); }
+  .callout.warning .callout-icon { filter: none; }
+  .callout.warning .callout-body strong { color: var(--warn); }
+  .callout.tip { background: rgba(63,185,80,0.08); border-color: var(--tip); }
+  .callout.tip .callout-body strong { color: var(--tip); }
+  .callout.note { background: rgba(47,129,247,0.08); border-color: var(--note); }
+  .callout.note .callout-body strong { color: var(--note); }
+  .callout.exam { background: rgba(210,168,255,0.08); border-color: var(--exam); }
+  .callout.exam .callout-body strong { color: var(--exam); }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex; flex-wrap: wrap; gap: 0; 
+    margin: 1.2rem 0; align-items: center;
+  }
+  .flow-step {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 0.7rem 1rem; border-radius: var(--radius);
+    font-size: 0.82rem; text-align: center; min-width: 110px;
+  }
+  .flow-step .step-num {
+    font-size: 0.65rem; color: var(--accent);
+    font-weight: 700; letter-spacing: 1px;
+    display: block; margin-bottom: 3px;
+  }
+  .flow-arrow {
+    font-size: 1.2rem; color: var(--accent);
+    padding: 0 0.3rem;
+  }
+
+  /* ── VERSION TABLE (div-based) ── */
+  .version-row { 
+    display: grid; gap: 1px;
+    background: var(--border); border-radius: var(--radius); overflow: hidden;
+    margin: 1rem 0;
+  }
+  .version-hdr, .version-item {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px; background: var(--border);
+  }
+  .version-hdr > div { background: var(--surface2); padding: 0.6rem 1rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+  .version-item > div { background: var(--surface); padding: 0.7rem 1rem; font-size: 0.88rem; }
+  .tag {
+    display: inline-block; padding: 2px 10px;
+    border-radius: 20px; font-size: 0.73rem; font-weight: 700;
+    letter-spacing: .5px;
+  }
+  .tag-lts { background: rgba(63,185,80,0.2); color: var(--accent2); border: 1px solid rgba(63,185,80,0.4); }
+  .tag-fr { background: rgba(47,129,247,0.15); color: var(--accent); border: 1px solid rgba(47,129,247,0.3); }
+  .tag-mr { background: rgba(210,168,255,0.15); color: var(--accent4); border: 1px solid rgba(210,168,255,0.3); }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+  /* ── QA SECTION ── */
+  .qa-item { 
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden;
+  }
+  .qa-q {
+    background: rgba(47,129,247,0.07); padding: 0.9rem 1.2rem;
+    font-weight: 600; font-size: 0.92rem;
+    border-left: 3px solid var(--accent);
+    display: flex; gap: 0.7rem; align-items: flex-start;
+  }
+  .qa-q span { color: var(--accent); font-weight: 800; flex-shrink: 0; }
+  .qa-a {
+    padding: 0.9rem 1.2rem; font-size: 0.9rem;
+    border-left: 3px solid var(--accent2);
+    background: rgba(63,185,80,0.04);
+  }
+
+  /* ── AUTHOR CARD ── */
+  .author-section {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 2.5rem; margin: 3rem 0 1rem;
+    position: relative; overflow: hidden;
+  }
+  .author-section::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 200px; height: 200px;
+    background: radial-gradient(ellipse, rgba(47,129,247,0.08) 0%, transparent 70%);
+  }
+  .author-top { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
+  .author-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent4));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; flex-shrink: 0;
+  }
+  .author-info h3 {
+    font-family: Georgia, serif; font-size: 1.15rem;
+    color: var(--text); margin: 0 0 0.3rem;
+  }
+  .author-info p { color: var(--text-muted); font-size: 0.88rem; margin: 0; }
+  .author-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.2rem 0; }
+  .author-badge {
+    background: rgba(47,129,247,0.12); border: 1px solid rgba(47,129,247,0.3);
+    color: var(--accent); padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+  }
+  .author-email {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 8px 16px; border-radius: var(--radius); font-size: 0.88rem;
+    color: var(--text); margin-top: 0.8rem;
+    transition: all .2s;
+  }
+  .author-email:hover { border-color: var(--accent); text-decoration: none; }
+  .disclaimer-box {
+    background: rgba(247,166,87,0.08); border: 1px solid rgba(247,166,87,0.3);
+    border-radius: var(--radius); padding: 1rem 1.2rem; margin-top: 1.5rem;
+    font-size: 0.85rem; color: var(--text-muted);
+  }
+  .disclaimer-box strong { color: var(--accent5); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--surface); border-top: 1px solid var(--border);
+    text-align: center; padding: 1.5rem;
+    color: var(--text-muted); font-size: 0.82rem;
+  }
+
+  /* ── PROGRESS STRIP ── */
+  .toc-strip {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.6rem;
+  }
+  .toc-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; }
+  .toc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    .version-hdr > div, .version-item > div { padding: 0.5rem 0.7rem; font-size: 0.8rem; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav>
+  <div class="brand">Tutorial 4</div>
+  <a href="#sql">SQL Agent</a>
+  <a href="#maintenance">Maintenance</a>
+  <a href="#indexing">Indexing</a>
+  <a href="#dedup">Deduplication</a>
+  <a href="#oracle">Oracle</a>
+  <a href="#vmware">VMware</a>
+  <a href="#author">Author</a>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-badge">Administration Tutorial 4</div>
+  <h1>Commvault Cloud <span>Administration</span><br>Tutorial 4</h1>
+  <p>A comprehensive self-paced tutorial covering SQL Server Agent, Maintenance Releases, Index Caching (V1/V2), Deduplication, Oracle Agent, and VMware Backup &amp; Restore.</p>
+  <div class="hero-meta">
+    <span><strong>Level:</strong> L2 Administration</span>
+    <span><strong>Version:</strong> Commvault 11.32</span>
+    <span><strong>Modules:</strong> 8 Core Topics</span>
+    <span><strong>Format:</strong> Self-Paced</span>
+  </div>
+</div>
+
+<!-- ── PAGE WRAPPER ── -->
+<div class="page">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc-strip">
+    <div class="toc-item"><div class="toc-dot"></div> SQL Server Agent Setup &amp; Backup</div>
+    <div class="toc-item"><div class="toc-dot" style="background:var(--accent2)"></div> Maintenance Release Update</div>
+    <div class="toc-item"><div class="toc-dot" style="background:var(--accent4)"></div> Index V1 Deep Dive</div>
+    <div class="toc-item"><div class="toc-dot" style="background:var(--accent5)"></div> Index V2 &amp; Action Logs</div>
+    <div class="toc-item"><div class="toc-dot" style="background:var(--warn)"></div> Deduplication Architecture</div>
+    <div class="toc-item"><div class="toc-dot" style="background:var(--accent)"></div> Oracle Agent Configuration</div>
+    <div class="toc-item"><div class="toc-dot" style="background:var(--accent2)"></div> VMware ESX Setup</div>
+    <div class="toc-item"><div class="toc-dot" style="background:var(--accent4)"></div> VMware Backup &amp; Restore</div>
+  </div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 – SQL SERVER AGENT -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="sql" class="section-header">
+  <div class="section-num">1</div>
+  <h2>SQL Server Agent – Configuration, Backup &amp; Restore</h2>
+</div>
+
+<div class="card">
+  <p>Microsoft SQL Server is one of the most widely deployed enterprise databases. Fortune 500 organisations run critical workloads on SQL Server, making its protection a fundamental task for any backup administrator. This section covers the complete end-to-end workflow: deploying a SQL VM, installing the Commvault SQL agent, configuring an instance, executing backups, and restoring databases.</p>
+
+  <div class="callout note">
+    <div class="callout-icon">📌</div>
+    <div class="callout-body">
+      <strong>Prerequisite Knowledge</strong>
+      <p>You do not need SQL DBA-level expertise. As a backup administrator, you need to understand the database file types, agent configuration, and backup/restore procedures to protect SQL workloads effectively.</p>
+    </div>
+  </div>
+</div>
+
+<h3>1.1 SQL Server Lab VM Setup</h3>
+<div class="card">
+  <p>Before deploying the Commvault SQL Agent, a working SQL Server environment is required. The following steps outline the minimum setup for a lab environment.</p>
+
+  <h4>VM Provisioning Checklist</h4>
+  <ul>
+    <li>Deploy a Windows Server 2019 VM (recommend 4 vCPUs, 8 GB RAM, 60 GB disk)</li>
+    <li>Select <strong>Desktop Experience</strong> during OS installation for GUI access</li>
+    <li>Assign a <strong>static IP address</strong> – dynamic DHCP IPs will break Commvault client registration</li>
+    <li>Disable all Windows Firewall profiles (in production, open required ports only)</li>
+    <li>Enable <strong>Remote Desktop</strong> for remote management</li>
+  </ul>
+
+  <div class="callout warning">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Static IP is Mandatory</strong>
+      <p>A dynamic IP will cause Commvault client registration to break after reboots. Always set a static IP using the same subnet gateway and DNS as your CommServe. Obtain this from <code>ipconfig /all</code> before making the change.</p>
+    </div>
+  </div>
+</div>
+
+<h3>1.2 SQL Server Engine &amp; SSMS Installation</h3>
+<div class="card">
+  <p>Download the <strong>Developer Edition</strong> (free) of SQL Server from the Microsoft website. Run the installer and select the <strong>Basic</strong> installation type. After the engine is installed, install SQL Server Management Studio (SSMS).</p>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Browser Tip for SSMS Download</strong>
+      <p>Internet Explorer is no longer supported on Microsoft's download pages. Use Microsoft Edge or Chrome to download SSMS. After download, run the installer and accept defaults.</p>
+    </div>
+  </div>
+
+  <h4>First Login to SSMS</h4>
+  <p>When connecting for the first time, if you receive an SSL/TLS error:</p>
+  <ol>
+    <li>Click the <strong>Options &gt;&gt;</strong> button in the connection dialog</li>
+    <li>Locate <strong>Encryption</strong> and change it from <em>Mandatory</em> to <em>Optional</em></li>
+    <li>Click <strong>Connect</strong></li>
+  </ol>
+  <p>Only <em>System Databases</em> will appear on first login. User/customer databases are added separately.</p>
+</div>
+
+<h3>1.3 Loading a Sample Database (AdventureWorks)</h3>
+<div class="card">
+  <p>For lab purposes, Microsoft's sample database <strong>AdventureWorks2022</strong> is used. Download the <code>.bak</code> file from the Microsoft documentation site and restore it into SQL Server via SSMS.</p>
+
+  <h4>SQL Database File Types</h4>
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">MDF – Database File</div>
+      <p>Primary data file containing all schema, tables, and stored data. This is the main backup target.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">LDF – Log File</div>
+      <p>Transaction log file. Records all changes committed to the database. Critical for point-in-time recovery.</p>
+    </div>
+  </div>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: What files does Commvault back up for a SQL Server database?<br>
+      A: <strong>MDF</strong> (metadata/data file) and <strong>LDF</strong> (transaction log file). Both are protected by the SQL Server agent.</p>
+    </div>
+  </div>
+</div>
+
+<h3>1.4 Installing the Commvault SQL Server Agent</h3>
+<div class="card">
+  <p>The SQL agent can be deployed via two methods in the Commvault Command Center:</p>
+
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">Method 1 – Guided Setup</div>
+      <p>Navigate to <strong>Guided Setup → Databases → SQL Server</strong>. Enter the SQL server IP, credentials, package, and plan. Commvault pushes the agent remotely.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Method 2 – Manage Servers</div>
+      <p>Navigate to <strong>Manage → Servers → Add Server</strong>. Provide host name/IP, credentials, and select the <em>SQL Server</em> package.</p>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Dependent Package</strong>
+      <p>When the SQL Server agent is pushed, the <strong>File System Core</strong> package is also installed automatically as a dependency. This is expected behaviour.</p>
+    </div>
+  </div>
+
+  <h4>Credentials Required</h4>
+  <ul>
+    <li><strong>Server Credentials</strong> – Windows OS credentials (domain\username or .\administrator) for remote installation</li>
+    <li><strong>Database Credentials</strong> – SQL Server credentials with <strong>SysAdmin</strong> role on the SQL instance</li>
+  </ul>
+
+  <h4>Resolving the SysAdmin Role Warning</h4>
+  <p>After agent installation, if the Command Center displays a warning that the user lacks SysAdmin rights:</p>
+  <ol>
+    <li>Navigate to the SQL Server instance in Commvault</li>
+    <li>In the <strong>SQL Server Authentication</strong> section, set <em>Impersonate User</em></li>
+    <li>Create a new credential set using format: <code>hostname\administrator</code></li>
+    <li>Save and apply – the warning should disappear and status should show <em>Ready</em></li>
+  </ol>
+</div>
+
+<h3>1.5 Backup and Restore Workflow</h3>
+<div class="card">
+  <h4>Running a Backup</h4>
+  <p>Once the agent is configured and the instance is discovered, navigate to <strong>Protect → Databases → SQL Server → [Instance]</strong>. Edit the default subclient content and select the databases to protect. Then trigger a manual backup or rely on the scheduled plan.</p>
+
+  <div class="callout warning">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Production Consent Required</strong>
+      <p>Never run a manual backup on a production SQL server without obtaining explicit confirmation from the DBA. Running backups during peak hours can impact application performance and is against best practice.</p>
+    </div>
+  </div>
+
+  <h4>Restore Procedure – In-Place Restore</h4>
+  <div class="flow">
+    <div class="flow-step"><span class="step-num">STEP 1</span>Go to database<br>instance</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 2</span>Select recovery<br>point</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 3</span>Choose In-Place<br>Restore</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 4</span>Confirm overwrite<br>with DBA</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 5</span>Submit &amp; verify<br>in SSMS</div>
+  </div>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: What restore granularity is available for SQL Server in Commvault?<br>
+      A: SQL Server supports <strong>Database-level restore</strong> only in standard configurations. Table-level restore is not available without additional licensing. Recovery options: In-Place (overwrite existing), Out-of-Place (restore to new instance), or Clone.</p>
+    </div>
+  </div>
+</div>
+
+<h3>1.6 Registry Keys and Additional Settings</h3>
+<div class="card">
+  <div class="callout warning">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Best Practice – Additional Settings</strong>
+      <p>Never add Commvault registry keys or additional settings to SQL agents as a standard practice. Apply them <strong>only when</strong>:
+        <ul>
+          <li>Commvault Technical Support explicitly recommends them for a specific issue</li>
+          <li>The official documentation mandates them for a particular version</li>
+        </ul>
+        Generic application of additional settings to every SQL client is incorrect.
+      </p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 – MAINTENANCE RELEASE -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="maintenance" class="section-header">
+  <div class="section-num">2</div>
+  <h2>Commvault Versioning &amp; Maintenance Release Updates</h2>
+</div>
+
+<div class="card">
+  <p>Understanding Commvault's versioning structure is foundational for lifecycle management, upgrade planning, and support engagement. This section covers the version hierarchy, maintenance release types, and the step-by-step update procedure.</p>
+</div>
+
+<h3>2.1 Commvault Versioning Structure</h3>
+<div class="card">
+  <div class="version-row">
+    <div class="version-hdr">
+      <div>Release Type</div>
+      <div>Example</div>
+      <div>Also Called</div>
+    </div>
+    <div class="version-item">
+      <div><span class="tag tag-lts">LTS</span> Platform Release</div>
+      <div>11.36 (Lavender)</div>
+      <div>Feature Release, FR</div>
+    </div>
+    <div class="version-item">
+      <div><span class="tag tag-mr">MR</span> Maintenance Release</div>
+      <div>11.32.83 (last 2 digits = 83)</div>
+      <div>Hot Fix, Service Pack (legacy)</div>
+    </div>
+  </div>
+
+  <div class="card-grid" style="margin-top:1rem">
+    <div class="mini-card">
+      <div class="mc-title">Long Term Support (LTS)</div>
+      <p>Commvault provides <strong>3 years of support</strong> for LTS releases. Running beyond EOL results in denial of technical support.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">End of Life (EOL)</div>
+      <p>When a release reaches EOL, Commvault Support will refuse to handle cases until the environment is upgraded. Plan upgrades proactively before EOL.</p>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-icon">🌐</div>
+    <div class="callout-body">
+      <strong>Essential Reference Sites</strong>
+      <ul>
+        <li><code>documentation.commvault.com</code> – Official documentation for all procedures</li>
+        <li><code>store.commvault.com</code> → cloud.commvault.com – Maintenance kit downloads, workflows, reports</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h3>2.2 Maintenance Release Update Procedure</h3>
+<div class="card">
+  <h4>Pre-Update Checklist (Pre-Sanity)</h4>
+  <ol>
+    <li>Verify current version: <strong>Support → About</strong> in the CommCell Console</li>
+    <li>Download the correct maintenance release from <code>store.commvault.com → Maintenance Kit</code></li>
+    <li><strong>Run a DR (Disaster Recovery) Backup</strong> – note the Phase 1 dump location</li>
+    <li><strong>Disable the Scheduler</strong> – use <em>Enable or Delay</em> option with auto-enable time (safer than disable)</li>
+    <li>Stop all Commvault services on the CommServe</li>
+  </ol>
+
+  <div class="callout warning">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Always Run DR Backup First</strong>
+      <p>If the maintenance update fails and services cannot start, you will need the DR backup to recover the CommServe database. Never begin a maintenance update without a recent DR backup confirming the Phase 1 dump location.</p>
+    </div>
+  </div>
+
+  <h4>Update Hierarchy – Always Follow This Order</h4>
+  <div class="flow">
+    <div class="flow-step"><span class="step-num">FIRST</span>CommServe</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">SECOND</span>Media Agents</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">THIRD</span>VSA Agents</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">FOURTH</span>Client Machines</div>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Infrastructure First</strong>
+      <p>CommServe, Media Agents, and VSA agents are <strong>infrastructure components</strong>. Commvault recommends keeping all infra components on the same maintenance release version. Clients can be updated in a later window if time is constrained.</p>
+    </div>
+  </div>
+
+  <h4>Updating via Push (Remote) – Windows</h4>
+  <pre><code># From Java Console:
+Right-click MediaAgent → All Tasks → Add or Remove Software → Upgrade Software
+
+# From Command Center:
+Manage → Servers → [Server] → Actions → Upgrade Software</code></pre>
+
+  <h4>Updating Interactively – Linux Client</h4>
+  <pre><code># 1. Copy the tar file to the Linux machine via WinSCP
+# 2. Extract the package (do NOT extract Windows; DO keep Linux as .tar)
+tar -xvf commvault_11.32.83_linux.tar -C /tmp/software/
+
+# 3. Set execute permissions
+chmod -R 775 /tmp/software/
+
+# 4. Run the installer
+cd /tmp/software/
+./Install_update
+
+# 5. Confirm restart when prompted</code></pre>
+
+  <div class="callout warning">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Linux: Keep the .tar File Intact</strong>
+      <p>For the Software Cache Copy operation, the Linux maintenance release <strong>must remain as a .tar file</strong>. Extracting it before copying will cause the cache copy job to fail. Only extract on the target client during interactive installation.</p>
+    </div>
+  </div>
+</div>
+
+<h3>2.3 Software Cache Configuration</h3>
+<div class="card">
+  <p>The Software Cache is the CommServe's internal repository of installation packages. A current cache is required for successful remote (push) installations. Navigate to <strong>Tools → Add or Remove Software → Software Cache Configuration</strong>.</p>
+
+  <h4>Cache Copy Job</h4>
+  <p>After downloading new packages, run a <strong>Copy Software</strong> job to sync the downloaded maintenance release into the cache. This job copies from a staging location (e.g., your desktop folder) to the CommServe's internal cache directory.</p>
+
+  <h4>Remote Software Cache</h4>
+  <p>For multi-site environments, configure a Remote Software Cache near geographically distributed clients. This reduces WAN bandwidth consumption during push installations by sourcing packages locally.</p>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: Why is a remote software cache beneficial in a multi-region environment?<br>
+      A: It reduces WAN latency and bandwidth usage when deploying agents to remote clients. Packages are sourced from a cache server co-located with the clients instead of downloading from the central CommServe across a WAN link.</p>
+    </div>
+  </div>
+</div>
+
+<h3>2.4 Commvault LiveSync (HA/DR Overview)</h3>
+<div class="card">
+  <p><strong>LiveSync</strong> provides High Availability (HA) or Disaster Recovery (DR) for the CommServe. The distinction between HA and DR is purely about <em>location</em>:</p>
+
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">High Availability (HA)</div>
+      <p>Production and standby CommServe are in the <strong>same data centre</strong>. Failover protects against hardware/OS failure.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Disaster Recovery (DR)</div>
+      <p>Standby CommServe is in a <strong>different data centre</strong> or geography. Protects against site-level outages.</p>
+    </div>
+  </div>
+
+  <h4>How LiveSync Works</h4>
+  <ul>
+    <li>The CommServe database (hosted on SQL Server) is replicated to the standby using the SQL Agent</li>
+    <li>Transaction logs are replicated every <strong>15 minutes</strong> – this defines the RPO (Recovery Point Objective)</li>
+    <li>A <strong>Virtual Hostname/Virtual IP</strong> is used so clients and media agents connect to the same logical name regardless of which node is active</li>
+    <li>Ports <strong>8400</strong> and <strong>8405</strong> must be open between production and standby nodes</li>
+  </ul>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: What is the replication interval in Commvault LiveSync and why is it called "Live"?<br>
+      A: Transaction logs replicate every 15 minutes, keeping the standby nearly in sync with production. The "Live" in LiveSync reflects this near-real-time synchronisation.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SECTION 3 – INDEXING V1 & V2 -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="indexing" class="section-header">
+  <div class="section-num">3</div>
+  <h2>Commvault Indexing – V1 and V2 Architecture</h2>
+</div>
+
+<div class="card">
+  <p>Commvault maintains an <strong>index</strong> for every backup job. This index functions like a book's table of contents – it maps every file, folder, and database object within a backup to its storage location, enabling fast granular browse and restore operations without scanning the entire backup set.</p>
+
+  <div class="callout note">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Why Indexing Matters</strong>
+      <p>Without the index, browsing a backup would require reading the entire backup from storage. The index enables instant file-level navigation during restore operations from the CommCell Console or Command Center.</p>
+    </div>
+  </div>
+</div>
+
+<h3>3.1 Index V1 – How It Works</h3>
+<div class="card">
+  <h4>Backup Job Phases (V1)</h4>
+  <div class="flow">
+    <div class="flow-step"><span class="step-num">PHASE 1</span>Scan Phase<br>File list created</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">PHASE 2</span>Backup Phase<br>Data written to library</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">PHASE 3</span>Archive Index<br>Index written to cache + library</div>
+  </div>
+
+  <h4>Key V1 Characteristics</h4>
+  <ul>
+    <li>Index is maintained at the <strong>subclient level</strong></li>
+    <li>Every <strong>Full Backup</strong> generates a new, complete index database</li>
+    <li>Index is written to two locations: <strong>Index Cache</strong> (temporary, on MediaAgent) and <strong>Library</strong> (permanent copy)</li>
+    <li>During Browse &amp; Restore, index is read from cache first; if expired, pulled from library</li>
+  </ul>
+
+  <h4>Index Cache Retention (V1)</h4>
+  <p>Configure retention via <strong>MediaAgent Properties → Catalog tab</strong>:</p>
+  <ul>
+    <li>Default retention: <strong>15 days</strong></li>
+    <li>Alert threshold: when free space falls below <strong>50 GB</strong></li>
+    <li>Auto-cleanup: triggered when free space reaches <strong>10%</strong></li>
+  </ul>
+
+  <div class="callout warning">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>V1 Drawback</strong>
+      <p>For large backups (1 TB+) with millions of files, the full index database generation significantly increases backup job duration. This was the primary driver for introducing Index V2.</p>
+    </div>
+  </div>
+</div>
+
+<h3>3.2 Index V2 – Architecture and Benefits</h3>
+<div class="card">
+  <h4>Key V2 Differences vs V1</h4>
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">Index Maintained At</div>
+      <p><strong>Backup Set level</strong> (not subclient level as in V1)</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Full Index Generation</div>
+      <p>Only on the <strong>first backup job</strong>. Subsequent jobs generate <em>action logs</em> only</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Action Logs</div>
+      <p>Equivalent to transaction logs. Written to cache and library with each job</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Performance Impact</div>
+      <p>Significantly <strong>shorter backup windows</strong> because no full index rebuild per job</p>
+    </div>
+  </div>
+
+  <h4>V2 Backup Process Flow</h4>
+  <div class="flow">
+    <div class="flow-step"><span class="step-num">FIRST RUN</span>Full index DB<br>created</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">SUBSEQUENT</span>Action logs<br>generated only</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">BACKGROUND</span>Big Data App<br>job commits logs</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">CHECKPOINT</span>Index DB backed<br>up separately</div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Big Data App Jobs</strong>
+      <p>In V2, the index databases are protected by background <strong>Big Data App</strong> jobs rather than inline with each backup. These jobs run on a schedule and protect V2 client index databases. You will see these in the Job Controller at regular intervals.</p>
+    </div>
+  </div>
+
+  <h4>Agents Supporting V2 (reference via documentation.commvault.com)</h4>
+  <ul>
+    <li>Windows &amp; Linux File System Agents</li>
+    <li>Exchange Mailbox Agent</li>
+    <li>VMware VSA Agent</li>
+    <li>SQL Server (Block Level and IntelliSnap only)</li>
+  </ul>
+</div>
+
+<h3>3.3 Checking Index Version per Client</h3>
+<div class="card">
+  <p>Download the <strong>Index Version Status</strong> report XML from <code>store.commvault.com</code>, then import it via <strong>Command Center → Reports → Actions → Import Report</strong>. This report shows which clients are running V1 or V2 indexing.</p>
+
+  <h4>Upgrading from V1 to V2</h4>
+  <p>Download the <strong>Upgrade to Indexing V2</strong> workflow from the Commvault Store. Import it via the Java Console: <strong>Workflows → All Tasks → Import Definition</strong>. Deploy and execute it, selecting the target client and agent type.</p>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: What is the main advantage of Index V2 over V1?<br>
+      A: V2 only generates a full index database on the first backup. Subsequent backups generate lightweight <strong>action logs</strong>, reducing the archive index phase duration and improving overall backup throughput. The index DB is protected independently by Big Data App jobs.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SECTION 4 – DEDUPLICATION -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="dedup" class="section-header">
+  <div class="section-num">4</div>
+  <h2>Deduplication Architecture &amp; DDB Deep Dive</h2>
+</div>
+
+<div class="card">
+  <p>Commvault Software Deduplication eliminates redundant data blocks before writing to storage. This reduces storage consumption and network bandwidth usage. Deduplication operates on <strong>Disk Storage</strong> and <strong>Cloud Storage</strong> – it is <em>not supported</em> on Tape.</p>
+</div>
+
+<h3>4.1 How Deduplication Works</h3>
+<div class="card">
+  <h4>Deduplication Process (5-Step Flow)</h4>
+  <div class="flow">
+    <div class="flow-step"><span class="step-num">STEP 1</span>Read data blocks<br>from client</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 2</span>Generate signature<br>(hash) per 128 KB block</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 3</span>Compare signature<br>to DDB</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 4</span>Duplicate → Discard<br>Unique → Write</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 5</span>Unique blocks<br>written to storage</div>
+  </div>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Key Interview Fact</strong>
+      <p>The default Commvault deduplication block size is <strong>128 KB</strong>. A unique cryptographic signature (hash) is generated for each 128 KB block. This value is configurable via Storage Pool properties.</p>
+    </div>
+  </div>
+</div>
+
+<h3>4.2 Client-Side Deduplication (Signature Generation)</h3>
+<div class="card">
+  <p>By default, Commvault enables <strong>client-side signature generation</strong>. The iDataAgent on the client machine generates the signature locally before sending data to the MediaAgent.</p>
+
+  <h4>How Client-Side Dedup Saves Network Bandwidth</h4>
+  <ul>
+    <li>Client generates a signature for each 128 KB block</li>
+    <li>Client sends the signature to the MediaAgent for comparison (not the full block)</li>
+    <li>If the MediaAgent finds a match (duplicate), the client <strong>does not transmit</strong> that block</li>
+    <li>Only <strong>unique blocks</strong> are sent across the network</li>
+  </ul>
+
+  <p>Result: For a second full backup with only 10% data change, the client transmits <strong>~10% of the total data size</strong> instead of 100%.</p>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>When to Disable Client-Side Dedup</strong>
+      <p>Only disable client-side deduplication if the application owner reports that the iDataAgent is consuming excessive CPU/RAM resources. This setting is under <strong>Subclient Properties → Storage Devices → Deduplication</strong>.</p>
+    </div>
+  </div>
+</div>
+
+<h3>4.3 Content-Aware Deduplication</h3>
+<div class="card">
+  <p>Commvault separates deduplication stores by agent type to maximise savings. This is called <strong>Content-Aware Deduplication</strong>.</p>
+
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">File Store</div>
+      <p>Used by all <strong>File System Agent</strong> backup jobs. Windows DLL files and common OS data deduplicate aggressively across clients.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Database Store</div>
+      <p>Used by all <strong>Database Agent</strong> backup jobs (SQL, Oracle, SAP). Block processing order differs from file backups.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">VM Store</div>
+      <p>Used by all <strong>VMware and Hyper-V</strong> backup jobs. VMDK blocks from similar OS builds deduplicate well.</p>
+    </div>
+  </div>
+
+  <h4>Block Processing Order per Agent Type</h4>
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">Object-Based (File System, VM)</div>
+      <p>Order: <strong>Compress → Hash → Encrypt</strong></p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Database Agent</div>
+      <p>Order: <strong>Hash → Compress → Encrypt</strong> (reversed for better dedup savings)</p>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Log Backups are Not Deduplicated</strong>
+      <p>Transaction log backups are excluded from deduplication by design. Log data is highly unique and offers negligible deduplication savings while consuming DDB resources.</p>
+    </div>
+  </div>
+</div>
+
+<h3>4.4 Deduplication Database (DDB) Architecture</h3>
+<div class="card">
+  <p>The DDB is hosted on the MediaAgent. A dedicated partition (drive) should be provisioned for the DDB, separate from the backup data mount path.</p>
+
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">DDB Partition (Database)</div>
+      <p>Stores the signature tables. Location: dedicated MediaAgent drive (e.g., F:\DDB_Partition). Max <strong>4 partitions</strong> by default (up to 6 with additional settings).</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Mount Path (Store)</div>
+      <p>Stores the actual backup data (chunks and volumes). This is your disk library mount path.</p>
+    </div>
+  </div>
+
+  <h4>DDB Internal Tables</h4>
+  <ul>
+    <li><strong>Primary Table</strong> – Stores unique block signatures</li>
+    <li><strong>Secondary Table</strong> – Stores block references (how many times a block is referenced)</li>
+    <li><strong>Zero Reference Table</strong> – Stores signatures of prunable blocks (blocks whose retention has expired)</li>
+  </ul>
+
+  <h4>Storage Data Structure</h4>
+  <p>Backup data on the mount path is organised as: <code>Mount Path → Volumes → Chunks → Metadata Files</code></p>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: What is the difference between the DDB store and the DDB database?<br>
+      A: The <strong>DDB database</strong> (partition) stores the signature/hash tables used for comparison. The <strong>store</strong> (mount path/library) is where the actual backup data blocks are written. They are separate entities, ideally on separate disks.</p>
+    </div>
+  </div>
+</div>
+
+<h3>4.5 Archive File and Chunk Relationship</h3>
+<div class="card">
+  <p>Every backup job is internally divided into logical units by Commvault:</p>
+  <ul>
+    <li><strong>Archive File</strong> – A logical record in the CommServe database tracking each portion of a job. Used for storage policy tracking.</li>
+    <li><strong>Volume</strong> – A physical container on the mount path holding backup data.</li>
+    <li><strong>Chunk</strong> – A logical checkpoint within a volume. Each completed chunk is registered in the CommServe DB and updates indexes.</li>
+  </ul>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Archive Files are in the Database Only</strong>
+      <p>Archive files do not exist as physical files on storage. They are database entries in the CommServe SQL database. Volumes and chunks are physical structures on the mount path.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SECTION 5 – ORACLE AGENT -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="oracle" class="section-header">
+  <div class="section-num">5</div>
+  <h2>Oracle Database Agent – Configuration, Backup &amp; Restore</h2>
+</div>
+
+<div class="card">
+  <p>Oracle Database is the most widely deployed enterprise database platform, used by the majority of Fortune 500 companies for mission-critical workloads. Commvault protects Oracle through its dedicated iDataAgent, which leverages Oracle's native <strong>RMAN</strong> (Recovery Manager) utility to perform backups and restores.</p>
+</div>
+
+<h3>5.1 Oracle Architecture Essentials for Backup Admins</h3>
+<div class="card">
+  <h4>Files Protected by Commvault Oracle Agent</h4>
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">Data Files (.dbf)</div>
+      <p>Contain the actual database data – tables, indexes, and stored content.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Redo Log Files</div>
+      <p>Record all changes made to data. Required for instance recovery.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Control Files</div>
+      <p>Contain metadata about the database structure. Restored first during recovery.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Archive Log Files</div>
+      <p>Archived copies of filled redo logs. Required for point-in-time recovery.</p>
+    </div>
+  </div>
+
+  <h4>Database States You Must Know</h4>
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">For Backup → OPEN + Archive Log Mode ENABLED</div>
+      <p>The database must be <strong>OPEN</strong> and running in <strong>Archive Log Mode</strong> for Commvault to take a successful online backup.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">For Restore → NO MOUNT Mode</div>
+      <p>Commvault automatically switches the database to <strong>NO MOUNT</strong> before restore begins, then restores it to OPEN state after completion.</p>
+    </div>
+  </div>
+
+  <h4>Oracle Multi-Tenant Architecture (12c+)</h4>
+  <ul>
+    <li><strong>CDB</strong> – Container Database (the root/parent database, also called the Global Database Name)</li>
+    <li><strong>PDB</strong> – Pluggable Database (child databases hosted within the CDB, also called test PDB or similar)</li>
+  </ul>
+</div>
+
+<h3>5.2 Oracle Lab Prerequisites</h3>
+<div class="card">
+  <h4>Prerequisites Checklist</h4>
+  <ul>
+    <li>Deploy an Oracle Linux 8 VM (minimum 2 vCPU, 8 GB RAM, 80 GB disk)</li>
+    <li>Install Oracle 19c software using the interactive or silent method</li>
+    <li>Create a database instance using <strong>DBCA</strong> (Database Configuration Assistant)</li>
+    <li>Verify the instance is in <strong>OPEN</strong> state and <strong>Archive Log Mode</strong> is enabled</li>
+    <li>Ensure port <strong>22 (SSH)</strong> is open between CommServe and the Oracle server</li>
+  </ul>
+
+  <h4>Essential Oracle CLI Commands (for Backup Admins)</h4>
+  <pre><code># Verify the Oracle listener and running instances
+lsnrctl status
+
+# Connect to SQL*Plus
+sqlplus / as sysdba
+
+# Check instance name and status
+SELECT instance_name, status FROM v$instance;
+
+# Check archive log mode
+ARCHIVE LOG LIST;
+
+# Enable archive log mode (if disabled – done by DBA)
+SHUTDOWN IMMEDIATE;
+STARTUP MOUNT;
+ALTER DATABASE ARCHIVELOG;
+ALTER DATABASE OPEN;
+
+# Check service name (needed for Commvault config)
+SELECT * FROM global_name;</code></pre>
+
+  <div class="callout warning">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>DBA Responsibility</strong>
+      <p>The above Oracle commands are for reference and DBA coordination only. In production, backup administrators should <strong>not</strong> modify Oracle database settings. Always involve the DBA for database mode changes, startup/shutdown, and archive log configuration.</p>
+    </div>
+  </div>
+</div>
+
+<h3>5.3 Installing the Oracle Agent</h3>
+<div class="card">
+  <p>Navigate to <strong>Command Center → Guided Setup → Databases → Oracle</strong>, or <strong>Manage → Servers → Add Server</strong>.</p>
+
+  <h4>Required Information (from DBA)</h4>
+  <ul>
+    <li>Oracle server IP address or hostname</li>
+    <li>OS-level credentials (user with <code>sudo</code>/root privileges) for agent installation</li>
+    <li>Oracle Instance Name (SID)</li>
+    <li>Oracle Home directory path</li>
+    <li>Service Name (Global Database Name)</li>
+    <li>Database credentials with <strong>SYSDBA</strong> privilege (or a service account with SYSDBA role)</li>
+  </ul>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Auto-Discovery</strong>
+      <p>After agent installation, Commvault automatically discovers Oracle instances running on the server. Manual instance addition is only needed if auto-discovery is disabled. Check <strong>Enable Automatic Instance Discovery</strong> in the instance configuration.</p>
+    </div>
+  </div>
+</div>
+
+<h3>5.4 Oracle Backup Types</h3>
+<div class="card">
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">Online (Hot) Backup</div>
+      <p>Database remains <strong>OPEN</strong> during backup. Commvault leverages RMAN to back up data files while the database serves transactions. This is the standard production method.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Offline (Cold) Backup</div>
+      <p>Database is <strong>shut down</strong> before backup. Used for consistent full backups in specific scenarios. Causes downtime and must be planned with the DBA and application teams.</p>
+    </div>
+  </div>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: How does Commvault take Oracle backups? Does it directly access the data files?<br>
+      A: No. The Commvault Oracle iDataAgent sends instructions to Oracle's native <strong>RMAN</strong> utility, which performs the actual backup. RMAN writes the backup data and the iDataAgent transfers it to the MediaAgent and storage. The backup admin does not interact with RMAN directly.</p>
+    </div>
+  </div>
+</div>
+
+<h3>5.5 Oracle Restore Procedure</h3>
+<div class="card">
+  <h4>Restore Types</h4>
+  <ul>
+    <li><strong>In-Place Restore</strong> – Overwrites existing database at original location (Commvault auto-manages database state switches)</li>
+    <li><strong>Out-of-Place Restore</strong> – Restores to a new instance (useful for testing and cloning)</li>
+    <li><strong>Restore to Disk</strong> – Dumps the database files to a directory; DBA performs recovery manually</li>
+  </ul>
+
+  <h4>Switch Database Mode Option</h4>
+  <p>When initiating an in-place restore, the <strong>Switch Database Mode</strong> checkbox should remain enabled (default). This allows Commvault to:</p>
+  <ol>
+    <li>Automatically switch the database from OPEN → NO MOUNT</li>
+    <li>Perform the restore and recovery</li>
+    <li>Automatically bring the database back to OPEN state</li>
+  </ol>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>SCN – System Change Number</strong>
+      <p>Oracle assigns a unique SCN to every committed transaction. Commvault automatically captures the latest SCN from the backup. During restore, the default recovery point is the latest backed-up SCN. You can override this for point-in-time recovery.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SECTION 6 – VMWARE ESX SETUP -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="vmware" class="section-header">
+  <div class="section-num">6</div>
+  <h2>VMware Backup &amp; Restore – Architecture and Transport Modes</h2>
+</div>
+
+<div class="card">
+  <p>VMware Virtual Machine backups through Commvault are <strong>agentless</strong> – no agent is installed inside the guest VMs. A dedicated <strong>Virtual Server Agent (VSA)</strong>, also called a proxy, handles all backup coordination by communicating with the ESX host or vCenter via APIs.</p>
+</div>
+
+<h3>6.1 VMware Architecture Overview</h3>
+<div class="card">
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">vCenter Server</div>
+      <p>The central management server for the VMware environment. Manages multiple ESX hosts, clusters, and resources. Preferred target for Commvault configuration in large environments.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">ESX Host</div>
+      <p>Physical server running the VMware hypervisor. Virtual machines and their VMDK files reside here.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Data Store</div>
+      <p>Storage volume (local or shared) where VM files (VMDK) are stored. Can be SAN, NAS, or local disk.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">VSA / Proxy</div>
+      <p>The Commvault agent server. Can be inside or outside the VMware environment. Coordinates backup jobs and transfers data to the MediaAgent.</p>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>What Gets Backed Up</strong>
+      <p>Commvault backs up <strong>Virtual Machines</strong> only. The ESX host itself and vCenter are not backed up by the VSA agent. VM files are in <strong>VMDK format</strong> – these are what the backup reads and protects.</p>
+    </div>
+  </div>
+</div>
+
+<h3>6.2 VSA Proxy Placement Options</h3>
+<div class="card">
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">Option A – External Proxy</div>
+      <p>VSA installed on a <strong>physical or virtual server outside</strong> the VMware environment. Simpler setup. Transport mode limited to NBD or SAN.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Option B – Internal Proxy (Hot Add)</div>
+      <p>VSA installed on a <strong>virtual machine inside the ESX host</strong>. Enables Hot Add transport mode for block-level backup performance.</p>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Package Name</strong>
+      <p>When installing the Commvault agent for VMware, the package name to select is <strong>Virtual Server</strong> – the same package used for Hyper-V, AWS, and Azure virtualisation. Commvault uses a single unified agent with platform-specific plugins.</p>
+    </div>
+  </div>
+</div>
+
+<h3>6.3 Transport Modes – Comparison</h3>
+<div class="card">
+  <div class="version-row">
+    <div class="version-hdr">
+      <div>Transport Mode</div>
+      <div>How it Works</div>
+      <div>Requirement</div>
+    </div>
+    <div class="version-item">
+      <div><strong>SAN</strong> ⚡ Fastest</div>
+      <div>Data transferred via Fibre Channel between data store LUNs and VSA</div>
+      <div>Physical VSA + FC infrastructure + LUN zoning</div>
+    </div>
+    <div class="version-item">
+      <div><strong>NAS</strong> 🏎 Fast</div>
+      <div>VSA reads directly from NFS data store, bypasses ESX</div>
+      <div>NFS data store + VSA has NFS mount access</div>
+    </div>
+    <div class="version-item">
+      <div><strong>Hot Add</strong> 🔵 Good</div>
+      <div>VM disks mounted to VSA proxy at block level (disk-to-disk copy)</div>
+      <div>VSA must be a VM on the same ESX as backed-up VMs</div>
+    </div>
+    <div class="version-item">
+      <div><strong>NBD</strong> 🟡 Baseline</div>
+      <div>Data transferred via TCP/IP through ESX NIC (file-level copy)</div>
+      <div>No special infrastructure required (default fallback)</div>
+    </div>
+  </div>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip – Auto Transport Mode</strong>
+      <p>When transport mode is set to <strong>Auto</strong>, Commvault evaluates each mode in order of preference: SAN → NAS → Hot Add → NBD. It automatically selects the highest-performance mode whose prerequisites are satisfied. NBD is always the final fallback.</p>
+    </div>
+  </div>
+</div>
+
+<h3>6.4 Hot Add Transport – Conditions</h3>
+<div class="card">
+  <p>For Hot Add backup to succeed, all three conditions must be true:</p>
+  <ol>
+    <li>The VSA proxy must be a <strong>virtual machine running on the same ESX host</strong></li>
+    <li>The ESX host where the VSA runs must have <strong>access (visibility) to the data stores</strong> holding the VMs being backed up</li>
+    <li>Data store sharing can extend to remote ESX hosts – if ESX1's VSA can see ESX2/ESX3 data stores, Hot Add can back up VMs from those hosts too</li>
+  </ol>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Hot Add – What Happens During Backup</strong>
+      <p>During a Hot Add backup, the VMDK files of the source VM are <strong>temporarily mounted</strong> to the VSA proxy as local disks. You can observe this in Disk Management on the proxy (Disk 1 will appear as Offline during the backup). Once the backup completes, the disk is automatically unmounted and removed.</p>
+    </div>
+  </div>
+</div>
+
+<h3>6.5 VMware Backup Process Flow</h3>
+<div class="card">
+  <div class="flow">
+    <div class="flow-step"><span class="step-num">STEP 1</span>Schedule triggers<br>VM group discovery</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 2</span>Commvault sends<br>VM list to VSA proxy</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 3</span>VSA sends API<br>request to ESX/vCenter</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 4</span>ESX creates<br>VM snapshot (GX_Backup)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 5</span>VM quiesced –<br>VMDK backed up via transport</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><span class="step-num">STEP 6</span>Backup complete –<br>snapshot deleted, cleanup</div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Snapshot Naming</strong>
+      <p>During backup, Commvault creates a snapshot on the VM named <strong>GX_BACKUP</strong>. The snapshot description includes the Job ID and proxy server name. This snapshot is automatically deleted upon backup completion. If you see stale GX_BACKUP snapshots, it may indicate a failed or stuck backup job.</p>
+    </div>
+  </div>
+</div>
+
+<h3>6.6 Configuring ESX in Commvault</h3>
+<div class="card">
+  <h4>Step-by-Step: Add ESX to Command Center</h4>
+  <ol>
+    <li>Navigate to <strong>Guided Setup → Virtualisation</strong></li>
+    <li>Select <strong>VMware vCenter</strong> (use ESX IP directly if no vCenter)</li>
+    <li>Enter the ESX/vCenter IP address and credentials (root or service account)</li>
+    <li>Select the <strong>Access Node</strong> (the VSA proxy server)</li>
+    <li>Create a <strong>VM Group</strong> and add target VMs (by content or rule)</li>
+    <li>Assign a backup plan</li>
+    <li>Click <strong>Finish</strong></li>
+  </ol>
+
+  <div class="callout note">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Access Node is Mandatory</strong>
+      <p>The Access Node (VSA proxy) must have network connectivity to the ESX host before being selected. Without L3 connectivity from the VSA to the ESX, the API requests for snapshot creation will fail and the configuration step will not complete.</p>
+    </div>
+  </div>
+</div>
+
+<h3>6.7 VMware Restore Options</h3>
+<div class="card">
+  <div class="card-grid">
+    <div class="mini-card">
+      <div class="mc-title">Full VM Restore (In-Place)</div>
+      <p>Restores and overwrites the existing VM at its original location. Use for disaster recovery when the VM is corrupt or deleted.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Full VM Restore (Out-of-Place)</div>
+      <p>Restores the VM as a new clone at a different location or ESX. Ideal for DR testing without impacting production.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Guest File Restore</div>
+      <p>Restores individual files from within a VM backup without restoring the entire VM.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mc-title">Attach Disk to Existing VM</div>
+      <p>Mounts a backed-up VMDK to a running VM for data extraction or recovery testing.</p>
+    </div>
+  </div>
+
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: What does the Commvault VSA Proxy do during a VMware backup?<br>
+      A: The VSA proxy sends an API request to ESX/vCenter to create a VM snapshot (quiescing the VM), then reads the VMDK data via the appropriate transport mode (SAN/NAS/Hot Add/NBD), and transfers the data to the MediaAgent and storage. The proxy coordinates the entire data movement process.</p>
+    </div>
+  </div>
+</div>
+
+<h3>6.8 VMware Lab ESX Setup Reference</h3>
+<div class="card">
+  <h4>ESX Installation in VMware Workstation (Lab Environment)</h4>
+  <ul>
+    <li>Create a new VM with at least 8 vCPUs, 20 GB RAM, 150 GB disk</li>
+    <li>Select <strong>VMware ESX</strong> as the guest OS type in Workstation</li>
+    <li>Enable <strong>Virtualize Intel VT-x/EPT</strong> in processor settings (required for nested virtualisation)</li>
+    <li>Use the ESX 7.x ISO from the FTP mirror link (VMware download requires an account)</li>
+    <li>Set a static IP via ESX DCUI console: <strong>F2 → Configure Management Network → IPv4</strong></li>
+    <li>Disable IPv6 to avoid confusion in lab environments</li>
+  </ul>
+
+  <h4>ESX File System Format</h4>
+  <div class="callout exam">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body">
+      <strong>Interview / Exam Tip</strong>
+      <p>Q: What file system format does VMware use for data stores?<br>
+      A: <strong>VMFS</strong> (Virtual Machine File System). This is VMware's proprietary clustered file system that supports concurrent access from multiple ESX hosts to a shared data store.</p>
+    </div>
+  </div>
+
+  <h4>Creating Data Stores on ESX</h4>
+  <pre><code># Access ESX host management console via browser:
+# https://[ESX-IP]
+
+# Navigate to: Storage → Datastores → New Datastore
+# Select disk → Assign name → Use complete disk (VMFS format)
+# Create separate data stores for Windows VMs and Linux VMs</code></pre>
+</div>
+
+<hr>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCENARIO BASED Q&A -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="section-header" style="margin-top:2.5rem">
+  <div class="section-num" style="background:var(--accent4)">Q</div>
+  <h2>Scenario-Based Interview Questions &amp; Answers</h2>
+</div>
+
+<div class="qa-item">
+  <div class="qa-q"><span>Q1.</span> Your SQL Server backup fails and the logs mention "user does not have sysadmin role." What do you do?</div>
+  <div class="qa-a">Navigate to the SQL Server instance in Commvault, find the SQL Server Authentication section, select <strong>Impersonate User</strong>, and create a new credential using the format <code>hostname\administrator</code>. Verify the account has SysAdmin role in SSMS under Security → Logins → Properties → Server Roles. Re-run the backup.</div>
+</div>
+
+<div class="qa-item">
+  <div class="qa-q"><span>Q2.</span> During a maintenance release update, the CommServe services fail to start after installation. What is your recovery approach?</div>
+  <div class="qa-a">First, attempt a <strong>Repair</strong> by running the installer from <code>C:\Program Files\Commvault\</code> and selecting the repair option. If that fails, download a fresh platform release package and use it for repair. If services still won't start, engage Commvault Technical Support immediately. As a last resort, use <strong>CommServe Recovery Assist</strong> to restore from your most recent DR backup dump (Phase 1 location). Never attempt registry manipulation without expert guidance.</div>
+</div>
+
+<div class="qa-item">
+  <div class="qa-q"><span>Q3.</span> A browse operation on a backup job that completed 20 days ago is very slow. What is the likely cause and solution?</div>
+  <div class="qa-a">The index cache on the MediaAgent has a default 15-day retention. The index for that job has likely been pruned from the cache. Commvault will automatically retrieve the index from the library (storage), which takes longer than reading from cache. No manual intervention is required – the retrieval happens automatically. If this is a frequent issue, consider increasing the index cache retention threshold on the MediaAgent properties.</div>
+</div>
+
+<div class="qa-item">
+  <div class="qa-q"><span>Q4.</span> Your VMware backup is using NBD transport mode but you expected Hot Add. Why might this happen?</div>
+  <div class="qa-a">Hot Add requires the VSA proxy to be a virtual machine <strong>running on the same ESX host</strong> that has data store access to the VMs being backed up. If the VSA is deployed outside the VMware environment (external proxy), or if the ESX data stores are not accessible/shared with the ESX hosting the VSA, Commvault will automatically fall back to NBD transport mode. Verify VSA placement and data store sharing configuration.</div>
+</div>
+
+<div class="qa-item">
+  <div class="qa-q"><span>Q5.</span> The Oracle backup is failing with an error saying "database is not in archive log mode." What do you do?</div>
+  <div class="qa-a">Contact the Oracle DBA and request that the database be switched to Archive Log mode. As a backup admin, you should not make this change yourself. Guide the DBA: shut down the database, start it in mount mode, run <code>ALTER DATABASE ARCHIVELOG;</code>, and open the database. Verify with <code>ARCHIVE LOG LIST;</code> that archive mode is enabled before re-triggering the backup.</div>
+</div>
+
+<div class="qa-item">
+  <div class="qa-q"><span>Q6.</span> What is the difference between marking a MediaAgent "offline for maintenance" versus fully disabling it?</div>
+  <div class="qa-a">When marked <strong>offline for maintenance</strong>, backup and restore jobs are suspended but background activities like <strong>data pruning (DDB cleanup)</strong> continue. When the MediaAgent is <strong>fully disabled</strong>, absolutely nothing runs on it – no backups, no restores, and no pruning. Use maintenance mode for OS patching or planned downtime to allow storage reclamation to continue. Use full disable only when the MediaAgent needs to be completely taken out of service.</div>
+</div>
+
+<div class="qa-item">
+  <div class="qa-q"><span>Q7.</span> A customer asks about cloud storage costs. What is the difference between ingress and egress, and which incurs charges?</div>
+  <div class="qa-a"><strong>Ingress</strong> = data flowing INTO the cloud (your backups going to S3/Azure Blob). Cloud vendors typically do <strong>not charge</strong> for ingress. <strong>Egress</strong> = data flowing OUT of the cloud (restores to on-premises). Cloud vendors <strong>charge for egress</strong>. This means your restores from cloud storage will incur costs. Plan cloud storage architecture with this in mind – restores from cloud are expensive at scale.</div>
+</div>
+
+<hr>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- AUTHOR SECTION -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="author">
+  <div class="author-section">
+    <div class="author-top">
+      <div class="author-avatar">👨‍💻</div>
+      <div class="author-info">
+        <h3>Mohammed Abdul</h3>
+
+      </div>
+    </div>
+    <div class="author-badges">
+      <span class="author-badge">Commvault</span>
+      <span class="author-badge">Veeam</span>
+      <span class="author-badge">NetBackup</span>
+      <span class="author-badge">NetApp</span>
+      <span class="author-badge">Hybrid Cloud</span>
+      <span class="author-badge">15+ Years Experience</span>
+    </div>
+    <p style="color:var(--text-muted); font-size:0.92rem; max-width:720px;">Mohammed Abdul is a Data Protection Architect with more than 15 years of experience in Hybrid Cloud and has worked with global clients across various industries. With extensive expertise in enterprise backup and recovery solutions, Mohammed specialises in Commvault, Veeam, NetBackup, and NetApp technologies, helping organisations design and implement robust data protection strategies.</p>
+    <div>
+      <a href="mailto:abdul.md.20000102@gmail.com" class="author-email">
+        📧 &nbsp; abdul.md.20000102@gmail.com
+      </a>
+    </div>
+    <div class="disclaimer-box">
+      <strong>⚠️ Disclaimer:</strong> This content is for educational purposes and tutorial material only. Always refer to official Commvault documentation at <strong>documentation.commvault.com</strong> and follow your organisation's approved change management procedures for all production implementations.
+    </div>
+  </div>
+</div>
+
+</div><!-- end .page -->
+
+<footer>
+  <p>Commvault Cloud Administration Tutorial 4 &nbsp;|&nbsp; Version 11.32 &nbsp;|&nbsp; Built by Mohammed Abdul</p>
+  <p style="margin-top:0.4rem; font-size:0.75rem;">Self-paced tutorial material for data protection administrators.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Cloud Administration Tutorial 5</title>
+<style>
+:root {
+  --bg: #0a0f1a;
+  --surface: #111827;
+  --surface2: #1a2235;
+  --surface3: #1e2d45;
+  --border: #2a3a52;
+  --border2: #1e3a5f;
+  --text: #e2eaf6;
+  --text-muted: #8a9bb5;
+  --text-dim: #5a6e88;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59,130,246,0.18);
+  --green: #22c55e;
+  --green-soft: rgba(34,197,94,0.13);
+  --orange: #f97316;
+  --orange-soft: rgba(249,115,22,0.13);
+  --red: #ef4444;
+  --red-soft: rgba(239,68,68,0.13);
+  --purple: #a855f7;
+  --purple-soft: rgba(168,85,247,0.13);
+  --teal: #14b8a6;
+  --teal-soft: rgba(20,184,166,0.13);
+  --gold: #eab308;
+  --gold-soft: rgba(234,179,8,0.13);
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow: 0 4px 32px rgba(0,0,0,0.5);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',Calibri,'Helvetica Neue',Arial,sans-serif;
+  font-size:15.5px;
+  line-height:1.75;
+}
+
+/* ─── NAV ─────────────────────────────────────────────── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,15,26,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;
+  display:flex;align-items:center;gap:24px;
+  height:56px;
+  overflow-x:auto;white-space:nowrap;
+}
+nav::-webkit-scrollbar{height:2px}
+nav::-webkit-scrollbar-track{background:transparent}
+nav::-webkit-scrollbar-thumb{background:var(--border)}
+.nav-brand{
+  font-family:Georgia,'Times New Roman',Cambria,serif;
+  font-size:15px;font-weight:700;
+  color:var(--accent);
+  margin-right:8px;flex-shrink:0;
+}
+.nav-brand span{color:var(--text-muted);font-weight:400}
+nav a{
+  color:var(--text-muted);
+  text-decoration:none;
+  font-size:12.5px;font-weight:500;
+  padding:4px 10px;
+  border-radius:6px;
+  transition:all .2s;
+  flex-shrink:0;
+}
+nav a:hover{color:var(--text);background:var(--surface2)}
+
+/* ─── HERO ────────────────────────────────────────────── */
+.hero{
+  background:linear-gradient(135deg,#0a0f1a 0%,#0d1b33 40%,#0a1f2e 100%);
+  padding:64px 48px 56px;
+  position:relative;overflow:hidden;
+  border-bottom:1px solid var(--border);
+}
+.hero::before{
+  content:'';position:absolute;top:-120px;right:-80px;
+  width:520px;height:520px;
+  background:radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-80px;left:-60px;
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(20,184,166,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.hero-badge{
+  display:inline-block;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  color:var(--accent);
+  font-size:11.5px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;
+  padding:5px 14px;border-radius:20px;
+  margin-bottom:20px;
+}
+.hero h1{
+  font-family:Georgia,'Times New Roman',Cambria,serif;
+  font-size:2.6rem;font-weight:700;
+  line-height:1.2;
+  color:#f0f6ff;
+  margin-bottom:16px;
+}
+.hero h1 span{color:var(--accent)}
+.hero-sub{
+  font-size:1.05rem;
+  color:var(--text-muted);
+  max-width:680px;
+  margin-bottom:28px;
+}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:10px;
+}
+.meta-tag{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  color:var(--text-muted);
+  font-size:12px;font-weight:500;
+  padding:4px 12px;border-radius:20px;
+}
+.meta-tag strong{color:var(--text)}
+
+/* ─── LAYOUT ──────────────────────────────────────────── */
+.main-wrap{max-width:1100px;margin:0 auto;padding:40px 32px 80px}
+
+/* ─── TOC ─────────────────────────────────────────────── */
+.toc-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:28px 32px;
+  margin-bottom:48px;
+}
+.toc-card h2{
+  font-family:Georgia,'Times New Roman',Cambria,serif;
+  font-size:1.1rem;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:1.2px;
+  margin-bottom:20px;
+}
+.toc-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;
+}
+.toc-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  text-decoration:none;
+  transition:all .2s;
+}
+.toc-item:hover{background:var(--surface3);border-color:var(--accent);transform:translateX(3px)}
+.toc-num{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--surface3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--accent);
+  flex-shrink:0;
+}
+.toc-text{font-size:13px;font-weight:500;color:var(--text-muted)}
+.toc-item:hover .toc-text{color:var(--text)}
+
+/* ─── SECTION ─────────────────────────────────────────── */
+.section{margin-bottom:64px}
+.section-header{
+  display:flex;align-items:flex-start;gap:16px;
+  margin-bottom:28px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--border);
+}
+.section-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;margin-top:2px;
+}
+.section-title-wrap{}
+.section-num{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:4px;
+}
+.section h2{
+  font-family:Georgia,'Times New Roman',Cambria,serif;
+  font-size:1.65rem;font-weight:700;color:#f0f6ff;
+  line-height:1.25;
+}
+.section-intro{
+  color:var(--text-muted);font-size:0.97rem;
+  line-height:1.8;margin-bottom:28px;
+  padding:16px 20px;
+  background:var(--surface);
+  border-left:3px solid var(--border2);
+  border-radius:0 var(--radius) var(--radius) 0;
+}
+
+/* ─── CONTENT BLOCKS ──────────────────────────────────── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:24px 28px;
+  margin-bottom:20px;
+}
+.card h3{
+  font-family:Georgia,'Times New Roman',Cambria,serif;
+  font-size:1.15rem;font-weight:700;
+  color:#e8f0ff;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.card h4{
+  font-size:0.92rem;font-weight:700;color:var(--text);
+  text-transform:uppercase;letter-spacing:0.8px;
+  margin:16px 0 8px;
+}
+.card p{color:var(--text-muted);line-height:1.8;margin-bottom:10px}
+.card ul,.card ol{
+  color:var(--text-muted);
+  padding-left:20px;
+  margin-bottom:10px;
+}
+.card li{margin-bottom:6px;line-height:1.75}
+.card strong{color:var(--text)}
+
+/* ─── CALLOUT BOXES ───────────────────────────────────── */
+.callout{
+  border-radius:var(--radius);
+  padding:16px 20px;
+  margin:16px 0;
+  display:flex;gap:12px;
+}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout-body{flex:1}
+.callout-title{font-weight:700;font-size:12.5px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.callout-body p{font-size:14px;line-height:1.7;margin-bottom:4px}
+.callout-body ul{font-size:14px;padding-left:18px}
+.callout-body li{margin-bottom:4px}
+.callout.warn{background:var(--red-soft);border-left:3px solid var(--red)}
+.callout.warn .callout-title{color:var(--red)}
+.callout.tip{background:var(--green-soft);border-left:3px solid var(--green)}
+.callout.tip .callout-title{color:var(--green)}
+.callout.note{background:var(--accent-glow);border-left:3px solid var(--accent)}
+.callout.note .callout-title{color:var(--accent)}
+.callout.exam{background:var(--purple-soft);border-left:3px solid var(--purple)}
+.callout.exam .callout-title{color:var(--purple)}
+.callout.best{background:var(--teal-soft);border-left:3px solid var(--teal)}
+.callout.best .callout-title{color:var(--teal)}
+
+/* ─── CODE BLOCKS ─────────────────────────────────────── */
+.code-block{
+  background:#070d18;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin:14px 0;
+  overflow:hidden;
+}
+.code-header{
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  padding:8px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.code-label{
+  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text-dim);
+}
+.code-dots{display:flex;gap:5px}
+.code-dots span{
+  width:10px;height:10px;border-radius:50%;
+}
+.code-dots span:nth-child(1){background:#ef4444}
+.code-dots span:nth-child(2){background:#f59e0b}
+.code-dots span:nth-child(3){background:#22c55e}
+pre{
+  padding:16px 20px;
+  font-family:'Courier New',Courier,'Lucida Console',monospace;
+  font-size:13px;line-height:1.7;
+  color:#a8d4ff;
+  overflow-x:auto;
+  white-space:pre;
+}
+code{
+  background:#0d1624;
+  border:1px solid var(--border);
+  color:#7dd3fc;
+  font-family:'Courier New',Courier,monospace;
+  font-size:12.5px;
+  padding:2px 7px;border-radius:4px;
+}
+
+/* ─── FLOW DIAGRAMS ───────────────────────────────────── */
+.flow{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:8px;padding:20px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  margin:16px 0;
+}
+.flow-step{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:10px 16px;
+  text-align:center;
+  font-size:12.5px;font-weight:600;
+  color:var(--text);
+  min-width:100px;
+}
+.flow-step.highlight{
+  background:var(--accent-glow);
+  border-color:var(--accent);
+  color:#93c5fd;
+}
+.flow-step.success{
+  background:var(--green-soft);
+  border-color:var(--green);
+  color:#86efac;
+}
+.flow-step.warn{
+  background:var(--orange-soft);
+  border-color:var(--orange);
+  color:#fdba74;
+}
+.flow-arrow{color:var(--text-dim);font-size:18px;font-weight:300}
+
+/* ─── INFO GRID ───────────────────────────────────────── */
+.info-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:14px;margin:16px 0;
+}
+.info-tile{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px 18px;
+}
+.info-tile-icon{font-size:22px;margin-bottom:6px}
+.info-tile-label{
+  font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--text-dim);margin-bottom:4px;
+}
+.info-tile-value{
+  font-size:1.1rem;font-weight:700;color:var(--text);
+  font-family:Georgia,'Times New Roman',Cambria,serif;
+}
+.info-tile-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* ─── LOG TABLE (NO HTML TABLES) ─────────────────────── */
+.log-table{margin:14px 0}
+.log-row{
+  display:grid;grid-template-columns:200px 160px 1fr;
+  border-bottom:1px solid var(--border);
+  padding:10px 0;
+}
+.log-row.header{
+  background:var(--surface2);
+  border-radius:var(--radius) var(--radius) 0 0;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-bottom:2px solid var(--border2);
+}
+.log-row:not(.header){padding:10px 12px}
+.log-row:last-child{border-bottom:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
+.log-row:nth-child(even):not(.header){background:var(--surface)}
+.log-cell{font-size:13px;color:var(--text-muted)}
+.log-cell code{font-size:11.5px}
+.log-cell.strong{color:var(--text);font-weight:600}
+.log-cell.accent{color:#7dd3fc}
+.log-border{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+
+/* ─── PHASE CARDS ─────────────────────────────────────── */
+.phase-list{display:flex;flex-direction:column;gap:12px;margin:14px 0}
+.phase-item{
+  display:flex;gap:14px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 18px;
+}
+.phase-num{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--surface3);
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;
+  color:var(--accent);flex-shrink:0;
+}
+.phase-body h4{font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.phase-body p{font-size:13.5px;color:var(--text-muted);line-height:1.7}
+
+/* ─── COMPARISON BLOCKS ───────────────────────────────── */
+.compare-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;
+}
+.compare-card{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 20px;
+}
+.compare-card h4{
+  font-size:0.88rem;font-weight:700;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.8px;
+  margin-bottom:12px;
+  padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+}
+.compare-card ul{color:var(--text-muted);padding-left:16px;font-size:13.5px}
+.compare-card li{margin-bottom:6px;line-height:1.7}
+
+/* ─── Q&A SECTION ─────────────────────────────────────── */
+.qa-item{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  margin-bottom:18px;
+}
+.qa-q{
+  background:var(--surface2);
+  padding:16px 22px;
+  font-weight:600;font-size:0.95rem;
+  color:var(--text);
+  display:flex;align-items:flex-start;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.qa-q-icon{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#fff;
+  flex-shrink:0;margin-top:1px;
+}
+.qa-a{
+  padding:16px 22px;
+  color:var(--text-muted);
+  font-size:14px;line-height:1.8;
+}
+.qa-a strong{color:var(--text)}
+.qa-a ul{padding-left:18px;margin-top:6px}
+.qa-a li{margin-bottom:6px}
+.qa-label{
+  font-size:10.5px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--green);
+  margin-bottom:6px;
+}
+
+/* ─── AUTHOR ──────────────────────────────────────────── */
+.author-section{
+  margin-top:72px;
+  border-top:1px solid var(--border);
+  padding-top:48px;
+}
+.author-card{
+  background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:36px 40px;
+  display:flex;align-items:flex-start;gap:28px;
+}
+.author-avatar{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;flex-shrink:0;
+  border:2px solid var(--border2);
+}
+.author-info h3{
+  font-family:Georgia,'Times New Roman',Cambria,serif;
+  font-size:1.35rem;color:#f0f6ff;margin-bottom:4px;
+}
+.author-info p{color:var(--text-muted);font-size:0.92rem;line-height:1.8;margin-bottom:12px}
+.author-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.badge{
+  background:var(--surface3);
+  border:1px solid var(--border2);
+  color:var(--text-muted);
+  font-size:11.5px;font-weight:600;
+  padding:3px 10px;border-radius:20px;
+}
+.author-email{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--accent-glow);
+  border:1px solid var(--accent);
+  color:#93c5fd;
+  font-size:13px;font-weight:600;
+  padding:7px 16px;border-radius:var(--radius);
+  text-decoration:none;
+}
+.author-email:hover{background:rgba(59,130,246,0.25)}
+
+/* ─── FOOTER ──────────────────────────────────────────── */
+footer{
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  text-align:center;
+  padding:24px;
+  color:var(--text-dim);
+  font-size:12.5px;
+  margin-top:48px;
+}
+
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:768px){
+  .hero{padding:40px 24px 36px}
+  .hero h1{font-size:1.8rem}
+  .main-wrap{padding:28px 18px 60px}
+  .compare-grid{grid-template-columns:1fr}
+  .author-card{flex-direction:column;gap:18px;padding:24px}
+  .log-row{grid-template-columns:1fr;gap:4px}
+  .log-row.header{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">Commvault <span>Tutorial 5</span></div>
+  <a href="#s1">Secondary Copies</a>
+  <a href="#s2">Feature Release Upgrade</a>
+  <a href="#s3">Monitoring &amp; Reports</a>
+  <a href="#s4">Log Analysis</a>
+  <a href="#s5">DDB Troubleshooting</a>
+  <a href="#s6">Index &amp; Performance</a>
+  <a href="#s7">CS Recovery</a>
+  <a href="#s8">Data Aging &amp; Pruning</a>
+  <a href="#qa">Scenario Q&amp;A</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Administration Tutorial 5</div>
+    <h1>Commvault Cloud <span>Administration</span><br>Tutorial 5</h1>
+    <p class="hero-sub">
+      Advanced operations, monitoring, troubleshooting, and disaster recovery for Commvault Cloud environments.
+      Covers secondary copies, feature release upgrades, log analysis, DDB and index troubleshooting,
+      CommServe recovery, and storage pruning workflows.
+    </p>
+    <div class="hero-meta">
+      <span class="meta-tag"><strong>Level:</strong> L2 / L3 Administration</span>
+      <span class="meta-tag"><strong>Topics:</strong> Sessions 26–33</span>
+      <span class="meta-tag"><strong>Platform:</strong> Version 11.32 → 11.36</span>
+      <span class="meta-tag"><strong>Format:</strong> Self-Paced Tutorial</span>
+    </div>
+  </div>
+</div>
+
+<div class="main-wrap">
+
+<!-- TOC -->
+<div class="toc-card">
+  <h2>📋 Contents</h2>
+  <div class="toc-grid">
+    <a class="toc-item" href="#s1"><div class="toc-num">1</div><span class="toc-text">Secondary Copies &amp; Aux Copy Jobs</span></a>
+    <a class="toc-item" href="#s2"><div class="toc-num">2</div><span class="toc-text">Feature Release Upgrade (11.32 → 11.36)</span></a>
+    <a class="toc-item" href="#s3"><div class="toc-num">3</div><span class="toc-text">Monitoring, Alerts &amp; Reports</span></a>
+    <a class="toc-item" href="#s4"><div class="toc-num">4</div><span class="toc-text">Log Analysis &amp; Backup Troubleshooting</span></a>
+    <a class="toc-item" href="#s5"><div class="toc-num">5</div><span class="toc-text">DDB Offline &amp; Full Troubleshooting</span></a>
+    <a class="toc-item" href="#s6"><div class="toc-num">6</div><span class="toc-text">Index Cache &amp; Performance Issues</span></a>
+    <a class="toc-item" href="#s7"><div class="toc-num">7</div><span class="toc-text">CommServe Recovery Assistant Tool</span></a>
+    <a class="toc-item" href="#s8"><div class="toc-num">8</div><span class="toc-text">Data Aging, Storage Pruning &amp; Micro-Pruning</span></a>
+    <a class="toc-item" href="#qa"><div class="toc-num">✦</div><span class="toc-text">Scenario-Based Interview Q&amp;A</span></a>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 1 — SECONDARY COPIES & AUX COPY
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(59,130,246,0.15);color:var(--accent)">📦</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Section 01</div>
+      <h2>Secondary Copies &amp; Auxiliary Copy Jobs</h2>
+    </div>
+  </div>
+
+  <div class="section-intro">
+    A secondary copy — also called a <strong>storage copy</strong> — is a duplicate of data residing on a primary copy.
+    Its purpose spans fault tolerance, long-term retention, and disaster recovery. Understanding copy types and how
+    auxiliary copy jobs drive the replication is foundational to Commvault operations.
+  </div>
+
+  <div class="card">
+    <h3>🏗️ Storage Policy Architecture Recap</h3>
+    <p>Every backup in Commvault is written to a <strong>primary copy</strong> within a storage policy.
+    The storage pool under the primary copy contains:</p>
+    <ul>
+      <li><strong>Mount Path</strong> — the physical location where actual backup data is written</li>
+      <li><strong>DDB Partition</strong> — location of the deduplication database (if dedup is enabled)</li>
+      <li><strong>Deduplication Stores</strong> — File Store, Database Store, VM Store (one per agent type)</li>
+    </ul>
+    <p>A secondary copy adds an additional write target (cloud, tape, or disk) to the same storage policy,
+    providing redundancy for the jobs in the primary copy.</p>
+
+    <div class="callout note">
+      <div class="callout-icon">📌</div>
+      <div class="callout-body">
+        <div class="callout-title">Terminology: Java Console vs Command Center</div>
+        <p>In the <strong>Java (CommCell) Console</strong>, these are called <em>secondary copies</em>. In the
+        <strong>Command Center</strong>, the equivalent is called a <em>storage copy</em>. Both terms are identical in function.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🎯 Why Create a Secondary Copy?</h3>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <h4>🛡️ Fault Tolerance</h4>
+        <ul>
+          <li>Primary library corruption or hardware failure</li>
+          <li>Data loss on the source mount path</li>
+          <li>Server-level failures on the primary MediaAgent</li>
+          <li>Restore capability remains from the secondary</li>
+        </ul>
+      </div>
+      <div class="compare-card">
+        <h4>📅 Long-Term Retention</h4>
+        <ul>
+          <li>Primary copy may hold 7-day retention only</li>
+          <li>Secondary copy can hold 30, 90, or 365 days</li>
+          <li>Compliance and audit requirements often demand separate retention tiers</li>
+          <li>Tape copies commonly used for multi-year archival</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Secondary Copy Types</h3>
+
+    <h4>Synchronous Copy</h4>
+    <p>Copies <strong>all backup jobs</strong> from the source copy — full, incremental, differential, transaction logs —
+    to the secondary. This is a complete mirror of whatever is in the primary copy.</p>
+    <ul>
+      <li>All job types are replicated</li>
+      <li>Available for any library type: disk, cloud, or tape</li>
+      <li>Suitable when the customer requires a complete mirror for DR</li>
+    </ul>
+
+    <h4>Selective Copy</h4>
+    <p>Copies only <strong>full backup jobs</strong> from the source. Incrementals, transaction logs, and differential
+    jobs are excluded from replication.</p>
+    <ul>
+      <li>Reduces the volume of data written to secondary storage (tape or cloud)</li>
+      <li>Options: All Fulls, Daily Full, Weekly Full, Monthly Full, etc.</li>
+      <li>No limitations on library type — selective works for disk, cloud, and tape equally</li>
+    </ul>
+
+    <div class="callout exam">
+      <div class="callout-icon">🎓</div>
+      <div class="callout-body">
+        <div class="callout-title">Exam / Interview Tip</div>
+        <p><strong>Q: Is selective copy limited to tape libraries only?</strong><br>
+        A: No. Selective copy can be applied to any library type — disk, cloud, or tape. The customer's requirement determines the copy type, not the library type.</p>
+      </div>
+    </div>
+
+    <h4>Snapshot Copy (IntelliSnap)</h4>
+    <p>Used exclusively with IntelliSnap backups. Requires SAN-based storage with snapshot support.
+    This copy type is only activated when IntelliSnap is configured on the storage array.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔧 Creating a Secondary Copy — Step-by-Step</h3>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Open the Storage Policy</h4>
+          <p>Navigate to <strong>Policies → Storage Policies</strong> in the CommCell Console. Right-click the target policy → <strong>All Tasks → Create New Copy</strong>.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Name the Copy &amp; Select Library</h4>
+          <p>Provide a descriptive name (e.g., <em>copy-to-cloud</em> or <em>copy-to-tape</em>). Select the target storage pool — cloud library, tape library, or disk library.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Configure Retention</h4>
+          <p>Set the retention period appropriate for the use case. Secondary copies typically hold longer retention (e.g., 30 days) than the primary (7 days).</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <h4>Set Copy Type &amp; Date Filter</h4>
+          <p>Choose <em>Synchronous</em> or <em>Selective</em>. Optionally, configure a start date to limit which backup jobs are eligible for replication (e.g., only jobs completed after March 1st).</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">5</div>
+        <div class="phase-body">
+          <h4>Verify Auto-Copy Schedule</h4>
+          <p>Right-click the secondary copy → <strong>View Schedules</strong>. A system-created <em>auto copy schedule</em> runs every <strong>30 minutes</strong> automatically. Manual triggering is also available.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>⚙️ Running an Auxiliary Copy Job</h3>
+    <p>An <strong>Auxiliary Copy (Aux Copy)</strong> job is the operation that copies data from the primary copy
+    to the secondary copy. Jobs in the secondary copy display a status of <strong>"To Be Copied"</strong> until
+    the aux copy completes, after which they show <strong>"Available"</strong> (ready for restore).</p>
+
+    <h4>Job Statuses in Secondary Copy</h4>
+    <div class="info-grid">
+      <div class="info-tile">
+        <div class="info-tile-icon">🟡</div>
+        <div class="info-tile-label">To Be Copied</div>
+        <div class="info-tile-value">Pending</div>
+        <div class="info-tile-sub">Jobs exist in primary but not yet replicated</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🟢</div>
+        <div class="info-tile-label">Available</div>
+        <div class="info-tile-value">Replicated</div>
+        <div class="info-tile-sub">Jobs copied and available for restore from secondary</div>
+      </div>
+    </div>
+
+    <h4>Manual Aux Copy Trigger</h4>
+    <p>To run immediately without waiting 30 minutes:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-label">CommCell Console</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre>Storage Policy → Right-click → All Tasks → Run Aux Copy
+↓
+Select specific copy (e.g., "Copy to Cloud")
+OR select All Copies
+↓
+Click OK → Monitor from Job Controller</pre>
+    </div>
+
+    <p>Multiple secondary copies can run simultaneously — one aux copy job per secondary copy target.</p>
+
+    <div class="callout best">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <div class="callout-title">Best Practice</div>
+        <p>Always probe your customer for the correct secondary copy configuration before setup: <em>What copy type (synchronous or selective)? Which library (tape, cloud, disk)? What date range to start replication from?</em> These inputs shape the entire configuration.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 2 — FEATURE RELEASE UPGRADE
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(34,197,94,0.15);color:var(--green)">⬆️</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Section 02</div>
+      <h2>Feature Release Upgrade: 11.32 → 11.36</h2>
+    </div>
+  </div>
+
+  <div class="section-intro">
+    A Feature Release (FR) or Platform Release (PR) upgrade is a major version change — distinct from a Maintenance Release (MR) update.
+    Moving from 11.32 to 11.36 requires careful pre-flight checks, sequential upgrade ordering, and readiness validation
+    at each stage. This section walks through the complete procedure.
+  </div>
+
+  <div class="card">
+    <h3>📐 Version Nomenclature Reference</h3>
+    <div class="info-grid">
+      <div class="info-tile">
+        <div class="info-tile-icon">🔢</div>
+        <div class="info-tile-label">Platform Release (FR/PR)</div>
+        <div class="info-tile-value">11.32, 11.36</div>
+        <div class="info-tile-sub">Major release — first four digits (e.g., 11.32)</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🔧</div>
+        <div class="info-tile-label">Maintenance Release (MR)</div>
+        <div class="info-tile-value">.28, .83</div>
+        <div class="info-tile-sub">Last two digits — patch/hotfix increments</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🏷️</div>
+        <div class="info-tile-label">LTS (Long-Term Support)</div>
+        <div class="info-tile-value">3 Years</div>
+        <div class="info-tile-sub">Multiples of 4: 11.24, 11.28, 11.32, 11.36</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">⏰</div>
+        <div class="info-tile-label">Technology Release</div>
+        <div class="info-tile-value">6 Months</div>
+        <div class="info-tile-sub">Non-multiples of 4 (e.g., 11.38) — short-term only</div>
+      </div>
+    </div>
+
+    <div class="callout exam">
+      <div class="callout-icon">🎓</div>
+      <div class="callout-body">
+        <div class="callout-title">Exam Tip — LTS Rule</div>
+        <p>LTS versions follow the <strong>multiples-of-4 rule</strong> for the last two digits: 11.24, 11.28, 11.32, 11.36.
+        A non-LTS release like 11.38 has only 6 months of support — after which you must upgrade again.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Pre-Upgrade Checklist</h3>
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Critical — Complete All Steps Before Running the Installer</div>
+        <ul>
+          <li>Plan a maintenance window — allow <strong>minimum 3 hours</strong> for a feature release upgrade</li>
+          <li>Review system requirements documentation for the target OS + 11.36 compatibility</li>
+          <li>Ensure <strong>30 GB free space</strong> minimum on the CommServe C: drive</li>
+          <li>Run a <strong>Disaster Recovery (DR) backup</strong> job and note the dump file location</li>
+          <li><strong>Suspend all running backup jobs</strong> on the Job Controller</li>
+          <li><strong>Disable the scheduler</strong> (CommCell Properties → Activity Control → uncheck "Enable Scheduler")</li>
+          <li>Stop all Commvault services gracefully via Process Manager</li>
+          <li>Copy the installer package <strong>directly to the drive root</strong> (C:\ or E:\) — NOT inside subfolders (path must be under 72 characters)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📦 Upgrade Sequence — Critical Order</h3>
+    <p>The upgrade sequence must be followed strictly. Upgrading out of order will cause connectivity and compatibility issues.</p>
+    <div class="flow">
+      <div class="flow-step highlight">1. CommServe</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">2. MediaAgent(s)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">3. VSA Proxies</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step success">4. Clients</div>
+    </div>
+    <p style="font-size:13.5px;color:var(--text-muted);margin-top:10px">
+      After upgrading the CommServe, validate the Command Center and CommCell Console are fully operational before
+      proceeding to MediaAgent upgrades.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>💻 CommServe Upgrade — Local Installation</h3>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Download &amp; Extract</h4>
+          <p>Download the 11.36 base package from <code>store.commvault.com</code>. Copy the <strong>zip file directly to the drive root</strong> (e.g., <code>E:\Windows_11.36\</code>). Extract there — never in a deep subfolder path.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Run setup.exe as Administrator</h4>
+          <p>The installer detects an existing Commvault installation and presents <strong>"Upgrade Feature Release"</strong>. Select this option and proceed.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Accept Prompts &amp; Reboot</h4>
+          <p>The installer upgrades third-party packages first, then requires a reboot mid-installation. After reboot, the installer auto-resumes. If it does not, run setup.exe again — it will detect the unfinished install and offer to resume.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <h4>Verify Services</h4>
+          <p>Open Process Manager. All services should be green (running). Open CommCell Console and Command Center to validate. Run <code>iisreset</code> from command prompt if Command Center fails to load.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">72-Character Path Limitation</div>
+        <p>If the installer raises a "SQL install required — path exceeds 72 characters" error, the package is nested too deeply. Move the extracted folder directly to <code>E:\</code> or <code>C:\</code> root and re-run setup.exe.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🚀 MediaAgent Upgrade via Push Install</h3>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Update Software Cache</h4>
+          <p>Navigate to <strong>Tools → Add/Remove Software → Copy Software</strong>. Browse to the 11.36 package location and click OK. This copies the installer files into the CommServe software cache. Verify via <strong>Tools → Software Cache Configuration → Cache Detail</strong>.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Add Linux Packages (if needed)</h4>
+          <p>For Linux clients (Ubuntu, Oracle Linux, etc.), perform a second <strong>Copy Software</strong> specifying the Linux <code>.tar</code> file path. The source path differs from Windows; the cache location stays the same.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Push Upgrade to MediaAgent</h4>
+          <p>Right-click the MediaAgent in the CommCell Console → <strong>Add/Remove Software → Upgrade Software</strong>. The MediaAgent must be in <strong>Ready</strong> state (not Offline). If it shows offline, toggle the Enable/Disable MediaAgent option to force refresh.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <div class="callout-title">Re-enable the Scheduler After Upgrade</div>
+        <p>After all components are upgraded, go to <strong>CommCell Properties → Activity Control</strong> and re-enable the scheduler. Consider using the <strong>"Enable Operator Delay"</strong> option to auto-enable after X hours to avoid forgetting this critical step.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔄 Post-Upgrade: Command Center Repair (.NET Issue)</h3>
+    <p>If the Command Center fails to load after a feature release upgrade, the ASP.NET hosting bundle may be
+    corrupted or missing. Resolution:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-label">Repair Steps</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre>1. Download the ASP.NET Core Hosting Bundle matching your .NET version
+   (e.g., .NET 8.x → download the 8.x Hosting Bundle from Microsoft)
+
+2. Run the downloaded installer — it detects the existing version
+   and offers a "Repair" option. Click Repair.
+
+3. Restart the server gracefully:
+   - Ensure all Commvault services are stopped
+   - Reboot server
+   - Verify services start automatically
+
+4. Test Command Center: try incognito mode first
+   If still failing → run: iisreset (elevated command prompt)</pre>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <div class="callout-title">Best Practice — Graceful Shutdown</div>
+        <p>Always stop Commvault services gracefully before any reboot or security patch. Hard resets without stopping services can corrupt binary files and .NET dependencies, leading to post-reboot service failures.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 3 — MONITORING, ALERTS & REPORTS
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="s3">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(234,179,8,0.15);color:var(--gold)">📊</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Section 03</div>
+      <h2>Monitoring, Alerts &amp; Reports</h2>
+    </div>
+  </div>
+
+  <div class="section-intro">
+    Day-to-day Commvault administration revolves around monitoring dashboards, interpreting health indicators,
+    generating scheduled reports, and configuring alerts. Even without deep internals knowledge, a backup admin
+    must be proficient in the monitoring and reporting layer from day one.
+  </div>
+
+  <div class="card">
+    <h3>📋 Command Center Dashboard</h3>
+    <p>The Command Center dashboard provides a consolidated health view of the entire Commvault environment.
+    Key metrics visible at a glance:</p>
+    <div class="info-grid">
+      <div class="info-tile">
+        <div class="info-tile-icon">📈</div>
+        <div class="info-tile-label">SLA</div>
+        <div class="info-tile-value">% Success</div>
+        <div class="info-tile-sub">Percentage of backup jobs completing successfully in last 24 hours</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">💾</div>
+        <div class="info-tile-label">License Capacity</div>
+        <div class="info-tile-value">Front-End TB</div>
+        <div class="info-tile-sub">Used vs licensed front-end terabyte (pre-dedup application size)</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🔴</div>
+        <div class="info-tile-label">Critical</div>
+        <div class="info-tile-value">Immediate Action</div>
+        <div class="info-tile-sub">Issues requiring immediate resolution</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🟡</div>
+        <div class="info-tile-label">Warning</div>
+        <div class="info-tile-value">Monitor Closely</div>
+        <div class="info-tile-sub">Non-urgent but needs attention within a timeframe</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🏥 Health Dashboard — Critical Alerts to Watch</h3>
+    <h4>SLA Compliance</h4>
+    <p>Low SLA indicates backup jobs are not completing. Investigate which clients are missing backups and why.
+    The health view shows per-client status — identify which of your configured clients have not completed
+    a successful backup.</p>
+
+    <h4>Fallen Behind Secondary Copies</h4>
+    <p>Triggered when aux copy data has not been replicated within 24 hours. Indicates an aux copy job failure
+    or running behind schedule. Investigate the Job Controller for failed or delayed aux copy jobs.</p>
+
+    <h4>DDB Backup Not Running</h4>
+    <p>Each MediaAgent hosting a DDB partition has an auto-created DDB backup subclient scheduled at <strong>4:00 PM daily</strong>.
+    If this DDB backup has not run, a critical alert is raised. Navigate to the MediaAgent → File System →
+    Default Backup Set → DDB backup subclient to verify schedules.</p>
+
+    <h4>Database Index Fragmentation</h4>
+    <p>The Commvault SQL database can become fragmented over time, causing Console lag and slow response.
+    Resolution is to run <strong>DB Maintenance Full</strong> — recommended once every 6 months. The recommended
+    (partial) maintenance runs automatically via a system-created workflow weekly.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-label">DB Maintenance Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre># Navigate to Commvault base installation directory
+# (visible in Process Manager → Base Path)
+
+dbmaintenance -full    # Performs: checkdb + shrink + re-index ALL
+dbmaintenance -recommended  # Performs: checkdb + re-index recommended only
+
+# Prerequisite: Stop Commvault services before running -full
+# Plan downtime: ~30 minutes</pre>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Downtime Required for Full Maintenance</div>
+        <p>Running DB Maintenance Full requires Commvault services to be stopped. Always follow the pre-activity checklist:
+        suspend jobs → disable scheduler → stop services → run maintenance → restart services → re-enable scheduler.</p>
+      </div>
+    </div>
+
+    <h4>DDB Library Growth (Index Fragmentation)</h4>
+    <p>When the database index fragmentation exceeds 50%, the health report shows this as red. Red = action required.
+    Green = healthy, no action needed.</p>
+  </div>
+
+  <div class="card">
+    <h3>📝 Key Reports for Daily Operations</h3>
+    <h4>Backup Job Summary</h4>
+    <p>The most critical daily report. Shows last-24-hour job breakdown by status (completed, failed, suspended,
+    delayed, CWE = Completed With Error, CWW = Completed With Warning) per client type. Schedule this report
+    to run automatically and email to relevant team members each morning.</p>
+
+    <h4>Storage Utilization Report</h4>
+    <p>Shows current usage per library, projected full date for disk libraries, free space status (critical/good).
+    Monitor this daily — proactive capacity management prevents storage-full incidents.</p>
+
+    <h4>License Summary Report</h4>
+    <p>Shows front-end terabyte consumption vs licensed capacity. Typically scheduled weekly for management
+    reporting and licensing compliance.</p>
+
+    <h4>Restore Job Summary</h4>
+    <p>Useful in high-restore environments. Tracks all restore operations for audit and SLA reporting.</p>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <div class="callout-title">Automating Reports</div>
+        <p>All reports support scheduling. Navigate to the report → click the three-dot menu → <strong>Schedule</strong>.
+        Configure recipient email, format (HTML), compression, and recurrence (daily/weekly). The report
+        is emailed automatically — no manual intervention required.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔔 Configuring Custom Alerts</h3>
+    <p>Beyond built-in health checks, Commvault supports custom alert configuration for specific job conditions.
+    Example: alert when an aux copy job runs slow or falls behind.</p>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Navigate to Alert Configuration</h4>
+          <p>Command Center → Administration → Configure Alert → Add New Alert</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Select Alert Type &amp; Target</h4>
+          <p>Choose the alert category (e.g., Job Management → Aux Copy Falling Behind). Select the relevant storage policy.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Set Threshold &amp; Notification</h4>
+          <p>Configure condition (e.g., aux copy delayed by more than 1 hour) and notification type (email). Provide recipient email addresses if SMTP is configured.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-icon">📌</div>
+      <div class="callout-body">
+        <div class="callout-title">SMTP Server Configuration</div>
+        <p>Email notifications require SMTP server details. Configure under <strong>Command Center → Manage → System → Email Server</strong>. Obtain the SMTP server details from your Exchange team.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🌐 Additional Monitoring Items</h3>
+    <h4>Job Controller (Live Monitoring)</h4>
+    <p>The Job Controller provides real-time status of all running jobs: job type, client, operation, status,
+    throughput, and delay reasons. This is the primary live-monitoring view for backup admins.</p>
+
+    <h4>Library &amp; MediaAgent Status</h4>
+    <p>Under <strong>Storage Resources → Libraries</strong> and <strong>Storage Resources → MediaAgents</strong>,
+    all components should show <strong>Ready</strong>. Any Offline status requires immediate investigation.
+    For MediaAgents: gray = no software installed; red = offline; green = ready.</p>
+
+    <h4>Blackout Windows</h4>
+    <p>Prevents backup jobs from running during production hours. Configurable at the CommCell, client group,
+    client, or subclient level. Jobs triggered during a blackout enter a <strong>Queued</strong> state
+    and execute once the blackout period ends.</p>
+
+    <h4>Job Priority Management</h4>
+    <p>Lower numeric priority = higher preference. Priority 1 jobs preempt priority 9 jobs.
+    Aux copy is typically priority 2. Synthetic Full is priority 9.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 4 — LOG ANALYSIS & TROUBLESHOOTING
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="s4">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(249,115,22,0.15);color:var(--orange)">🔍</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Section 04</div>
+      <h2>Log Analysis &amp; Backup/Restore Troubleshooting</h2>
+    </div>
+  </div>
+
+  <div class="section-intro">
+    Log-based troubleshooting is the cornerstone of reliable Commvault operations. Rather than guessing root causes,
+    always start with the logs. Commvault log files are plain text, human-readable, and organized by process name —
+    making them significantly easier to navigate than binary-format logs in other backup tools.
+  </div>
+
+  <div class="card">
+    <h3>📂 Log File Locations</h3>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <h4>🪟 Windows</h4>
+        <ul>
+          <li><code>&lt;Install Dir&gt;\ContentStore\Log Files\</code></li>
+          <li>Default: <code>C:\Program Files\Commvault\ContentStore\Log Files\</code></li>
+          <li>View from Process Manager → copy Base Path</li>
+          <li>Navigate one level up → Log Files folder</li>
+        </ul>
+      </div>
+      <div class="compare-card">
+        <h4>🐧 Linux / Unix</h4>
+        <ul>
+          <li><code>/var/log/commvault/Log_Files/</code></li>
+          <li>Read using: <code>cat</code>, <code>more</code>, <code>less</code>, <code>tail -f</code></li>
+          <li>No GxTail equivalent on Linux — use standard CLI tools</li>
+          <li>Filter with: <code>grep "job_id" filename.log</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-icon">📌</div>
+      <div class="callout-body">
+        <div class="callout-title">Log Files are Role-Specific</div>
+        <p>Log files differ based on the role of the machine. A CommServe has different active logs than a MediaAgent
+        or a client machine. The process names — and therefore the log file names — reflect what that machine is doing.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>⚙️ Log File Settings (Process Manager → Logging)</h3>
+    <div class="info-grid">
+      <div class="info-tile">
+        <div class="info-tile-icon">🔢</div>
+        <div class="info-tile-label">Default Debug Level</div>
+        <div class="info-tile-value">1</div>
+        <div class="info-tile-sub">Level 3 may be requested by Commvault support for deep troubleshooting</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">📄</div>
+        <div class="info-tile-label">Default File Size</div>
+        <div class="info-tile-value">5 MB</div>
+        <div class="info-tile-sub">Maximum size per log file before rotation</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🗂️</div>
+        <div class="info-tile-label">Default File Versions</div>
+        <div class="info-tile-value">5</div>
+        <div class="info-tile-sub">Number of rotated log files retained per process</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">📝</div>
+        <div class="info-tile-label">Active Log Format</div>
+        <div class="info-tile-value">Plain Text</div>
+        <div class="info-tile-sub">Current log file always readable; older rotated files are compressed</div>
+      </div>
+    </div>
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Revert Debug Level After Collection</div>
+        <p>If debug level is increased to 3 for troubleshooting, revert to 1 afterward. Elevated debug levels
+        increase CPU/RAM usage on the server. Always revert once logs have been collected.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🛠️ GxTail — Log Review Tool (Windows Only)</h3>
+    <p>GxTail is Commvault's built-in log viewer on Windows. It provides real-time log tailing, filtering,
+    and color-coded marker highlighting — far more efficient than reading raw text files.</p>
+
+    <h4>Essential GxTail Workflow</h4>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Open the Job Manager Log</h4>
+          <p>Process Manager → Logging → Find <strong>JobMgr</strong> → Right-click → <strong>Open Log</strong>. GxTail opens automatically.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Filter by Job ID</h4>
+          <p>Click the <strong>Filter</strong> icon → enter the job ID number (e.g., 2080). GxTail shows only log lines relevant to that job.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Apply Failure/Success Markers</h4>
+          <p>Click the <strong>Marker</strong> icon → select the <em>Failures and Success</em> profile. Red = failure/pending. Blue = success. Focus on the first red marker.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <h4>Work Offline (Optional)</h4>
+          <p>To prevent live log updates from scrolling your view while a job is running, click the <strong>Work Offline</strong> (computer icon) to freeze the log display.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📜 Backup Job Log Flow — File System</h3>
+    <p>For any backup or restore failure, always start with the Job Manager log on the CommServe. Then follow
+    the chain to the specific log file indicated by the error.</p>
+
+    <div class="flow">
+      <div class="flow-step highlight">1. JobMgr.log<br><small>CommServe</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">2. CVD.log<br><small>Client / MA</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">3. FindScan.log<br><small>Client (scan)</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">4. clBackup.log<br><small>Client (backup)</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step success">5. ArchiveIndex.log<br><small>MediaAgent</small></div>
+    </div>
+
+    <div class="log-border">
+      <div class="log-row header">
+        <div class="log-cell strong">Log File</div>
+        <div class="log-cell strong">Machine</div>
+        <div class="log-cell strong">Used When</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>JobMgr.log</code></div>
+        <div class="log-cell">CommServe</div>
+        <div class="log-cell">Always — start here for any job failure</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>CVD.log</code></div>
+        <div class="log-cell">CS / MA / Client</div>
+        <div class="log-cell">Network/communication failures</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>CVFWD.log</code></div>
+        <div class="log-cell">CS / MA / Client</div>
+        <div class="log-cell">Firewall/tunnel communication issues</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>FileScan.log</code></div>
+        <div class="log-cell">Client</div>
+        <div class="log-cell">Scan phase failures</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>clBackup.log</code></div>
+        <div class="log-cell">Client</div>
+        <div class="log-cell">Backup phase failures</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>CVMount.log</code></div>
+        <div class="log-cell">MediaAgent</div>
+        <div class="log-cell">Storage access / mount path issues during backup</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>clRestore.log</code></div>
+        <div class="log-cell">Client</div>
+        <div class="log-cell">Restore write failures on the destination</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>CVMA.log</code></div>
+        <div class="log-cell">MediaAgent</div>
+        <div class="log-cell">Storage issues, mount path offline, library problems</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>CVJobReplicatorODS.log</code></div>
+        <div class="log-cell">Source MediaAgent</div>
+        <div class="log-cell">Aux copy / secondary copy failures</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>SIDBEngine.log</code></div>
+        <div class="log-cell">MediaAgent</div>
+        <div class="log-cell">Deduplication engine issues, DDB corruption</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>SIDBPrune.log</code></div>
+        <div class="log-cell">MediaAgent</div>
+        <div class="log-cell">DDB pruning / space reclamation issues</div>
+      </div>
+      <div class="log-row">
+        <div class="log-cell accent"><code>DataAging.log</code></div>
+        <div class="log-cell">CommServe</div>
+        <div class="log-cell">Data aging / retention enforcement issues</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📤 Running Send Logs for Commvault Support</h3>
+    <p>When opening a Commvault support case, the support team will request Send Logs output — a packaged
+    collection of relevant logs, performance data, and optionally the DR database.</p>
+
+    <h4>From CommCell Console (Job Level)</h4>
+    <p>Right-click the specific failing job → <strong>Send Logs</strong>. The job ID is pre-selected.
+    Set output path to a local drive location with sufficient free space (avoid sending large DB files
+    unless explicitly requested).</p>
+
+    <h4>From CommCell Console (Client/Server Level)</h4>
+    <p>Right-click the client or server → <strong>All Tasks → Send Logs</strong>. Select relevant MediaAgents
+    and client machines. For output: if internet connectivity exists, enable upload to support portal;
+    otherwise, save locally and manually attach to the support case.</p>
+
+    <p>The resulting file is a <code>.7z</code> archive. Extract with 7-Zip only if local review is needed;
+    otherwise upload directly to the Commvault support case at <code>support.commvault.com</code>.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔬 Performance Troubleshooting — Stream Management</h3>
+    <p>For backup/restore performance issues, the <strong>CVPerfManager.log</strong> on the destination MediaAgent
+    is the primary diagnostic tool. It records throughput metrics for three key operations:</p>
+
+    <div class="info-grid">
+      <div class="info-tile">
+        <div class="info-tile-icon">📖</div>
+        <div class="info-tile-label">Data Reader</div>
+        <div class="info-tile-value">Client Read</div>
+        <div class="info-tile-sub">Throughput reading data from the source client disk</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🌐</div>
+        <div class="info-tile-label">Network Transfer</div>
+        <div class="info-tile-value">Client → MA</div>
+        <div class="info-tile-sub">Data transfer speed between client and MediaAgent</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">✍️</div>
+        <div class="info-tile-label">Media Write</div>
+        <div class="info-tile-value">MA → Storage</div>
+        <div class="info-tile-sub">Write throughput to the backup library/mount path</div>
+      </div>
+    </div>
+
+    <h4>Throughput Benchmarks (Experience-Based)</h4>
+    <ul>
+      <li><strong>&lt; 30 MB/s</strong> — Very slow, investigation needed</li>
+      <li><strong>30–100 MB/s</strong> — Acceptable but below optimal</li>
+      <li><strong>&gt; 100 MB/s</strong> — Good performance</li>
+    </ul>
+
+    <h4>Network Test 2 Workflow</h4>
+    <p>Run this workflow (available in Command Center → Workflows) to measure actual network throughput
+    between two specific hosts. Select <strong>Host-to-Host</strong>, specify the client and MediaAgent,
+    and let the job run. The result shows measured transfer speed. Port 25000 must be open between the hosts.</p>
+
+    <h4>Validate Mount Path</h4>
+    <p>Right-click the library or mount path → <strong>Validate Mount Path</strong>. Provides read and
+    write throughput on the storage volume. Values below 30 MB/s indicate a storage-level issue —
+    engage the storage or hardware team with the evidence.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 5 — DDB TROUBLESHOOTING
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="s5">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(239,68,68,0.15);color:var(--red)">🗄️</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Section 05</div>
+      <h2>DDB Offline &amp; Full Troubleshooting</h2>
+    </div>
+  </div>
+
+  <div class="section-intro">
+    A DDB (Deduplication Database) going offline is one of the most impactful incidents in a Commvault environment.
+    All backup jobs targeting that deduplication store will enter a pending state until the DDB is brought back
+    online. Understanding the reconstruction process and when to escalate to a full reconstruction is critical.
+  </div>
+
+  <div class="card">
+    <h3>🔍 DDB Offline — Initial Triage Checklist</h3>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Verify MediaAgent Status</h4>
+          <p>Navigate to <strong>Storage Resources → MediaAgents</strong>. Confirm the MediaAgent hosting the offline DDB partition shows <strong>Ready</strong>. Run <strong>Check Readiness</strong> if uncertain.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Verify Drive/Partition Accessibility</h4>
+          <p>Log into the MediaAgent. Navigate to the DDB partition path (e.g., <code>E:\DDB</code>). Confirm the folder is accessible and files exist within it. An inaccessible path or 0-byte files indicates OS-level corruption.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Check for Auto-Reconstruction Job</h4>
+          <p>Check the Job Controller for a running <strong>DDB Reconstruction</strong> job. If one is running, Commvault detected corruption and is automatically reconstructing — wait for it to complete. Do not intervene.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <h4>Review Logs</h4>
+          <p>On the MediaAgent: check <strong>SIDBEngine.log</strong> and <strong>CVMA.log</strong> for error messages indicating the reason for the DDB going offline.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔧 DDB Reconstruction — Automatic (Normal)</h3>
+    <p>Commvault automatically triggers DDB reconstruction when it detects corruption (e.g., due to ungraceful
+    service shutdown or disk errors). The reconstruction has <strong>three phases</strong>:</p>
+
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Restore Phase</h4>
+          <p>Commvault restores the most recent DDB backup onto the partition path. Logs to check:
+          <code>AuxCopyMgr.log</code> (CommServe), <code>CVMA.log</code> (MediaAgent), <code>clRestore.log</code> (MediaAgent).</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Add Record Phase</h4>
+          <p>Re-plays transactions from the restore point to the present. Reads new blocks from the disk library and adds their signatures back to the database. Logs: <code>DDBRecovery.log</code>, <code>SIDBEngine.log</code>, <code>ScalableDDBRecovery.log</code>.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Prune Record Phase</h4>
+          <p>Removes references for any jobs that aged out since the restore point — keeping the database current. Logs: <code>SIDBPrune.log</code>, <code>SIDBEngine.log</code>, <code>LibraryOperations.log</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <div class="callout-title">DDB Backup Schedule</div>
+        <p>The DDB backup subclient is auto-created when a DDB partition is added to a MediaAgent. It runs daily at <strong>4:00 PM</strong> by default. Ensure this schedule is active — the effectiveness of automatic reconstruction depends on having a recent DDB backup.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>⚠️ Full DDB Reconstruction — When to Use</h3>
+    <p>If the normal reconstruction fails (e.g., the restored DDB backup is itself corrupted, or the Add Record
+    phase fails with corruption messages in SIDBEngine.log), a <strong>Full DDB Reconstruction</strong> is required.
+    This skips the restore phase entirely and rebuilds the database directly from chunks on the storage.</p>
+
+    <h4>Triggers for Full Reconstruction</h4>
+    <ul>
+      <li>DDB backup unavailable, corrupted, or too old</li>
+      <li>Restore phase failing during normal reconstruction</li>
+      <li>Add Record phase failing with "restored database is corrupt" in SIDBEngine.log</li>
+      <li>Chunks missing from the disk library</li>
+      <li>SIDB index shows corrupted entries</li>
+    </ul>
+
+    <h4>How to Trigger</h4>
+    <div class="code-block">
+      <div class="code-header"><span class="code-label">CommCell Console</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre>Navigate to: Storage Resources → Deduplication
+Right-click the DDB partition → All Tasks → Recover Dedup Database
+
+Select Option:
+☑ Reconstruct the entire DDB without using a previous recovery backup
+
+Click OK → Monitor Job Controller for Full Reconstruction job</pre>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Full Reconstruction — Impact &amp; Time</div>
+        <p>Full reconstruction has only two phases (Add Record + Prune Record — no restore). It rebuilds by
+        reading every chunk on the storage, which can take <strong>hours or days</strong> for large environments.
+        Backup jobs will not run during reconstruction. Set proper expectations with the customer before initiating.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>💽 DDB Full (Partition Full) — Resolution</h3>
+    <p>When the partition hosting the DDB database runs out of space, the DDB shows offline with a "partition full"
+    reason. Resolution: provision a larger disk and use the <strong>DDB Move Partition</strong> workflow to
+    migrate the DDB to the new, larger drive.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-label">CommCell Console</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre>Right-click DDB partition → All Tasks → Move Partition
+↓
+Select destination path (new, larger drive)
+↓
+A Move job starts — monitor until complete
+DDB comes back online automatically at the new location</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 6 — INDEX CACHE & PERFORMANCE
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="s6">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(168,85,247,0.15);color:var(--purple)">⚡</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Section 06</div>
+      <h2>Index Cache &amp; Performance Issues</h2>
+    </div>
+  </div>
+
+  <div class="section-intro">
+    Index cache offline and upgrade failures are common operational challenges. This section covers
+    troubleshooting index cache issues (offline, full, NTFS errors), handling feature/maintenance release
+    upgrade failures, and a structured approach to diagnosing backup, restore, and aux copy performance bottlenecks.
+  </div>
+
+  <div class="card">
+    <h3>🗂️ Index Cache — Architecture Recap</h3>
+    <p>Each client machine creates an index database for browse and restore operations. This database has
+    two copies:</p>
+    <ul>
+      <li><strong>Cache</strong>: temporary location on the MediaAgent (<code>&lt;InstallDir&gt;\ContentStore\Index Cache\</code>)</li>
+      <li><strong>Library</strong>: permanent copy written to the backup library during each backup (archive index phase)</li>
+    </ul>
+    <p>The cache is intermediate storage — if files are lost, they can be retrieved from the library. The cache
+    must remain <strong>online</strong> for backup jobs to run.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Index Cache Offline — Troubleshooting</h3>
+
+    <h4>Scenario 1: Drive Full</h4>
+    <p>The drive hosting the index cache has no free space.</p>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Provision a New/Larger Drive</h4>
+          <p>Work with the infrastructure team to provision additional disk space or a larger dedicated drive for the index cache.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Move Index Cache via Catalog Migration</h4>
+          <p>MediaAgent Properties → <strong>Catalog</strong> → Browse → select the new path → OK. Commvault runs a <strong>Catalog Migration</strong> job to move all index databases from the old path to the new one. Once complete, the cache comes online at the new location.</p>
+        </div>
+      </div>
+    </div>
+
+    <h4>Scenario 2: Large Index Consuming Space (No Bigger Disk)</h4>
+    <p>When a bigger disk is not available, identify and relocate the largest index consumer:</p>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Identify the Large Index Folder</h4>
+          <p>On the MediaAgent, navigate to the index cache path. Use the <strong>TreeSize</strong> application (open-source) or right-click folder properties to identify which folder (by GUID) consumes the most space.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Map GUID to Client</h4>
+          <p>Run the <strong>Index State Report</strong> in Command Center (Health Dashboard → Index State). The "Database Name" column maps the GUID folder to a specific client name.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Run Change Index Server Workflow</h4>
+          <p>Import and run the <strong>Change Index Server</strong> workflow from <code>store.commvault.com</code>. Select the client and choose a different MediaAgent as the new index server. The large index database is moved to another MediaAgent, freeing space on the original.</p>
+        </div>
+      </div>
+    </div>
+
+    <h4>Scenario 3: Drive-Level NTFS Errors</h4>
+    <p>If the drive hosting the index cache has NTFS corruption (files showing 0 bytes, IO errors on access),
+    neither catalog migration nor cleanup will succeed until the OS-level issue is resolved.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-label">Windows — Check Disk Repair</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre># Engage Windows (Wintel) team to run:
+chkdsk E: /f /r
+
+# /f = fix errors, /r = locate bad sectors and recover data
+# Requires drive to be offline (schedule at next reboot)
+# After completion, verify folder accessibility before re-enabling index cache</pre>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <div class="callout-title">Index Cache — Missing Files After CHKDSK</div>
+        <p>Some index files may be missing after CHKDSK completes. This is acceptable — the index cache is
+        only a temporary copy. As long as the cache is online, backups will run and rebuild the missing indexes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔄 Upgrade Failure Troubleshooting</h3>
+
+    <h4>Feature Release Upgrade Failures</h4>
+    <p>If a feature release upgrade (e.g., 11.32 → 11.36) fails, check the <strong>install.log</strong> file
+    at the Commvault installation path. Open with GxTail, apply the Failures filter to identify the exact
+    failure point.</p>
+
+    <h4>Maintenance Release Upgrade Failures</h4>
+    <p>For MR upgrades, refer to <strong>UpdateInfo.log</strong> and <strong>UpdateDBG.log</strong>. Always
+    cross-reference the date/time stamp against when the upgrade was initiated.</p>
+
+    <h4>Services Not Starting After Upgrade</h4>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Try Repair Option First</h4>
+          <p>Re-run the setup file from the installer package. The installer detects the existing version and offers <strong>Repair Existing Instance</strong>. This performs a non-destructive uninstall+reinstall preserving cache, registry variables, and environment settings — much safer than a clean reinstall.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Identify the Failing Service from Logs</h4>
+          <p>Check <code>EVMGRS.log</code> for general service startup issues. If a specific process (e.g., CVD) is failing, check that process's log for the root cause.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Check .NET and Third-Party Dependencies</h4>
+          <p>In Control Panel, verify that .NET packages required by Commvault are intact. Security patching can impact .NET installations. If the Command Center fails, download and repair the ASP.NET Core Hosting Bundle.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <h4>SQL Server Issues — Engage Support</h4>
+          <p>If SQL errors appear in logs, do not attempt to uninstall/reinstall SQL independently. The Commvault SQL database is critical. Engage Commvault Technical Support before touching SQL. Have your DR backup dump file location ready.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Antivirus Blocking Installation</div>
+        <p>Antivirus software is a common cause of installation failures. During upgrade maintenance windows,
+        request the security team to temporarily disable AV scanning on the Commvault directories, or add
+        Commvault installation paths to the AV exclusion list. Always coordinate with the security team —
+        do not disable AV unilaterally.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 7 — CS RECOVERY ASSISTANT
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="s7">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(20,184,166,0.15);color:var(--teal)">🔑</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Section 07</div>
+      <h2>CommServe Recovery Assistant Tool</h2>
+    </div>
+  </div>
+
+  <div class="section-intro">
+    The CommServe Recovery Assistant is the last-resort tool for recovering a CommServe database from DR backup dumps.
+    It is used only after all standard troubleshooting steps have been exhausted. Using it for minor issues
+    is a critical mistake — understand the exact use cases before deployment.
+  </div>
+
+  <div class="card">
+    <h3>📋 Use Cases</h3>
+    <div class="info-grid">
+      <div class="info-tile">
+        <div class="info-tile-icon">💥</div>
+        <div class="info-tile-label">Disaster Recovery</div>
+        <div class="info-tile-value">Hardware Failure</div>
+        <div class="info-tile-sub">CommServe OS crashed / not booting — rebuild on new hardware</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🔄</div>
+        <div class="info-tile-label">Hardware Migration</div>
+        <div class="info-tile-value">New Server</div>
+        <div class="info-tile-sub">Move CommServe database to new hardware</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🧪</div>
+        <div class="info-tile-label">Staging Environment</div>
+        <div class="info-tile-value">Test/Analysis</div>
+        <div class="info-tile-sub">Build a non-production replica for testing upgrades or database analysis</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📁 Prerequisites — DR Backup Dump Files</h3>
+    <p>The CommServe Recovery Assistant requires the CommServe DR backup dump files — the metadata backups
+    created by the automatic DR backup job. <strong>Know this location at all times</strong>, as the
+    CommServe console may be unavailable during a disaster.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-label">Locating DR Dump Files</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre># In CommCell Console:
+Home → Control Panel → DR Backup → View DR Backup Details
+
+# Note the dump file path (e.g., E:\CommServe_DR\)
+# Store this path in documentation outside the CommServe
+
+# If dump files are corrupted or missing:
+# Use Media Explorer tool to recover from backup library or tape</pre>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Document the DR Location Today</div>
+        <p>The DR dump file path must be documented externally (email, wiki, or physical document). During a
+        disaster, the CommServe console will be unavailable and you will need this path from memory or documentation.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🚀 Recovery Procedure — Step-by-Step</h3>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Prepare the Target Server</h4>
+          <p>On the new/repaired CommServe server: ensure the same OS version is installed, sufficient disk space is available, and Commvault software is installed (same version). Stop all Commvault services if running.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Launch CS Recovery Assistant</h4>
+          <p>Navigate to the Commvault installation path → locate <strong>CSRecoveryAssistant.exe</strong> → Right-click → Run as Administrator.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Select Recovery Purpose</h4>
+          <p>Choose <strong>Production Recovery</strong> (as opposed to staging/troubleshooting). Read and confirm the decommission warning — this confirms the original CommServe has been taken offline.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <h4>Provide DR Dump File Path</h4>
+          <p>Browse to the folder containing the latest DR dump files (e.g., <code>E:\CommServe_DR\</code>). Select the most recent dump. The tool will also extract and restore the database files.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">5</div>
+        <div class="phase-body">
+          <h4>Allow Recovery to Complete</h4>
+          <p>The tool automatically: stops services → restores the database → upgrades the schema if needed → synchronizes CommServe configuration. Typical duration: 15–30 minutes. Perform post-recovery operations as prompted.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">6</div>
+        <div class="phase-body">
+          <h4>Validate &amp; License</h4>
+          <p>Open Process Manager — all services should be green. Open CommCell Console and Command Center. If this is a new server (not original hardware), apply the license as prompted.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout exam">
+      <div class="callout-icon">🎓</div>
+      <div class="callout-body">
+        <div class="callout-title">Exam Tip — Repair vs Recovery Assistant</div>
+        <p><strong>Repair</strong> = non-destructive fix for service/binary issues. Use first when services won't start after upgrade. Preserves cache and configuration.<br>
+        <strong>CS Recovery Assistant</strong> = last resort for database recovery when all other options fail. Use only when CommServe database is unrecoverable through normal means.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 8 — DATA AGING, PRUNING & MICRO-PRUNING
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="s8">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(234,179,8,0.15);color:var(--gold)">🧹</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Section 08</div>
+      <h2>Data Aging, Storage Pruning &amp; Micro-Pruning</h2>
+    </div>
+  </div>
+
+  <div class="section-intro">
+    Storage space reclamation in Commvault is a multi-stage automated process involving data aging,
+    archive file pruning, and deduplication block cleanup. Understanding this end-to-end workflow is essential
+    for diagnosing why storage space is not being reclaimed as expected.
+  </div>
+
+  <div class="card">
+    <h3>🔄 Non-Dedup Storage — Pruning Workflow</h3>
+    <p>For a non-deduplicated storage policy (plain disk library without DDB), the space reclamation
+    follows this sequence:</p>
+
+    <div class="flow" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <div class="flow-step highlight" style="min-width:200px">Data Aging Job Runs (12:00 daily)</div>
+        <div class="flow-arrow">→</div>
+        <div style="font-size:13px;color:var(--text-muted)">CommServe identifies jobs whose retention period has expired</div>
+      </div>
+      <div style="padding-left:10px;color:var(--text-dim);font-size:18px">↓</div>
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <div class="flow-step" style="min-width:200px">MM Delete AF Table Updated</div>
+        <div class="flow-arrow">→</div>
+        <div style="font-size:13px;color:var(--text-muted)">Aged job archive files listed in CommServe database for pruning</div>
+      </div>
+      <div style="padding-left:10px;color:var(--text-dim);font-size:18px">↓</div>
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <div class="flow-step" style="min-width:200px">Archive Files → MediaAgent</div>
+        <div class="flow-arrow">→</div>
+        <div style="font-size:13px;color:var(--text-muted)">CommServe sends archive file info (not job IDs) to the MediaAgent</div>
+      </div>
+      <div style="padding-left:10px;color:var(--text-dim);font-size:18px">↓</div>
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <div class="flow-step success" style="min-width:200px">Chunks Pruned from Storage</div>
+        <div class="flow-arrow">→</div>
+        <div style="font-size:13px;color:var(--text-muted)">MediaAgent identifies relevant chunks and deletes them — space reclaimed</div>
+      </div>
+    </div>
+
+    <p style="margin-top:14px;color:var(--text-muted);font-size:13.5px">For non-dedup issues, refer to <code>CVMA.log</code> on the MediaAgent and search for delete-related errors.</p>
+  </div>
+
+  <div class="card">
+    <h3>⚙️ Deduplicated Storage — Extended Pruning Workflow</h3>
+    <p>When a DDB (deduplication engine) is involved, the space reclamation process includes additional steps
+    to decrement signature counters and manage the three DDB tables.</p>
+
+    <h4>DDB Table Types</h4>
+    <div class="info-grid">
+      <div class="info-tile">
+        <div class="info-tile-icon">🔑</div>
+        <div class="info-tile-label">Primary Table</div>
+        <div class="info-tile-value">Unique Signatures</div>
+        <div class="info-tile-sub">One record per unique data block. Counter tracks how many jobs reference it.</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🔗</div>
+        <div class="info-tile-label">Secondary Table</div>
+        <div class="info-tile-value">Archive File References</div>
+        <div class="info-tile-sub">Maps archive files to the chunks they reference on storage.</div>
+      </div>
+      <div class="info-tile">
+        <div class="info-tile-icon">🗑️</div>
+        <div class="info-tile-label">Zero-Reference Table</div>
+        <div class="info-tile-value">Eligible for Pruning</div>
+        <div class="info-tile-sub">Signatures whose counter reached 0 — blocks are candidates for deletion.</div>
+      </div>
+    </div>
+
+    <h4>Pruning Flow for Dedup Storage</h4>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h4>Data Aging Job Runs</h4>
+          <p>CommServe identifies aged jobs and populates the MM Delete AF table (same as non-dedup).</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h4>Archive Files Sent to MediaAgent</h4>
+          <p>CommServe sends archive file information to the MediaAgent for processing.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h4>Signature Counters Decremented</h4>
+          <p>For each block referenced by the aged archive file, the signature counter in the Primary Table is decremented. A block referenced by 4 jobs still has a counter of 3 after one job ages — it is not yet prunable.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <h4>Zero-Reference Table Updated</h4>
+          <p>When a signature counter reaches <strong>0</strong> (no remaining jobs reference that block), the signature record moves to the Zero-Reference Table. This marks the block as prunable.</p>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="phase-num">5</div>
+        <div class="phase-body">
+          <h4>Blocks Pruned from Storage</h4>
+          <p>The MediaAgent deletes the actual data chunks (s-files) from the disk library where the zero-reference blocks reside. Space is reclaimed from the storage.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout exam">
+      <div class="callout-icon">🎓</div>
+      <div class="callout-body">
+        <div class="callout-title">Key Interview Question</div>
+        <p><strong>Q: A customer deleted 100 backup jobs but no storage space was reclaimed. Why?</strong><br>
+        A: In a dedup environment, deleting jobs only decrements the signature counter. Space is reclaimed only when
+        the counter reaches <strong>0</strong> — meaning no other remaining backup jobs reference that data block.
+        If other jobs still reference those blocks, space cannot be freed. Check the Zero-Reference table — if it
+        has no entries, no blocks are eligible for pruning.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔬 Micro-Pruning vs Macro-Pruning (Space Reclamation)</h3>
+
+    <h4>Micro-Pruning</h4>
+    <p>When individual data blocks within a chunk file (s-file) are deleted but the chunk still contains other
+    valid blocks, the freed blocks appear as fragmented empty space within the file. Micro-pruning reclaims
+    these fragmented internal gaps without rebuilding the entire chunk.</p>
+    <ul>
+      <li>Requires the storage to support <strong>sparse file (hole-punching)</strong> capability</li>
+      <li>Check support: Library Properties → Mount Path → look for <strong>Sparse Support = Enabled</strong></li>
+      <li>If enabled: Commvault handles micro-pruning automatically in the background</li>
+      <li>Also visible via: Right-click mount path → Properties → <strong>Support Drilling of Holes = Yes</strong></li>
+    </ul>
+
+    <h4>Macro-Pruning (Space Reclamation Job)</h4>
+    <p>If the storage does <strong>not</strong> support sparse files (Sparse Support = disabled), micro-pruning
+    is unavailable. Instead, run a Space Reclamation job:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-label">CommCell Console</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre>Storage Resources → Deduplication → Select DDB Store
+Right-click → All Tasks → Run Space Reclamation
+
+Options:
+  ☑ Defragmentation (default — recommended)
+  ☐ Clean Orphan Data (only when instructed by support)
+
+A system-created schedule "DDB Space Reclamation" runs daily at 9:00 AM
+→ Only executes for stores without sparse support (Commvault auto-detects)</pre>
+    </div>
+
+    <div class="callout exam">
+      <div class="callout-icon">🎓</div>
+      <div class="callout-body">
+        <div class="callout-title">Exam Tip — Micro-Pruning &amp; Sparse Support</div>
+        <p><strong>Q: How do you know if micro-pruning is supported for a library?</strong><br>
+        A: Navigate to the mount path properties. If <strong>Sparse Support</strong> is checked/enabled and
+        <strong>Support Drilling of Holes = Yes</strong>, micro-pruning is supported and automatic.
+        If not supported, the DDB Space Reclamation schedule handles defragmentation.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🚨 When Pruning Stops — Common Causes</h3>
+    <ul>
+      <li><strong>DDB partition offline</strong> — pruning halts until DDB comes back online</li>
+      <li><strong>MediaAgent offline</strong> — MediaAgent must be online to perform chunk deletion</li>
+      <li><strong>Mount path offline</strong> — any offline mount path in the library stops pruning</li>
+      <li><strong>Drive IO errors / NTFS corruption</strong> — chunk deletion fails, space not reclaimed</li>
+    </ul>
+    <p>Monitor using: <code>SIDBPrune.log</code> and <code>SIDBEngine.log</code> on the MediaAgent.
+    Also run the <strong>Data Retention Forecast</strong> report to identify jobs that should have aged
+    but are still retained.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCENARIO-BASED Q&A
+     ════════════════════════════════════════════════════════ -->
+<div class="section" id="qa">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(59,130,246,0.15);color:var(--accent)">❓</div>
+    <div class="section-title-wrap">
+      <div class="section-num">Scenario Q&amp;A</div>
+      <h2>Real-World Interview &amp; Scenario Questions</h2>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">
+      <div class="qa-q-icon">Q</div>
+      A customer says they configured a secondary copy to tape three days ago but the tape copy jobs show "To Be Copied." What is the likely cause and how do you resolve it?
+    </div>
+    <div class="qa-a">
+      <div class="qa-label">Answer</div>
+      <p>The secondary copy has been configured but the aux copy job has not run or has not completed. Investigation steps:</p>
+      <ul>
+        <li>Check the Job Controller for any active or failed aux copy jobs for that storage policy</li>
+        <li>Right-click the secondary copy → <strong>View Schedules</strong> — confirm the auto-copy schedule is active and running every 30 minutes</li>
+        <li>Manually trigger: Storage Policy → Right-click → <strong>All Tasks → Run Aux Copy</strong> → select the tape copy</li>
+        <li>If the job fails, check <code>JobMgr.log</code> first, then <code>CVJobReplicatorODS.log</code> on the source MediaAgent for the error</li>
+        <li>Common causes: tape drive offline, MediaAgent not reachable, or insufficient media in the tape library</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">
+      <div class="qa-q-icon">Q</div>
+      After upgrading the CommServe from 11.32 to 11.36, the Command Center shows "This site can't be reached." Services appear to be running in Process Manager. What do you do?
+    </div>
+    <div class="qa-a">
+      <div class="qa-label">Answer</div>
+      <p>This is typically an ASP.NET hosting bundle issue after the feature release upgrade. Resolution steps:</p>
+      <ul>
+        <li>First, try opening Command Center in an <strong>incognito/private browser window</strong></li>
+        <li>If still failing, open an elevated command prompt and run: <code>iisreset</code></li>
+        <li>If still failing, download the <strong>ASP.NET Core Hosting Bundle</strong> matching the installed .NET version (e.g., .NET 8.x)</li>
+        <li>Run the installer — it detects the existing version and offers <strong>Repair</strong></li>
+        <li>Restart the server gracefully after repair completes</li>
+        <li>Verify Command Center opens after restart</li>
+      </ul>
+      <p><strong>Root cause prevention:</strong> Always perform a graceful service stop before rebooting the CommServe to avoid binary/DLL corruption.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">
+      <div class="qa-q-icon">Q</div>
+      A backup admin reports that backup jobs for 10 clients have been failing with "network error — failed to connect to communication service on remote machine." How do you troubleshoot?
+    </div>
+    <div class="qa-a">
+      <div class="qa-label">Answer</div>
+      <p>This is a network connectivity issue between the CommServe/MediaAgent and the client machines. Log-first approach:</p>
+      <ul>
+        <li>Open <code>JobMgr.log</code> on the CommServe → filter by one of the failing job IDs → identify the IP address mentioned in the network error</li>
+        <li>Right-click the affected client in CommCell Console → <strong>All Tasks → Check Readiness</strong> — if this fails, the client is unreachable</li>
+        <li>Attempt to log into the client machine via RDP/SSH — verify the machine is powered on and reachable</li>
+        <li>On a reachable client, verify Commvault services are running via Process Manager or <code>services.msc</code></li>
+        <li>Run CV Ping (equivalent to telnet) on ports 8400 and 8403 in both directions (CommServe ↔ Client)</li>
+        <li>If connectivity works but jobs still fail, check <code>CVD.log</code> and <code>CVFWD.log</code> on the client for firewall or SSL certificate issues</li>
+        <li>If packet loss is suspected, run a continuous ping or traceroute to isolate the network path</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">
+      <div class="qa-q-icon">Q</div>
+      The DDB for a large file server storage pool has gone offline. Process Manager on the MediaAgent shows all services running. How do you approach this?
+    </div>
+    <div class="qa-a">
+      <div class="qa-label">Answer</div>
+      <p>Structured DDB offline response:</p>
+      <ul>
+        <li><strong>Step 1:</strong> Confirm MediaAgent status — navigate to Storage Resources → MediaAgents → verify <strong>Ready</strong> state, run Check Readiness</li>
+        <li><strong>Step 2:</strong> On the MediaAgent, navigate to the DDB partition path (e.g., <code>F:\DDB\</code>) — confirm the folder is accessible and contains files (not 0-byte)</li>
+        <li><strong>Step 3:</strong> Check Job Controller for an auto-triggered DDB Reconstruction job. If running — wait. Do not interfere.</li>
+        <li><strong>Step 4:</strong> If no reconstruction job is visible, review <code>SIDBEngine.log</code> for the offline reason</li>
+        <li><strong>Step 5:</strong> If normal reconstruction is failing (restore phase errors in logs), manually trigger a <strong>Full DDB Reconstruction</strong>: right-click partition → All Tasks → Recover Dedup Database → check "Reconstruct without previous backup"</li>
+        <li>Communicate estimated reconstruction time to the customer — backups will not run during this period</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">
+      <div class="qa-q-icon">Q</div>
+      A backup admin deleted 200 old backup jobs 2 days ago but the storage utilization has not changed at all. The customer is asking why. What is your explanation?
+    </div>
+    <div class="qa-a">
+      <div class="qa-label">Answer</div>
+      <p>This is expected behavior in a dedup environment — and must be clearly explained to the customer:</p>
+      <ul>
+        <li>Deleting or aging a job in a <strong>deduplicated storage policy</strong> does not immediately reclaim storage</li>
+        <li>Space is only reclaimed when the <strong>signature counter for a dedup block reaches 0</strong> — meaning no other backup job still references that data block</li>
+        <li>If the 200 deleted jobs share data blocks with still-retained jobs (e.g., incremental backups sharing blocks with a full), those blocks remain on storage</li>
+        <li>Run the <strong>Data Retention Forecast</strong> report — it identifies jobs eligible for pruning and shows estimated space reclamation</li>
+        <li>Check <code>SIDBPrune.log</code> for any pruning errors; verify the Zero-Reference Table has entries (indicating blocks eligible for pruning exist)</li>
+        <li>Verify MediaAgent and mount path are <strong>online</strong> — pruning halts if either is offline</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">
+      <div class="qa-q-icon">Q</div>
+      Backup throughput dropped from 500 GB/hour to 20 GB/hour after a storage array replacement. How do you identify and prove the bottleneck to the storage team?
+    </div>
+    <div class="qa-a">
+      <div class="qa-label">Answer</div>
+      <p>Use evidence-based troubleshooting — never accuse without data:</p>
+      <ul>
+        <li>Open <code>CVPerfManager.log</code> on the <strong>destination MediaAgent</strong> and filter by the slow job ID</li>
+        <li>Identify the three metrics: <strong>Read Throughput</strong> (client disk read), <strong>Network Transfer</strong> (client to MA), <strong>Media Write</strong> (MA to storage)</li>
+        <li>In this case (storage replacement), focus on <strong>Media Write throughput</strong> — if this is ≈20 GB/hr while reads and network are normal, the bottleneck is the storage write path</li>
+        <li>Validate storage performance: right-click the mount path → <strong>Validate Mount Path</strong> with a 1 GB test file. This gives direct read/write throughput on the new storage.</li>
+        <li>If write speed is below 30 MB/s, present this evidence to the storage team: "Validate Mount Path shows write throughput of X MB/s on the new array — expected >100 MB/s based on previous performance history"</li>
+        <li>Ask the storage team to verify: RAID configuration, disk health, firmware levels, and I/O queue depth settings on the new array</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">
+      <div class="qa-q-icon">Q</div>
+      How would you recover a CommServe when the original server has a hardware failure and is unrecoverable? Walk through the complete process.
+    </div>
+    <div class="qa-a">
+      <div class="qa-label">Answer</div>
+      <p>CommServe recovery from DR backup dump using the CS Recovery Assistant Tool:</p>
+      <ul>
+        <li><strong>Pre-req:</strong> Know the DR dump file location (documented externally). Retrieve dump files — copy to the new CommServe server.</li>
+        <li><strong>Step 1:</strong> On the new server, install the same version of Commvault software (e.g., 11.36.28) but do not configure — stop services.</li>
+        <li><strong>Step 2:</strong> Navigate to the Commvault install path → locate <strong>CSRecoveryAssistant.exe</strong> → run as administrator.</li>
+        <li><strong>Step 3:</strong> Select <strong>Production Recovery</strong>. Confirm decommission warning (old CommServe is offline).</li>
+        <li><strong>Step 4:</strong> Provide the DR dump file path. The tool extracts database files and runs: stop services → restore DB → upgrade schema → sync.</li>
+        <li><strong>Step 5:</strong> Wait 15–30 minutes for completion. Click Finish. Apply license if prompted (new hardware).</li>
+        <li><strong>Step 6:</strong> Verify in Process Manager that all services are green. Open CommCell Console and Command Center to validate full functionality.</li>
+        <li><strong>Post-recovery:</strong> Run a DR backup immediately to capture the recovered state. Verify MediaAgent connectivity and re-queue any jobs that were pending.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     AUTHOR SECTION
+     ════════════════════════════════════════════════════════ -->
+<div class="author-section">
+  <div class="author-card">
+    <div class="author-avatar">👤</div>
+    <div class="author-info">
+      <h3>Mohammed Abdul</h3>
+      <p>
+        Mohammed Abdul is a Data Protection Architect with more than 15 years of experience in Hybrid Cloud
+        and has worked with global clients across various industries. With extensive expertise in enterprise
+        backup and recovery solutions, Mohammed specializes in Commvault, Veeam, NetBackup, and NetApp
+        technologies, helping organizations design and implement robust data protection strategies.
+      </p>
+      <div class="author-badges">
+        <span class="badge">Commvault</span>
+        <span class="badge">Veeam</span>
+        <span class="badge">NetBackup</span>
+        <span class="badge">NetApp</span>
+        <span class="badge">Hybrid Cloud</span>
+        <span class="badge">Data Protection</span>
+      </div>
+      <a class="author-email" href="mailto:abdul.md.20000102@gmail.com">📧 abdul.md.20000102@gmail.com</a>
+    </div>
+  </div>
+
+  <div class="callout note" style="margin-top:20px">
+    <div class="callout-icon">📋</div>
+    <div class="callout-body">
+      <div class="callout-title">Disclaimer</div>
+      <p>This content is for educational purposes and tutorial material only. Always refer to the official
+      Commvault documentation at <strong>documentation.commvault.com</strong> and follow your organization's
+      change management procedures for all production implementations.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main-wrap -->
+
+<footer>
+  <p>Commvault Cloud Administration Tutorial 5 &nbsp;|&nbsp; Sessions 26–33 &nbsp;|&nbsp; Version 11.32–11.36 &nbsp;|&nbsp; Built by Mohammed Abdul</p>
+</footer>
+
+</body>
+</html>
