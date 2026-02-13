@@ -361,7 +361,7 @@
     <div class="callout-head">⚠️ When NOT to Use Commvault Deduplication</div>
     <p>For certain storage types, Commvault recommends <strong>disabling</strong> its built-in deduplication:</p>
     <ul class="list">
-      <li><strong>HP Catalyst / StoreOnce</strong> — The storage appliance performs deduplication natively; double-dedup reduces efficiency. Commvault recommends configuring the plan without deduplication in this case.</li>
+      <li><strong>HPE StoreOnce Catalyst</strong> — The storage appliance performs deduplication natively; double-dedup reduces efficiency. Commvault recommends configuring the plan without deduplication in this case.</li>
       <li><strong>Tape libraries</strong> — Tape does not support block-level deduplication. Only compression applies. Never configure DDB for tape-only storage pools.</li>
     </ul>
   </div>
@@ -538,7 +538,7 @@
     </div>
     <div class="card">
       <span class="pill p-pu" style="margin-bottom:10px;display:inline-block;">Synthetic Full</span>
-      <p style="font-size:14px;">Creates a new full backup by <strong>consolidating existing full + incrementals on storage</strong> — without reading from the source client. Reduces backup window impact on the production server. Commvault auto-schedules this as a safety net (every 7 days) if no traditional full has run.</p>
+      <p style="font-size:14px;">Creates a new full backup by <strong>consolidating existing full + incrementals on storage</strong> — without reading from the source client. Reduces backup window impact on the production server. Included in the default Commvault schedule policy (typically once per week) as a protection mechanism to ensure a periodic merged full always exists on storage.</p>
     </div>
     <div class="card">
       <span class="pill p-re" style="margin-bottom:10px;display:inline-block;">Log Backup</span>
@@ -661,9 +661,9 @@
     <div class="flow-arrow">→</div>
     <div class="flow-step"><div class="fn">Phase 2</div><div class="ft">DMP files cached to metadata staging location (local path on CommServe)</div></div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step"><div class="fn">Phase 3</div><div class="ft">Cache copied to defined metadata export path (e.g. E:\CommserverDR)</div></div>
+    <div class="flow-step"><div class="fn">Phase 3</div><div class="ft">Cache copied to defined metadata export path (e.g. E:\CommserveDR)</div></div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step"><div class="fn">Phase 4</div><div class="ft">(Optional) Copy uploaded to Metallic Cloud (Commvault Cloud)</div></div>
+    <div class="flow-step"><div class="fn">Phase 4</div><div class="ft">(Optional) Copy uploaded to Commvault Cloud (formerly Metallic)</div></div>
     <div class="flow-arrow">→</div>
     <div class="flow-step"><div class="fn">Phase 5</div><div class="ft">Final copy written to CommServe DR Storage Policy on disk library</div></div>
   </div>
@@ -673,9 +673,9 @@
     <li><strong>SQL Server Engine</strong> — Installed automatically with CommServe. Hosts the CommServe database. Check via Control Panel → Programs and Features.</li>
     <li><strong>CommServe DB (DMP file)</strong> — Primary database dump. Located at <code>C:\Program Files\Commvault\ContentStore\CommserveDR\</code>. The file named <code>commserve_&lt;hostname&gt;.dmp</code> is the most critical.</li>
     <li><strong>Supporting databases</strong> — AppStudio, CacheDB, HistoryDB, WorkflowEngine — smaller databases that are also included in the DR dump.</li>
-    <li><strong>Metadata export path</strong> — A secondary local or network path (e.g. E: drive) where DR dumps are exported. <strong>Note this path carefully</strong> — it is your first recovery option if the C: drive fails.</li>
+    <li><strong>Metadata export path</strong> — A secondary local or network path (e.g. E:\CommserveDRBackup) where DR dumps are exported. <strong>Note this path carefully</strong> — it is your first recovery option if the C: drive fails.</li>
     <li><strong>CommServeDR Storage Policy</strong> — Auto-created when you add the first library. Visible in Java Console → Storage Policies. Not visible in Command Center.</li>
-    <li><strong>Metallic Cloud</strong> — Commvault's own cloud offering. An optional third copy destination for CommServe DR backups.</li>
+    <li><strong>Commvault Cloud (formerly Metallic)</strong> — Commvault's own cloud offering. An optional third copy destination for CommServe DR backups.</li>
   </ul>
 
   <div class="code-block">
@@ -684,7 +684,7 @@
 <span class="path">C:\Program Files\Commvault\ContentStore\CommserveDR\</span>
 
 <span class="cmt"># Example metadata export path (user-defined, configure in DR settings)</span>
-<span class="path">E:\CommserverDRBackup\</span>
+<span class="path">E:\CommserveDRBackup\</span>
 
 <span class="cmt"># Verify SQL Server installation in programs list</span>
 <span class="cmt"># Control Panel → Programs and Features → search "SQL"</span>
@@ -704,7 +704,7 @@
   <div class="callout c-exam">
     <div class="callout-head">🎓 Interview: CommServe DR Process Flow</div>
     <p><em>"Explain the CommServe DR backup process."</em></p>
-    <p style="margin-top:8px;">Answer: "The CommServe DR backup runs automatically as a scheduled job. It first generates a <strong>SQL dump</strong> of all CommServe databases — the primary commserve.dmp and supporting databases. These dumps are staged to a local cache path, then exported to a user-defined metadata location. Optionally, a copy is uploaded to Commvault Metallic Cloud. Finally, the DR data is written to the CommServeDR Storage Policy on the configured disk library. This provides three recovery options: local metadata path, cloud copy, and disk library copy."</p>
+    <p style="margin-top:8px;">Answer: "The CommServe DR backup runs automatically as a scheduled job. It first generates a <strong>SQL dump</strong> of all CommServe databases — the primary commserve.dmp and supporting databases. These dumps are staged to a local cache path, then exported to a user-defined metadata location. Optionally, a copy is uploaded to <strong>Commvault Cloud (formerly Metallic)</strong>. Finally, the DR data is written to the CommServeDR Storage Policy on the configured disk library. This provides three recovery options: local metadata path, cloud copy, and disk library copy."</p>
   </div>
 </div>
 
@@ -773,7 +773,7 @@
   <p>When Commvault writes backup data to cloud storage, it creates a structured hierarchy within the bucket:</p>
   <ul class="list">
     <li><strong>Container-level folders</strong> — Organised by CommCell ID, storage policy, and copy number</li>
-    <li><strong>Chunk files</strong> — Backup data is written in fixed-size chunks (typically 64 MB). Each chunk contains compressed, optionally encrypted, and optionally deduplicated data blocks.</li>
+    <li><strong>Chunk files</strong> — Backup data is written in fixed-size chunks (default 128 MB in Commvault v11.x). Each chunk contains compressed, optionally encrypted, and optionally deduplicated data blocks.</li>
     <li><strong>SFILE containers</strong> — Commvault's proprietary packaging format for cloud objects. Visible inside the S3 bucket as <code>SFILE</code> named objects.</li>
     <li><strong>Metadata files</strong> — Separate objects containing the catalogue and index information for each chunk</li>
   </ul>
@@ -930,12 +930,12 @@
     <li><strong>Install Hyper-V role</strong><p>Open Server Manager → Add Roles and Features → Hyper-V. Complete the wizard. Restart when prompted.</p></li>
     <li><strong>Install Failover Clustering feature</strong><p>Add Roles and Features → Features → Failover Clustering. Install and restart.</p></li>
     <li><strong>Create VMs inside Hyper-V</strong><p>Open Hyper-V Manager → New → Virtual Machine. Create one Windows VM and one Linux (Ubuntu) VM for backup testing. Assign 2–4 GB RAM each.</p></li>
-    <li><strong>Configure Failover Cluster</strong><p>Open Failover Cluster Manager → Create Cluster. Add the single Hyper-V node. Assign a cluster name and IP (e.g. <code>HV-Cluster01</code>, IP: 192.168.x.225). Note: the cluster IP is different from the node IP.</p></li>
+    <li><strong>Configure Failover Cluster</strong><p>Open Failover Cluster Manager → Create Cluster. Add the single Hyper-V node. Assign a cluster name and IP (e.g. <code>HV-Cluster01</code>, IP: 192.168.1.225). Note: the cluster IP is different from the node IP.</p></li>
   </ol>
 
   <div class="callout c-warn">
     <div class="callout-head">⚠️ Cluster IP vs. Node IP</div>
-    <p>When configuring Commvault for a Hyper-V Failover Cluster, always use the <strong>cluster IP address</strong> — not the individual node server IP. The cluster IP is visible in Failover Cluster Manager → Cluster Core Resources. In the example lab: cluster IP = 192.168.x.225, node IP = 192.168.x.115 (different).</p>
+    <p>When configuring Commvault for a Hyper-V Failover Cluster, always use the <strong>cluster IP address</strong> — not the individual node server IP. The cluster IP is visible in Failover Cluster Manager → Cluster Core Resources. In the example lab: cluster IP = 192.168.1.225, node IP = 192.168.1.115 (different).</p>
   </div>
 
   <h3>Configuring the Hyper-V Agent in Command Center</h3>
@@ -994,7 +994,7 @@
 
   <div class="qa-item">
     <div class="qa-q">What is a Synthetic Full backup and why would you use it?</div>
-    <div class="qa-a">A <strong>Synthetic Full</strong> creates a new full backup by consolidating the most recent full backup and all subsequent incrementals — <strong>reading from storage rather than from the source client</strong>. This means no I/O load on the production server during the operation. Commvault automatically schedules a Synthetic Full every 7 days as a safety net via the schedule policy. It is visible in the Java Console schedule policy but not in Command Center for Commvault v11.32 and earlier. The definition: "A backup that consolidates previous incrementals and the last full to create a new synthetic full, without reading from the source."</div>
+    <div class="qa-a">A <strong>Synthetic Full</strong> creates a new full backup by consolidating the most recent full backup and all subsequent incrementals — <strong>reading from storage rather than from the source client</strong>. This means no I/O load on the production server during the operation. The default Commvault schedule policy includes a Synthetic Full (typically once per week) as a protection mechanism to ensure a merged full copy is always available on storage. It is visible in the Java Console schedule policy. The definition: "A backup that consolidates previous incrementals and the last full to create a new synthetic full, without reading from the source."</div>
   </div>
 
   <div class="qa-item">
@@ -1004,7 +1004,7 @@
 
   <div class="qa-item">
     <div class="qa-q">Why is the CommServe DR backup critical, and what is its process flow?</div>
-    <div class="qa-a">The CommServe database contains all metadata for the entire backup environment — job history, client configurations, storage policies, schedules, and the backup catalogue. If the CommServe fails without a current DR backup, the environment cannot be recovered. The DR backup process: (1) generates a SQL dump of the CommServe database; (2) caches DMP files to a local staging path inside ContentStore\CommserveDR; (3) exports the dumps to a user-defined metadata path (e.g. E:\CommserverDRBackup); (4) optionally uploads a copy to Metallic Cloud; (5) writes the final copy to the CommServeDR Storage Policy on disk. Backup administrators must monitor DR job completion daily.</div>
+    <div class="qa-a">The CommServe database contains all metadata for the entire backup environment — job history, client configurations, storage policies, schedules, and the backup catalogue. If the CommServe fails without a current DR backup, the environment cannot be recovered. The DR backup process: (1) generates a SQL dump of the CommServe database; (2) caches DMP files to a local staging path inside ContentStore\CommserveDR; (3) exports the dumps to a user-defined metadata path (e.g. E:\CommserveDRBackup); (4) optionally uploads a copy to <strong>Commvault Cloud (formerly Metallic)</strong>; (5) writes the final copy to the CommServeDR Storage Policy on disk. Backup administrators must monitor DR job completion daily.</div>
   </div>
 
   <div class="qa-item">
@@ -1024,7 +1024,7 @@
 
   <div class="qa-item">
     <div class="qa-q">When would you NOT use Commvault deduplication, and why?</div>
-    <div class="qa-a">Commvault deduplication should not be configured in two scenarios: (1) <strong>HP Catalyst / StoreOnce appliances</strong> — These storage platforms perform native deduplication inside the appliance itself. Enabling Commvault dedup on top of this creates "double dedup," which reduces efficiency and can cause performance issues. Commvault formally recommends disabling its dedup for Catalyst targets. (2) <strong>Tape libraries</strong> — Tape storage does not support block-level deduplication at the Commvault layer. Only compression applies to tape-based data. Never configure a DDB partition for a tape-only storage pool.</div>
+    <div class="qa-a">Commvault deduplication should not be configured in two scenarios: (1) <strong>HPE StoreOnce Catalyst appliances</strong> — These storage platforms perform native deduplication inside the appliance itself. Enabling Commvault dedup on top of this creates "double dedup," which reduces efficiency and can cause performance issues. Commvault formally recommends disabling its dedup for Catalyst targets. (2) <strong>Tape libraries</strong> — Tape storage does not support block-level deduplication at the Commvault layer. Only compression applies to tape-based data. Never configure a DDB partition for a tape-only storage pool.</div>
   </div>
 
   <div class="summary">
@@ -1036,7 +1036,7 @@
       <li><strong>Backup types</strong> — Full, Incremental (last backup), Differential (last full), Synthetic Full (from storage), Log (databases only)</li>
       <li><strong>Cycles</strong> — Full-to-full period; both days AND cycles must expire before jobs age out</li>
       <li><strong>Console comparison</strong> — Command Center (Plans, Servers) vs. Java Console (Policies, Client Computers, Cycles)</li>
-      <li><strong>CommServe DR</strong> — SQL dump → metadata cache → metadata path → Metallic Cloud → DR Storage Policy. Monitor daily.</li>
+      <li><strong>CommServe DR</strong> — SQL dump → metadata cache → metadata path → Commvault Cloud (formerly Metallic) → DR Storage Policy. Monitor daily.</li>
       <li><strong>Cloud library</strong> — Requires: Access Key, Secret Key, Service Host, Bucket Name from cloud team</li>
       <li><strong>Tape library</strong> — Library (controller) + Drive (read/write) + Media (cartridge with barcode). Use VTL emulator for lab.</li>
       <li><strong>Hyper-V agentless</strong> — VSA installed on Hyper-V host; uses VSS API; cluster config uses cluster IP not node IP</li>

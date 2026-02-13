@@ -465,7 +465,7 @@
     <div class="callout-body">
       <strong>Interview / Exam Tip</strong>
       <p>Q: What files does Commvault back up for a SQL Server database?<br>
-      A: <strong>MDF</strong> (metadata/data file) and <strong>LDF</strong> (transaction log file). Both are protected by the SQL Server agent.</p>
+      A: <strong>MDF</strong> (Main Database File) and <strong>LDF</strong> (transaction log file). Both are protected by the SQL Server agent.</p>
     </div>
   </div>
 </div>
@@ -1062,8 +1062,8 @@ cd /tmp/software/
       <p>The database must be <strong>OPEN</strong> and running in <strong>Archive Log Mode</strong> for Commvault to take a successful online backup.</p>
     </div>
     <div class="mini-card">
-      <div class="mc-title">For Restore → NO MOUNT Mode</div>
-      <p>Commvault automatically switches the database to <strong>NO MOUNT</strong> before restore begins, then restores it to OPEN state after completion.</p>
+      <div class="mc-title">For Restore → MOUNT Mode</div>
+      <p>Commvault automatically switches the database to <strong>MOUNT</strong> before restore begins, then restores it to OPEN state after completion.</p>
     </div>
   </div>
 
@@ -1174,7 +1174,7 @@ SELECT * FROM global_name;</code></pre>
   <h4>Switch Database Mode Option</h4>
   <p>When initiating an in-place restore, the <strong>Switch Database Mode</strong> checkbox should remain enabled (default). This allows Commvault to:</p>
   <ol>
-    <li>Automatically switch the database from OPEN → NO MOUNT</li>
+    <li>Automatically switch the database from OPEN → MOUNT</li>
     <li>Perform the restore and recovery</li>
     <li>Automatically bring the database back to OPEN state</li>
   </ol>
@@ -1288,7 +1288,7 @@ SELECT * FROM global_name;</code></pre>
     <div class="callout-icon">🎓</div>
     <div class="callout-body">
       <strong>Interview / Exam Tip – Auto Transport Mode</strong>
-      <p>When transport mode is set to <strong>Auto</strong>, Commvault evaluates each mode in order of preference: SAN → NAS → Hot Add → NBD. It automatically selects the highest-performance mode whose prerequisites are satisfied. NBD is always the final fallback.</p>
+      <p>When transport mode is set to <strong>Auto</strong>, Commvault evaluates each mode in order of preference: SAN → Hot Add → NAS → NBD. It automatically selects the highest-performance mode whose prerequisites are satisfied. NBD is always the final fallback.</p>
     </div>
   </div>
 </div>
@@ -1476,7 +1476,7 @@ SELECT * FROM global_name;</code></pre>
       <div class="author-avatar">👨‍💻</div>
       <div class="author-info">
         <h3>Mohammed Abdul</h3>
-
+        <p>Data Protection Architect · Storage &amp; Backup Specialist</p>
       </div>
     </div>
     <div class="author-badges">
@@ -1502,9 +1502,4 @@ SELECT * FROM global_name;</code></pre>
 </div><!-- end .page -->
 
 <footer>
-  <p>Commvault Cloud Administration Tutorial 4 &nbsp;|&nbsp; Version 11.32 &nbsp;|&nbsp; Built by Mohammed Abdul</p>
-  <p style="margin-top:0.4rem; font-size:0.75rem;">Self-paced tutorial material for data protection administrators.</p>
-</footer>
-
-</body>
-</html>
+  <p>Commvault Cloud Administration Tutorial 4 &nbsp;|&nbsp; Version 11.32 &nbsp;|&nbsp; Built by Mohammed Abdul<

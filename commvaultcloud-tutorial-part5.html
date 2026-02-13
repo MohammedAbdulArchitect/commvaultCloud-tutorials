@@ -804,8 +804,8 @@ Click OK → Monitor from Job Controller</pre>
       <div class="info-tile">
         <div class="info-tile-icon">⏰</div>
         <div class="info-tile-label">Technology Release</div>
-        <div class="info-tile-value">6 Months</div>
-        <div class="info-tile-sub">Non-multiples of 4 (e.g., 11.38) — short-term only</div>
+        <div class="info-tile-value">18 Months</div>
+        <div class="info-tile-sub">Non-multiples of 4 (e.g., 11.30, 11.34) — shorter support window</div>
       </div>
     </div>
 
@@ -814,7 +814,7 @@ Click OK → Monitor from Job Controller</pre>
       <div class="callout-body">
         <div class="callout-title">Exam Tip — LTS Rule</div>
         <p>LTS versions follow the <strong>multiples-of-4 rule</strong> for the last two digits: 11.24, 11.28, 11.32, 11.36.
-        A non-LTS release like 11.38 has only 6 months of support — after which you must upgrade again.</p>
+        A non-LTS Technology Release like 11.30 or 11.34 has approximately <strong>18 months</strong> of support — after which you must upgrade again.</p>
       </div>
     </div>
   </div>
@@ -1183,7 +1183,8 @@ dbmaintenance -recommended  # Performs: checkdb + re-index recommended only
       <div class="compare-card">
         <h4>🐧 Linux / Unix</h4>
         <ul>
-          <li><code>/var/log/commvault/Log_Files/</code></li>
+          <li><code>/opt/commvault/Log_Files/</code></li>
+          <li>Also visible via: Process Manager → Base Path (one level up)</li>
           <li>Read using: <code>cat</code>, <code>more</code>, <code>less</code>, <code>tail -f</code></li>
           <li>No GxTail equivalent on Linux — use standard CLI tools</li>
           <li>Filter with: <code>grep "job_id" filename.log</code></li>
@@ -1784,7 +1785,7 @@ chkdsk E: /f /r
       <pre># In CommCell Console:
 Home → Control Panel → DR Backup → View DR Backup Details
 
-# Note the dump file path (e.g., E:\CommServe_DR\)
+# Note the dump file path (e.g., E:\CommserveDR\)
 # Store this path in documentation outside the CommServe
 
 # If dump files are corrupted or missing:
@@ -1829,7 +1830,7 @@ Home → Control Panel → DR Backup → View DR Backup Details
         <div class="phase-num">4</div>
         <div class="phase-body">
           <h4>Provide DR Dump File Path</h4>
-          <p>Browse to the folder containing the latest DR dump files (e.g., <code>E:\CommServe_DR\</code>). Select the most recent dump. The tool will also extract and restore the database files.</p>
+          <p>Browse to the folder containing the latest DR dump files (e.g., <code>E:\CommserveDR\</code>). Select the most recent dump. The tool will also extract and restore the database files.</p>
         </div>
       </div>
       <div class="phase-item">
@@ -2203,6 +2204,7 @@ A system-created schedule "DDB Space Reclamation" runs daily at 9:00 AM
     <div class="author-avatar">👤</div>
     <div class="author-info">
       <h3>Mohammed Abdul</h3>
+      <p style="color:var(--accent);font-size:0.88rem;font-weight:600;margin-bottom:10px;">Data Protection Architect · Storage &amp; Backup Specialist</p>
       <p>
         Mohammed Abdul is a Data Protection Architect with more than 15 years of experience in Hybrid Cloud
         and has worked with global clients across various industries. With extensive expertise in enterprise
@@ -2235,7 +2237,7 @@ A system-created schedule "DDB Space Reclamation" runs daily at 9:00 AM
 </div><!-- end main-wrap -->
 
 <footer>
-  <p>Commvault Cloud Administration Tutorial 5 &nbsp;|&nbsp; Sessions 26–33 &nbsp;|&nbsp; Version 11.32–11.36 &nbsp;|&nbsp; Built by Mohammed Abdul</p>
+  <p>Commvault Cloud Administration Tutorial 5 &nbsp;|&nbsp; Version 11.32 → 11.36 &nbsp;|&nbsp; Built by Mohammed Abdul</p>
 </footer>
 
 </body>

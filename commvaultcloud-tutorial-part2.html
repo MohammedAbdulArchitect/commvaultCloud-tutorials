@@ -741,7 +741,7 @@
       </li>
       <li>
         <strong>Data Directory Path</strong>
-        <p>Set to a dedicated non-OS drive (E: or D: if not Azure). This is where backup job results and working data are stored.</p>
+        <p>Set to a dedicated non-OS drive (E: or D: if not Azure). This is where DDB and Index Cache hosted if Commserve is given all in one(MediaAgent) role.</p>
       </li>
       <li>
         <strong>SQL Server Installation Path</strong>
@@ -1011,6 +1011,8 @@
       <li><strong>Authenticate with CommServe console credentials</strong><p>⚠️ These are the CommCell Console login credentials (e.g., <code>admin</code> + password), <strong>NOT</strong> the Windows server credentials.</p></li>
       <li><strong>Complete the wizard and verify registration</strong><p>Go back to CommCell Console → Client Computers → View → Refresh. The new client should appear.</p></li>
     </ol>
+
+    <p>Also, from a new Client/MediaAgent, the backup admin can UNC from the Client/MediaAgent to the CommServe's Software Cache location, then right click, and run Setup.exe as an Admin instead of downloading or copying the installer to the Client/MediaAgent.</p>
 
     <h3>Local Install — Linux (WinSCP + Interactive)</h3>
     <ol class="step-list">

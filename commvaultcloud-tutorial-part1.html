@@ -815,8 +815,8 @@
     </div>
 
     <div class="qa-item">
-      <div class="qa-q">Does the CommServe handle any backup data directly?</div>
-      <div class="qa-a">No — the CommServe <strong>never touches the actual backup data</strong>. Its sole responsibility is metadata management and job orchestration. All data movement happens directly between the Client and the Media Agent. This architectural decision is what allows CommCells to scale to tens of thousands of clients without the CommServe becoming a performance bottleneck.</div>
+      <div class="qa-q">Does the CommServe handle any Application backup data directly?</div>
+      <div class="qa-a">No — the CommServe never touches the actual backup data. Its sole responsibility is metadata management and job orchestration. All data movement happens directly between the Client and the Media Agent. This architectural decision is what allows CommCells to scale to tens of thousands of clients without the CommServe becoming a performance bottleneck. It runs Commserve DR backups which is backup of its own SQL Databases.</div>
     </div>
 
     <div class="qa-item">
