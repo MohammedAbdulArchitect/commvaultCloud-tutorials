@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Cloud Tutorial — Part 3: Plans, Backup Types, Storage &amp; Hyper-V</title>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --surface2:#1e2530;
+    --surface3:#252d3a;
+    --border:  #30363d;
+    --text:    #e6edf3;
+    --muted:   #8b949e;
+    --dim:     #6e7681;
+    --orange:  #f0883e;
+    --blue:    #58a6ff;
+    --green:   #3fb950;
+    --purple:  #bc8cff;
+    --red:     #ff7b72;
+    --yellow:  #e3b341;
+    --fb: 'Segoe UI',Calibri,'Helvetica Neue',Arial,sans-serif;
+    --fh: Georgia,'Times New Roman',Cambria,serif;
+    --fc: 'Courier New',Courier,'Lucida Console',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--fb);background:var(--bg);color:var(--text);font-size:15px;line-height:1.8;}
+
+  /* ── HERO ── */
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#1a1f2e 100%);border-bottom:1px solid var(--border);padding:68px 40px 56px;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;top:-80px;right:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(88,166,255,0.09) 0%,transparent 70%);pointer-events:none;}
+  .hero::after{content:'';position:absolute;bottom:-60px;left:-40px;width:380px;height:380px;background:radial-gradient(circle,rgba(63,185,80,0.07) 0%,transparent 70%);pointer-events:none;}
+  .hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(240,136,62,0.12);border:1px solid rgba(240,136,62,0.30);color:var(--orange);font-size:11px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:20px;}
+  .part-pill{display:inline-block;background:rgba(240,136,62,0.12);border:1px solid rgba(240,136,62,0.30);color:var(--orange);font-size:14px;font-weight:700;padding:3px 14px;border-radius:20px;vertical-align:middle;margin-left:12px;font-family:var(--fb);}
+  .hero h1{font-family:var(--fh);font-size:clamp(28px,4vw,50px);line-height:1.15;color:var(--text);margin-bottom:14px;}
+  .hero h1 span{color:var(--orange);}
+  .hero-sub{color:var(--muted);font-size:16px;max-width:640px;margin-bottom:28px;}
+  .hero-meta{display:flex;gap:22px;flex-wrap:wrap;}
+  .meta-item{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:13px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(63,185,80,0.5);flex-shrink:0;}
+
+  /* ── NAV ── */
+  .toc{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;position:sticky;top:0;z-index:100;overflow-x:auto;white-space:nowrap;}
+  .toc ul{display:flex;list-style:none;gap:2px;padding:7px 0;}
+  .toc a{display:block;padding:7px 12px;font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;border-radius:6px;transition:all .2s;}
+  .toc a:hover{color:var(--text);background:var(--surface2);}
+
+  /* ── MAIN ── */
+  .main{max-width:900px;margin:0 auto;padding:52px 40px 80px;}
+
+  /* ── SECTION HEADERS ── */
+  .section{margin-bottom:72px;}
+  .sec-hdr{display:flex;align-items:center;gap:16px;margin-bottom:26px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+  .sec-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .ic-or{background:rgba(240,136,62,.14);border:1px solid rgba(240,136,62,.3);}
+  .ic-bl{background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.28);}
+  .ic-gr{background:rgba(63,185,80,.12);border:1px solid rgba(63,185,80,.28);}
+  .ic-pu{background:rgba(188,140,255,.12);border:1px solid rgba(188,140,255,.28);}
+  .ic-ye{background:rgba(227,179,65,.12);border:1px solid rgba(227,179,65,.28);}
+  .ic-re{background:rgba(255,123,114,.12);border:1px solid rgba(255,123,114,.28);}
+  .sec-num{font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--dim);margin-bottom:2px;}
+  .sec-hdr h2{font-family:var(--fh);font-size:24px;color:var(--text);margin:0;}
+  .sec-hdr p{color:var(--muted);font-size:13px;margin:3px 0 0;}
+  h3{font-family:var(--fh);font-size:18px;color:var(--text);margin:34px 0 12px;}
+  h4{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0.07em;text-transform:uppercase;margin:22px 0 9px;}
+  p{color:var(--muted);margin-bottom:13px;}
+  strong{color:var(--text);font-weight:600;}
+  a{color:var(--blue);}
+
+  /* ── CARDS ── */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:14px;}
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  .card-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:640px){.card-grid,.card-grid-3{grid-template-columns:1fr;}}
+
+  /* ── LISTS ── */
+  ul.list{list-style:none;padding:0;margin:10px 0 16px;}
+  ul.list li{display:flex;gap:10px;color:var(--muted);font-size:14px;padding:6px 0;border-bottom:1px solid rgba(48,54,61,0.5);}
+  ul.list li:last-child{border-bottom:none;}
+  ul.list li::before{content:'›';color:var(--orange);font-size:16px;flex-shrink:0;}
+  ul.list li strong{color:var(--text);}
+
+  ol.steps{list-style:none;padding:0;margin:14px 0;counter-reset:st;}
+  ol.steps li{counter-increment:st;display:flex;gap:14px;margin-bottom:12px;align-items:flex-start;}
+  ol.steps li::before{content:counter(st);width:26px;height:26px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--blue);font-family:var(--fc);margin-top:2px;}
+  ol.steps li p{margin:0;font-size:14px;color:var(--muted);}
+  ol.steps li strong{display:block;font-size:14px;color:var(--text);margin-bottom:2px;}
+
+  /* ── CODE BLOCKS ── */
+  .code-block{background:#0d1117;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0;}
+  .code-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:var(--surface2);border-bottom:1px solid var(--border);}
+  .code-lang{font-family:var(--fc);font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;}
+  .code-dots{display:flex;gap:6px;}
+  .code-dot{width:10px;height:10px;border-radius:50%;}
+  .cd-r{background:#ff5f57;} .cd-y{background:#febc2e;} .cd-g{background:#28c840;}
+  pre{font-family:var(--fc);font-size:13px;padding:16px 18px;overflow-x:auto;line-height:1.7;color:#adbac7;}
+  pre .cmd{color:#79c0ff;} pre .flag{color:#ffa657;} pre .path{color:#56d364;}
+  pre .cmt{color:#6e7681;font-style:italic;} pre .val{color:#f0883e;}
+
+  /* ── CALLOUTS ── */
+  .callout{border-radius:10px;padding:16px 20px;margin:18px 0;border-left:3px solid;}
+  .callout-head{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+  .callout p{margin:0 0 5px;font-size:14px;}
+  .callout p:last-child{margin:0;}
+  .callout ul.list li{font-size:13px;}
+  .callout ol.steps li p{font-size:13px;}
+  .c-tip{background:rgba(63,185,80,.07);border-color:var(--green);}
+  .c-tip .callout-head{color:var(--green);}
+  .c-warn{background:rgba(227,179,65,.08);border-color:var(--yellow);}
+  .c-warn .callout-head{color:var(--yellow);}
+  .c-note{background:rgba(88,166,255,.07);border-color:var(--blue);}
+  .c-note .callout-head{color:var(--blue);}
+  .c-exam{background:rgba(188,140,255,.07);border-color:var(--purple);}
+  .c-exam .callout-head{color:var(--purple);}
+  .c-danger{background:rgba(255,123,114,.08);border-color:var(--red);}
+  .c-danger .callout-head{color:var(--red);}
+  .c-key{background:rgba(240,136,62,.07);border-color:var(--orange);}
+  .c-key .callout-head{color:var(--orange);}
+
+  /* ── FLOW DIAGRAM ── */
+  .flow{display:flex;align-items:stretch;gap:0;margin:20px 0;overflow-x:auto;padding:4px 0;flex-wrap:wrap;}
+  .flow-step{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;min-width:100px;flex-shrink:0;display:flex;flex-direction:column;gap:4px;}
+  .flow-step .fn{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange);}
+  .flow-step .ft{font-size:12px;font-weight:500;color:var(--text);}
+  .flow-arrow{color:var(--dim);font-size:18px;padding:0 5px;display:flex;align-items:center;flex-shrink:0;}
+
+  /* ── COMPARE GRID ── */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  .compare-col{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
+  .compare-col h4{font-size:13px;font-weight:700;margin:0 0 12px;text-transform:none;letter-spacing:0;}
+  @media(max-width:640px){.compare{grid-template-columns:1fr;}}
+
+  /* ── PILL BADGES ── */
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;letter-spacing:.05em;}
+  .p-or{background:rgba(240,136,62,.14);color:var(--orange);border:1px solid rgba(240,136,62,.3);}
+  .p-bl{background:rgba(88,166,255,.12);color:var(--blue);border:1px solid rgba(88,166,255,.28);}
+  .p-gr{background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.28);}
+  .p-pu{background:rgba(188,140,255,.12);color:var(--purple);border:1px solid rgba(188,140,255,.28);}
+  .p-re{background:rgba(255,123,114,.12);color:var(--red);border:1px solid rgba(255,123,114,.28);}
+  .p-ye{background:rgba(227,179,65,.12);color:var(--yellow);border:1px solid rgba(227,179,65,.28);}
+
+  /* ── TERM GRID ── */
+  .term-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0;}
+  .term-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+  .term-card .tc-label{font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+  .term-card .tc-def{font-size:13px;color:var(--muted);}
+
+  /* ── Q&A ── */
+  .qa-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+  .qa-q{padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border);font-weight:600;color:var(--text);font-size:14px;display:flex;gap:10px;align-items:flex-start;}
+  .qa-q::before{content:'Q';color:var(--purple);font-weight:700;flex-shrink:0;}
+  .qa-a{padding:12px 18px 12px 40px;color:var(--muted);font-size:14px;}
+  .qa-a::before{content:'A: ';color:var(--green);font-weight:700;}
+
+  /* ── SUMMARY BOX ── */
+  .summary{background:linear-gradient(135deg,rgba(240,136,62,.07),rgba(88,166,255,.05));border:1px solid rgba(240,136,62,.2);border-radius:12px;padding:20px 24px;margin:24px 0;}
+  .summary h4{color:var(--orange);text-transform:none;letter-spacing:0;font-size:15px;margin:0 0 12px;}
+  .summary ul.list li{font-size:13px;}
+
+  /* ── IMG PLACEHOLDER ── */
+  .img-ph{background:var(--surface2);border:1px dashed var(--border);border-radius:10px;padding:28px;text-align:center;margin:18px 0;color:var(--dim);font-size:13px;}
+  .img-ph .img-icon{font-size:32px;margin-bottom:8px;}
+  .img-caption{text-align:center;font-size:12px;color:var(--dim);margin-top:-10px;margin-bottom:18px;font-style:italic;}
+
+  /* ── ABOUT ── */
+  .about-wrap{background:var(--surface);border-top:1px solid var(--border);padding:56px 40px;}
+  .about-inner{max-width:900px;margin:0 auto;}
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px;}
+  @media(max-width:640px){.about-grid{grid-template-columns:1fr;}}
+
+  /* ── FOOTER ── */
+  footer{background:var(--bg);border-top:1px solid var(--border);text-align:center;padding:26px 20px;color:var(--dim);font-size:12px;line-height:1.7;}
+  hr{border:none;border-top:1px solid var(--border);margin:36px 0;}
+  code{font-family:var(--fc);font-size:13px;background:var(--surface2);border:1px solid var(--border);padding:2px 6px;border-radius:4px;color:var(--orange);}
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="badge">🛡️ Backup Administration Tutorials</div>
+    <h1>Commvault <span>Cloud Tutorial</span><span class="part-pill">Part 3</span></h1>
+    <p class="hero-sub">Deep-dive into logical architecture, plans, backup types, storage libraries, ConsoleConsole vs Command Center, CommServe DR, Cloud &amp; Tape libraries, and Hyper-V agentless backup with full lab walkthroughs.</p>
+    <div class="hero-meta">
+      <div class="meta-item"><div class="dot"></div>Sessions 10 – 17</div>
+      <div class="meta-item"><div class="dot" style="background:var(--blue);box-shadow:0 0 8px rgba(88,166,255,0.5)"></div>Level: L1 → L2</div>
+      <div class="meta-item"><div class="dot" style="background:var(--purple);box-shadow:0 0 8px rgba(188,140,255,0.5)"></div>Lab Walkthroughs Included</div>
+      <div class="meta-item"><div class="dot" style="background:var(--yellow);box-shadow:0 0 8px rgba(227,179,65,0.5)"></div>Interview Prep Included</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav class="toc">
+  <ul>
+    <li><a href="#logical">Logical Architecture</a></li>
+    <li><a href="#storage">Storage Types</a></li>
+    <li><a href="#plans">Plans &amp; Policies</a></li>
+    <li><a href="#fsbackup">FS Backup &amp; Restore</a></li>
+    <li><a href="#backuptypes">Backup Types</a></li>
+    <li><a href="#consoles">Console Comparison</a></li>
+    <li><a href="#dr">CommServe DR</a></li>
+    <li><a href="#cloud">Cloud Library</a></li>
+    <li><a href="#tape">Tape Library</a></li>
+    <li><a href="#hyperv">Hyper-V Agent</a></li>
+    <li><a href="#interview">Interview Q&amp;A</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+<!-- ─────────────────────────────────── SECTION 1: LOGICAL ARCHITECTURE -->
+<div class="section" id="logical">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-or">🏗️</div>
+    <div>
+      <div class="sec-num">Section 01</div>
+      <h2>Logical Architecture</h2>
+      <p>BackupSets, Subclients, Plans, and how they relate to physical components</p>
+    </div>
+  </div>
+
+  <p>The <strong>physical architecture</strong> of Commvault defines the three infrastructure tiers — CommServe, Media Agent, and Client. The <strong>logical architecture</strong> sits on top of this and defines <em>what</em> data gets protected, <em>how</em> it is organised, and <em>when</em> it runs. Understanding this layer is fundamental to configuring and troubleshooting any backup job.</p>
+
+  <h3>The Logical Hierarchy</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <div style="font-size:24px;margin-bottom:10px;">📦</div>
+      <h4 style="color:var(--blue);text-transform:none;font-size:14px;letter-spacing:0;">Backup Set</h4>
+      <p style="font-size:13px;">A logical collection of <strong>all data</strong> protected by a given agent on a client. For a Windows File System agent, the default Backup Set automatically covers all drives (C:, D:, etc.) unless you narrow it down.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:24px;margin-bottom:10px;">🗂️</div>
+      <h4 style="color:var(--green);text-transform:none;font-size:14px;letter-spacing:0;">Subclient</h4>
+      <p style="font-size:13px;">Defines a <strong>specific subset</strong> of data within a Backup Set. For example, protecting only the D: drive on a Windows server where critical application data lives — while excluding the C: OS drive.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:24px;margin-bottom:10px;">📋</div>
+      <h4 style="color:var(--orange);text-transform:none;font-size:14px;letter-spacing:0;">Plan</h4>
+      <p style="font-size:13px;">Governs a subclient's protection by defining the <strong>schedule</strong> (how often), <strong>storage target</strong> (where), and <strong>retention</strong> (how long). Plans are configured in Command Center.</p>
+    </div>
+  </div>
+
+  <h3>What a Plan Defines</h3>
+  <ul class="list">
+    <li><strong>Schedule (RPO)</strong> — How frequently backups run: Full on Sundays, Incremental Monday–Saturday at 9 PM, for example.</li>
+    <li><strong>Storage target</strong> — Which disk library, cloud bucket, or tape pool the data is written to.</li>
+    <li><strong>Retention</strong> — How many days backup data is kept before aging out. Example: 7 days, 30 days, 1 year.</li>
+    <li><strong>Storage Policy equivalent</strong> — Plans in Command Center map to Storage Policy + Schedule Policy in the Java Console.</li>
+  </ul>
+
+  <div class="callout c-note">
+    <div class="callout-head">📘 Plan vs. Storage Policy</div>
+    <p><strong>Plans</strong> are configured in the <strong>Command Center</strong> (web UI). <strong>Storage Policies</strong> and <strong>Schedule Policies</strong> are the equivalent objects configured in the <strong>Java Console</strong>. When you create a Plan in Command Center, Commvault automatically creates a corresponding Storage Policy and Schedule Policy visible in the Java Console.</p>
+  </div>
+
+  <h3>Configuration Sequence — Command Center</h3>
+  <div class="flow">
+    <div class="flow-step"><div class="fn">Step 1</div><div class="ft">Create Disk / Cloud / Tape Storage</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Step 2</div><div class="ft">Create a Plan (schedule + storage + retention)</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Step 3</div><div class="ft">Create a Subclient with content</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Step 4</div><div class="ft">Assign Plan to Subclient</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Step 5</div><div class="ft">Run Backup Jobs</div></div>
+  </div>
+
+  <h3>Configuration Sequence — Java Console</h3>
+  <div class="flow">
+    <div class="flow-step"><div class="fn">Step 1</div><div class="ft">Create Library (Disk / Tape / Cloud)</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Step 2</div><div class="ft">Create Storage Pool</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Step 3</div><div class="ft">Create Storage Policy</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Step 4</div><div class="ft">Create Schedule Policy</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Step 5</div><div class="ft">Create Subclient &amp; Associate Policies</div></div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 2: STORAGE TYPES -->
+<div class="section" id="storage">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-bl">💾</div>
+    <div>
+      <div class="sec-num">Section 02</div>
+      <h2>Storage Types &amp; Disk Libraries</h2>
+      <p>Configuring disk storage with and without deduplication</p>
+    </div>
+  </div>
+
+  <p>Before any backup job can run, at least one storage destination must be configured. Commvault supports three primary storage types, each suited to different environments and compliance requirements.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <div style="font-size:22px;margin-bottom:8px;">🖴</div>
+      <h4 style="color:var(--orange);text-transform:none;font-size:14px;letter-spacing:0;">Disk Storage</h4>
+      <p style="font-size:13px;">The most common type. A local or network-attached drive on the Media Agent. Fast and easy to configure. Supports deduplication.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:22px;margin-bottom:8px;">☁️</div>
+      <h4 style="color:var(--blue);text-transform:none;font-size:14px;letter-spacing:0;">Cloud Storage</h4>
+      <p style="font-size:13px;">Amazon S3, Azure Blob, or GCP Storage. Elastic capacity, pay-per-use. Ideal for offsite retention and long-term archival.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:22px;margin-bottom:8px;">📼</div>
+      <h4 style="color:var(--purple);text-transform:none;font-size:14px;letter-spacing:0;">Tape Storage</h4>
+      <p style="font-size:13px;">Preferred in air-gapped, dark-site, government, and highly regulated environments. Supports compression only — no deduplication at the Commvault layer.</p>
+    </div>
+  </div>
+
+  <h3>Disk Storage — Dedicated vs. Shared</h3>
+  <div class="compare">
+    <div class="compare-col">
+      <h4 style="color:var(--green);">✅ Dedicated (Local)</h4>
+      <ul class="list">
+        <li>Disk is directly connected to a <strong>single Media Agent</strong></li>
+        <li>Not shared with any other MA — exclusive use</li>
+        <li>Lowest latency, simplest configuration</li>
+        <li>Select <strong>Local</strong> as the type in Command Center</li>
+      </ul>
+    </div>
+    <div class="compare-col">
+      <h4 style="color:var(--blue);">🔗 Shared (Network)</h4>
+      <ul class="list">
+        <li>Disk is shared across <strong>multiple Media Agents</strong></li>
+        <li>Uses NAS or SAN connectivity</li>
+        <li>Requires credentials for the network share path</li>
+        <li>Select <strong>Network</strong> as the type; provide UNC path + credentials</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Understanding Deduplication</h3>
+  <p>Deduplication is one of the most impactful features for reducing backup storage consumption. It operates at the <strong>block level</strong> — identifying and eliminating redundant data chunks before writing to storage.</p>
+
+  <div class="callout c-tip">
+    <div class="callout-head">💡 Deduplication Example</div>
+    <p>You have two identical 1 GB files on a client with different names. <strong>Without dedup</strong>: both files are written to storage → 2 GB consumed. <strong>With dedup</strong>: the second file's blocks are recognised as duplicates; only pointer references are written → ~1 GB consumed. Savings ≈ 50% in this case. Real-world savings typically range from 50–90%.</p>
+  </div>
+
+  <h3>Deduplication Database (DDB)</h3>
+  <p>Deduplication requires a dedicated <strong>DDB partition</strong> — a separate drive on the Media Agent used exclusively for the deduplication index database. The DDB must <strong>never share</strong> the same drive as backup data.</p>
+
+  <ul class="list">
+    <li><strong>Separate drive required</strong> — The DDB partition must reside on a dedicated drive (e.g. F: drive) separate from backup data (E: drive).</li>
+    <li><strong>Multiple DDB partitions</strong> — Large environments can span the DDB across multiple partitions for performance.</li>
+    <li><strong>DDB = Deduplication Database</strong> — Short-form used in Commvault documentation and job logs.</li>
+    <li><strong>Folder must be empty</strong> — The folder selected as a mount path for backup data must be empty before associating it to a library.</li>
+  </ul>
+
+  <div class="callout c-warn">
+    <div class="callout-head">⚠️ When NOT to Use Commvault Deduplication</div>
+    <p>For certain storage types, Commvault recommends <strong>disabling</strong> its built-in deduplication:</p>
+    <ul class="list">
+      <li><strong>HP Catalyst / StoreOnce</strong> — The storage appliance performs deduplication natively; double-dedup reduces efficiency. Commvault recommends configuring the plan without deduplication in this case.</li>
+      <li><strong>Tape libraries</strong> — Tape does not support block-level deduplication. Only compression applies. Never configure DDB for tape-only storage pools.</li>
+    </ul>
+  </div>
+
+  <h3>Lab: Creating a Disk Library (Command Center)</h3>
+  <ol class="steps">
+    <li><strong>Navigate to Storage</strong><p>In Command Center → Storage → Disk. Click <strong>Add Disk Storage</strong>.</p></li>
+    <li><strong>Provide a name</strong><p>Choose a clear, descriptive name. Example: <code>DiskLib-NonDedup-MP1</code>.</p></li>
+    <li><strong>Select Media Agent &amp; type</strong><p>Choose the target Media Agent. Select <strong>Local</strong> for directly attached disk.</p></li>
+    <li><strong>Browse and create mount path</strong><p>Browse the drive (e.g. E:). Click the <code>+</code> icon to create a new folder named <code>mp1</code>. Click Add.</p></li>
+    <li><strong>For dedup libraries: add DDB partition</strong><p>Browse to the dedicated DDB drive (F:). Create folder <code>ddb-partition1</code>. Click Add &amp; Save.</p></li>
+  </ol>
+
+  <div class="callout c-warn">
+    <div class="callout-head">⚠️ Critical: Never Use the OS Drive</div>
+    <p>Always use a <strong>dedicated drive</strong> for backup data. Never write backup data to the C: drive (OS drive). Create a separate virtual disk (e.g. 100 GB → E: drive for data, 20 GB → F: drive for DDB) before configuring libraries.</p>
+  </div>
+
+  <div class="img-ph"><div class="img-icon">🖼️</div><p>Disk Library configuration — Command Center Storage view showing mount path and DDB partition settings</p></div>
+  <p class="img-caption">Figure: Disk storage configuration with deduplication enabled, showing separate mount path and DDB partition drives</p>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 3: PLANS -->
+<div class="section" id="plans">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-gr">📋</div>
+    <div>
+      <div class="sec-num">Section 03</div>
+      <h2>Creating Plans &amp; Subclients</h2>
+      <p>Defining schedules, retention, storage, and subclient content</p>
+    </div>
+  </div>
+
+  <p>A <strong>Plan</strong> in Command Center is the central configuration object that ties together <em>when</em> to backup, <em>where</em> to write it, and <em>how long</em> to keep it. One plan can be applied to many subclients across different clients and agents.</p>
+
+  <h3>Lab: Creating a Server Backup Plan</h3>
+  <ol class="steps">
+    <li><strong>Navigate to Manage → Plans → Add Plan → Server Backup Plan</strong></li>
+    <li><strong>Name the plan clearly</strong><p>Use a descriptive name tied to its purpose. Example: <code>WinFS-7day-NonDedup</code> or <code>LinuxFS-7day-Dedup</code>.</p></li>
+    <li><strong>Set backup frequency (RPO)</strong><p>Define the Full backup schedule (e.g. Sunday) and Incremental schedule (e.g. Monday–Saturday 9 PM). Exclude Sunday from the incremental schedule to avoid overlap with the Full run.</p></li>
+    <li><strong>Assign storage</strong><p>Select the disk library created in the previous step. Dedup or non-dedup storage can be assigned to any plan — there is no OS-specific restriction.</p></li>
+    <li><strong>Set retention</strong><p>Define how many days backups are retained on storage. Example: 7 days. Retention interacts with the Cycles setting (covered in the Console Comparison section).</p></li>
+    <li><strong>Ignore snapshot options</strong><p>The Snapshot / IntelliSnap options only apply if your storage supports snapshot APIs and an IntelliSnap license is active. Leave disabled in standard deployments.</p></li>
+  </ol>
+
+  <div class="callout c-note">
+    <div class="callout-head">📘 Naming Convention Best Practice</div>
+    <p>Plan names carry no technical restriction — they are identifiers only. Use a consistent naming pattern that makes the plan's purpose immediately clear: <code>[AgentType]-[Retention]-[StorageType]</code>. Example: <code>WinFS-30day-Dedup</code>. This removes ambiguity when supporting multiple environments.</p>
+  </div>
+
+  <h3>Creating a Subclient &amp; Assigning a Plan</h3>
+  <ol class="steps">
+    <li><strong>Navigate to Protect → File Servers → [Target Client]</strong></li>
+    <li><strong>View the default subclient</strong><p>Every agent creates a <strong>Default Subclient</strong> automatically. It protects all data under the agent's scope unless overridden. You can use it directly or create additional subclients for specific paths.</p></li>
+    <li><strong>Add a new subclient (optional)</strong><p>Click <strong>Add Subclient</strong>. Provide a name (e.g. <code>D-Drive-AppData</code>), assign a plan, and define content.</p></li>
+    <li><strong>Define content</strong><p>Use the Browse option to navigate the client's directory structure. Select specific folders or files to protect. For Linux clients, navigate Unix paths (e.g. <code>/usr/confidential.txt</code>).</p></li>
+    <li><strong>Save the subclient</strong><p>The subclient is now ready. It will run automatically per the plan's schedule, or can be triggered manually (ad-hoc / interactive backup).</p></li>
+  </ol>
+
+  <div class="callout c-tip">
+    <div class="callout-head">💡 Default vs. Custom Subclient</div>
+    <p>The <strong>Default Subclient</strong> protects <em>everything</em> the agent discovers — all drives on Windows, or all file systems on Linux. A <strong>custom subclient</strong> lets you narrow scope to specific paths, which is the common production pattern. Customer teams will tell you exactly which paths require protection.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 4: FS BACKUP & RESTORE -->
+<div class="section" id="fsbackup">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-or">🔄</div>
+    <div>
+      <div class="sec-num">Section 04</div>
+      <h2>File System Backup &amp; Restore</h2>
+      <p>Running Windows and Linux file system jobs and performing in-place restores</p>
+    </div>
+  </div>
+
+  <p>Once a subclient is configured with a plan and content, backups run on the defined schedule. You can also trigger <strong>interactive (ad-hoc) backups</strong> at any time. Restores can target the original location (<strong>in-place</strong>) or an alternate path (<strong>out-of-place</strong>).</p>
+
+  <h3>Backup Process Flow — File System Agent</h3>
+  <div class="flow">
+    <div class="flow-step"><div class="fn">1</div><div class="ft">CommServe sends job initiation to Client</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">2</div><div class="ft">Client iDataAgent scans &amp; gathers data</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">3</div><div class="ft">Data stream sent to Media Agent</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">4</div><div class="ft">MA deduplicates, compresses, encrypts</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">5</div><div class="ft">MA writes to Library (Disk/Cloud/Tape)</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">6</div><div class="ft">CommServe updates metadata &amp; index cache</div></div>
+  </div>
+
+  <div class="callout c-note">
+    <div class="callout-head">📘 Index Cache</div>
+    <p>The <strong>Index Cache</strong> resides on the Media Agent and stores catalogue metadata about all backed-up files — paths, versions, timestamps. This is separate from the CommServe database. It is used for browse and restore operations. Always ensure sufficient disk space on the MA for index cache growth.</p>
+  </div>
+
+  <h3>Running an Ad-Hoc Backup (Windows)</h3>
+  <ol class="steps">
+    <li><strong>Go to Protect → File Servers → [Windows Client] → Subclients</strong></li>
+    <li><strong>Select the subclient</strong> and click <strong>Backup</strong></li>
+    <li><strong>Choose backup type</strong> — Select <strong>Full</strong> for the first run. Subsequent runs can use Incremental.</li>
+    <li><strong>Uncheck email notification</strong> and click <strong>Submit</strong></li>
+    <li><strong>Monitor via Jobs</strong> — Navigate to the Jobs section. Click the Job ID to view progress, throughput, and object counts.</li>
+  </ol>
+
+  <div class="callout c-tip">
+    <div class="callout-head">💡 Compression vs. Deduplication</div>
+    <p>Even on a <strong>non-dedup</strong> storage library, Commvault automatically applies <strong>compression</strong>. You may see significant savings (e.g. 84%) on the job details screen even without dedup enabled. Compression = CPU-based size reduction. Dedup = block-level elimination of duplicate data. Both can be active simultaneously on dedup-enabled libraries.</p>
+  </div>
+
+  <h3>Performing an In-Place Restore (Windows)</h3>
+  <ol class="steps">
+    <li><strong>Navigate to the Windows client</strong> in Protect → File Servers</li>
+    <li><strong>Click Restore</strong> — The latest recovery point (backup time) is shown</li>
+    <li><strong>Browse the backup</strong> — Navigate the file tree to select files/folders to restore</li>
+    <li><strong>Select In-Place restore</strong> — Destination is the same as the source path</li>
+    <li><strong>Tick "Unconditionally Overwrite"</strong> — Required if the file already exists at the destination</li>
+    <li><strong>Submit</strong> and monitor the restore job to completion</li>
+  </ol>
+
+  <h3>Linux File System Backup &amp; Restore</h3>
+  <p>The process is identical to Windows, with two key differences: the content paths follow Unix directory conventions, and elevation to root is required for certain paths.</p>
+
+  <div class="code-block">
+    <div class="code-hdr"><span class="code-lang">Linux — Key Commands</span><div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div></div>
+    <pre><span class="cmt"># Elevate to root (required for protected paths)</span>
+<span class="cmd">sudo su -</span>
+
+<span class="cmt"># Navigate to /usr and create a test file for backup</span>
+<span class="cmd">cd</span> <span class="path">/usr</span>
+<span class="cmd">echo</span> <span class="val">"confidential data"</span> &gt; confidential.txt
+
+<span class="cmt"># Verify file contents</span>
+<span class="cmd">cat</span> <span class="path">confidential.txt</span>
+
+<span class="cmt"># Simulate accidental deletion (triggers restore scenario)</span>
+<span class="cmd">rm</span> <span class="path">/usr/confidential.txt</span>
+
+<span class="cmt"># After restore: verify file is recovered</span>
+<span class="cmd">ls</span> <span class="path">/usr</span></pre>
+  </div>
+
+  <div class="callout c-exam">
+    <div class="callout-head">🎓 Interview Tip — Backup Process Flow</div>
+    <p>A common interview question: <em>"Explain the backup process flow for a file system agent."</em> Key points to cover: (1) CommServe initiates the job; (2) the client iDataAgent gathers source data; (3) data is transferred directly to the Media Agent (CommServe never handles data); (4) the MA deduplicates, compresses, encrypts and writes to the library; (5) CommServe updates the metadata database and index cache. Always emphasise that <strong>CommServe never touches backup data</strong>.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 5: BACKUP TYPES -->
+<div class="section" id="backuptypes">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-pu">🔁</div>
+    <div>
+      <div class="sec-num">Section 05</div>
+      <h2>Backup Types Explained</h2>
+      <p>Full, Incremental, Differential, Synthetic Full, Log Backups, and the Cycle concept</p>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <span class="pill p-or" style="margin-bottom:10px;display:inline-block;">Full</span>
+      <p style="font-size:14px;">Backs up <strong>all selected data</strong> regardless of previous backup state. Largest backup size. Provides the most self-contained recovery point. Typically scheduled weekly (e.g. Sundays).</p>
+    </div>
+    <div class="card">
+      <span class="pill p-bl" style="margin-bottom:10px;display:inline-block;">Incremental</span>
+      <p style="font-size:14px;">Captures only data that has <strong>changed since the last backup</strong> (full or incremental). Smallest backup size. Fastest to run. Requires the last full + all incrementals for a complete restore. Typically scheduled daily.</p>
+    </div>
+    <div class="card">
+      <span class="pill p-gr" style="margin-bottom:10px;display:inline-block;">Differential</span>
+      <p style="font-size:14px;">Captures all data that has <strong>changed since the last Full backup</strong>. Larger than incremental but only requires the last full + the latest differential for restore. Grows in size each day until the next full runs.</p>
+    </div>
+    <div class="card">
+      <span class="pill p-pu" style="margin-bottom:10px;display:inline-block;">Synthetic Full</span>
+      <p style="font-size:14px;">Creates a new full backup by <strong>consolidating existing full + incrementals on storage</strong> — without reading from the source client. Reduces backup window impact on the production server. Commvault auto-schedules this as a safety net (every 7 days) if no traditional full has run.</p>
+    </div>
+    <div class="card">
+      <span class="pill p-re" style="margin-bottom:10px;display:inline-block;">Log Backup</span>
+      <p style="font-size:14px;">Backs up <strong>database transaction logs</strong> (Oracle archive logs, SQL Server transaction logs) for point-in-time recovery. Applicable to database agents only — not used for file system agents. Supports granular recovery between full/incremental schedules.</p>
+    </div>
+  </div>
+
+  <h3>Incremental vs. Differential — At a Glance</h3>
+  <div class="callout c-exam">
+    <div class="callout-head">🎓 Key Interview Distinction</div>
+    <p><strong>Incremental</strong>: "What changed since the <em>last backup</em>?" (last backup could be a full or another incremental)<br>
+    <strong>Differential</strong>: "What changed since the <em>last Full</em>?" (always references the most recent full only)<br><br>
+    A differential on Wednesday after a Sunday full will contain <strong>all changes from Monday + Tuesday + Wednesday</strong> — it grows larger each day. An incremental on Wednesday contains only Wednesday's changes.</p>
+  </div>
+
+  <h3>Understanding Retention Cycles</h3>
+  <p>Commvault retention is governed by two criteria — both must be satisfied before a backup job ages out:</p>
+  <ul class="list">
+    <li><strong>Retention Days</strong> — The number of days the backup must be kept (e.g. 7 days)</li>
+    <li><strong>Cycles</strong> — The number of full-to-full cycles that must complete before old jobs are deleted</li>
+  </ul>
+
+  <div class="callout c-note">
+    <div class="callout-head">📘 What is a Cycle?</div>
+    <p>A <strong>cycle</strong> is the period from one Full backup to the next Full backup, including all incrementals in between. With a 7-day retention and 1 cycle configured: even if 7 days have passed, Commvault will <strong>not delete</strong> the first Full until the second Full (and its following incrementals) have completed. This guarantees that at least one complete recovery cycle is always available on storage.</p>
+    <p style="margin-top:8px;"><em>Note: The Cycles setting is visible only in the Java Console, not in Command Center. Command Center focuses on days-based retention for simplicity.</em></p>
+  </div>
+
+  <h3>Data Aging</h3>
+  <p>A system-level job called <strong>Data Aging</strong> runs daily (by default at 12 PM) and performs the following actions:</p>
+  <ul class="list">
+    <li>Scans all backup jobs for jobs that have exceeded retention criteria (days + cycles)</li>
+    <li>Marks expired jobs for deletion from the CommServe database</li>
+    <li>Frees storage space on disk libraries by removing aged backup data</li>
+    <li>This job is auto-created at installation — you do not need to configure it manually</li>
+  </ul>
+
+  <div class="callout c-tip">
+    <div class="callout-head">💡 Viewing Jobs by Type (Java Console)</div>
+    <p>From the Java Console top-level: <strong>Right-click → View → Job History</strong> to see all backup jobs. Select <strong>Data Recovery Operation</strong> to see restore jobs. Select <strong>Admin Job History → Data Aging</strong> to verify data aging runs. Always verify that data aging jobs complete successfully on a daily basis.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 6: CONSOLE COMPARISON -->
+<div class="section" id="consoles">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-ye">⚖️</div>
+    <div>
+      <div class="sec-num">Section 06</div>
+      <h2>Command Center vs. Java Console</h2>
+      <p>Terminology differences, feature parity, and when to use each</p>
+    </div>
+  </div>
+
+  <p>Commvault provides two management interfaces. Both can be used to manage the same CommCell environment, but they use different terminology and expose different levels of configuration detail.</p>
+
+  <div class="compare">
+    <div class="compare-col">
+      <h4 style="color:var(--blue);">🌐 Command Center (Web UI)</h4>
+      <ul class="list">
+        <li>Browser-based, modern interface — accessible via <code>https://&lt;CommServe-IP&gt;/commandcenter</code></li>
+        <li>Recommended for <strong>new deployments v11.34+</strong></li>
+        <li>User-friendly; hides advanced low-level settings</li>
+        <li>Uses the term <strong>Servers</strong> for client machines</li>
+        <li>Uses the term <strong>Plans</strong> for schedule + storage policy combinations</li>
+        <li>Uses the term <strong>Disk Storage</strong> for libraries</li>
+        <li>Does <strong>not</strong> show CommServe DR policy or Cycles settings</li>
+      </ul>
+    </div>
+    <div class="compare-col">
+      <h4 style="color:var(--orange);">☕ Java Console (CommCell Console)</h4>
+      <ul class="list">
+        <li>Java-based thick client, installed on Windows; also called CommCell Console</li>
+        <li>Required for legacy environments and advanced configuration</li>
+        <li>Uses the term <strong>Client Computers</strong> for managed machines</li>
+        <li>Uses <strong>Storage Policy + Schedule Policy</strong> (separate objects)</li>
+        <li>Uses the term <strong>Libraries</strong> for storage targets</li>
+        <li>Exposes <strong>Cycles</strong> retention, <strong>CommServe DR policy</strong>, Aux Copy configuration</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Terminology Mapping</h3>
+  <div class="term-grid">
+    <div class="term-card"><div class="tc-label">Java Console Term</div><div class="tc-def"><strong>Client Computers</strong></div></div>
+    <div class="term-card"><div class="tc-label">Command Center Equivalent</div><div class="tc-def"><strong>Servers</strong></div></div>
+    <div class="term-card"><div class="tc-label">Java Console Term</div><div class="tc-def"><strong>Client Computer Groups</strong></div></div>
+    <div class="term-card"><div class="tc-label">Command Center Equivalent</div><div class="tc-def"><strong>Server Groups</strong></div></div>
+    <div class="term-card"><div class="tc-label">Java Console Term</div><div class="tc-def"><strong>Libraries</strong></div></div>
+    <div class="term-card"><div class="tc-label">Command Center Equivalent</div><div class="tc-def"><strong>Disk Storage / Cloud Storage</strong></div></div>
+    <div class="term-card"><div class="tc-label">Java Console Term</div><div class="tc-def"><strong>Storage Policy + Schedule Policy</strong></div></div>
+    <div class="term-card"><div class="tc-label">Command Center Equivalent</div><div class="tc-def"><strong>Plans</strong></div></div>
+    <div class="term-card"><div class="tc-label">Java Console Term</div><div class="tc-def"><strong>Storage Resources → Libraries</strong></div></div>
+    <div class="term-card"><div class="tc-label">Command Center Equivalent</div><div class="tc-def"><strong>Manage → Storage</strong></div></div>
+  </div>
+
+  <div class="callout c-exam">
+    <div class="callout-head">🎓 Interview Question: Console Differences</div>
+    <p><em>"What is the difference between Command Center and the Java Console?"</em></p>
+    <p style="margin-top:8px;">Answer: The <strong>Command Center</strong> is a web-based interface introduced for Commvault v11.20+, mandatory for new deployments from v11.34. It simplifies configuration by combining Storage Policy and Schedule Policy into a single <strong>Plan</strong> object and uses more intuitive terminology. The <strong>Java Console</strong> (CommCell Console) is the legacy Java-based interface that provides deeper configuration access — including Cycles-based retention, CommServe DR policies, and Aux Copy management. Production environments running older versions require familiarity with both.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 7: COMMSERVE DR -->
+<div class="section" id="dr">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-re">🆘</div>
+    <div>
+      <div class="sec-num">Section 07</div>
+      <h2>CommServe Disaster Recovery Backup</h2>
+      <p>Protecting the CommServe database — the most critical backup in any Commvault environment</p>
+    </div>
+  </div>
+
+  <p>The CommServe database is the single source of truth for your entire backup environment — it stores all metadata, job history, client configurations, and policies. If this database is lost without a DR backup, the entire CommCell environment must be rebuilt from scratch. Ensuring CommServe DR backups complete successfully every day is a <strong>top priority for every backup administrator</strong>.</p>
+
+  <h3>CommServe DR Backup — Process Flow</h3>
+  <div class="flow">
+    <div class="flow-step"><div class="fn">Phase 1</div><div class="ft">SQL dump generated — DMP files created for all CommServe databases</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Phase 2</div><div class="ft">DMP files cached to metadata staging location (local path on CommServe)</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Phase 3</div><div class="ft">Cache copied to defined metadata export path (e.g. E:\CommserverDR)</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Phase 4</div><div class="ft">(Optional) Copy uploaded to Metallic Cloud (Commvault Cloud)</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="fn">Phase 5</div><div class="ft">Final copy written to CommServe DR Storage Policy on disk library</div></div>
+  </div>
+
+  <h3>Key Components</h3>
+  <ul class="list">
+    <li><strong>SQL Server Engine</strong> — Installed automatically with CommServe. Hosts the CommServe database. Check via Control Panel → Programs and Features.</li>
+    <li><strong>CommServe DB (DMP file)</strong> — Primary database dump. Located at <code>C:\Program Files\Commvault\ContentStore\CommserveDR\</code>. The file named <code>commserve_&lt;hostname&gt;.dmp</code> is the most critical.</li>
+    <li><strong>Supporting databases</strong> — AppStudio, CacheDB, HistoryDB, WorkflowEngine — smaller databases that are also included in the DR dump.</li>
+    <li><strong>Metadata export path</strong> — A secondary local or network path (e.g. E: drive) where DR dumps are exported. <strong>Note this path carefully</strong> — it is your first recovery option if the C: drive fails.</li>
+    <li><strong>CommServeDR Storage Policy</strong> — Auto-created when you add the first library. Visible in Java Console → Storage Policies. Not visible in Command Center.</li>
+    <li><strong>Metallic Cloud</strong> — Commvault's own cloud offering. An optional third copy destination for CommServe DR backups.</li>
+  </ul>
+
+  <div class="code-block">
+    <div class="code-hdr"><span class="code-lang">CommServe DR — Default Paths</span><div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div></div>
+    <pre><span class="cmt"># Primary DR staging / cache location</span>
+<span class="path">C:\Program Files\Commvault\ContentStore\CommserveDR\</span>
+
+<span class="cmt"># Example metadata export path (user-defined, configure in DR settings)</span>
+<span class="path">E:\CommserverDRBackup\</span>
+
+<span class="cmt"># Verify SQL Server installation in programs list</span>
+<span class="cmt"># Control Panel → Programs and Features → search "SQL"</span>
+<span class="cmt"># Expected: SQL Server Engine, SQL Management Studio, SQL Native Client</span></pre>
+  </div>
+
+  <div class="callout c-danger">
+    <div class="callout-head">🚨 Critical: Monitor DR Backups Daily</div>
+    <p>CommServe DR backup failure is one of the most serious situations in backup administration. If the CommServe crashes and there is no current DR backup, the entire environment metadata is lost. Always verify that the DR job completed successfully in the previous 24 hours. Alert your manager immediately if DR backups are failing.</p>
+  </div>
+
+  <div class="callout c-tip">
+    <div class="callout-head">💡 Adding a Tape Copy to CommServe DR Policy</div>
+    <p>For additional protection, add a secondary tape copy to the CommServeDR Storage Policy: In Java Console → Storage Policies → CommServeDR Policy → Right-click → All Tasks → <strong>Create New Copy</strong> → assign a tape pool. Then run an <strong>Aux Copy</strong> to replicate DR data to tape. This ensures a copy exists even if both the disk library and CommServe itself are lost.</p>
+  </div>
+
+  <div class="callout c-exam">
+    <div class="callout-head">🎓 Interview: CommServe DR Process Flow</div>
+    <p><em>"Explain the CommServe DR backup process."</em></p>
+    <p style="margin-top:8px;">Answer: "The CommServe DR backup runs automatically as a scheduled job. It first generates a <strong>SQL dump</strong> of all CommServe databases — the primary commserve.dmp and supporting databases. These dumps are staged to a local cache path, then exported to a user-defined metadata location. Optionally, a copy is uploaded to Commvault Metallic Cloud. Finally, the DR data is written to the CommServeDR Storage Policy on the configured disk library. This provides three recovery options: local metadata path, cloud copy, and disk library copy."</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 8: CLOUD LIBRARY -->
+<div class="section" id="cloud">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-bl">☁️</div>
+    <div>
+      <div class="sec-num">Section 08</div>
+      <h2>Cloud Library (AWS S3)</h2>
+      <p>Configuring object storage as a Commvault backup target</p>
+    </div>
+  </div>
+
+  <p>Cloud storage integrates seamlessly with Commvault as a backup target. The most common configuration uses <strong>Amazon S3</strong> (Simple Storage Service) as an object store. Before configuring a cloud library in Commvault, the cloud storage team must provision the required resources and supply the credentials.</p>
+
+  <h3>Prerequisites — Information Required from Cloud Team</h3>
+  <ul class="list">
+    <li><strong>Access Key</strong> — IAM user access key for authenticating to AWS</li>
+    <li><strong>Secret Access Key</strong> — Paired secret credential (generated once — save immediately)</li>
+    <li><strong>Service Host</strong> — The AWS region endpoint URL, e.g. <code>s3.us-east-1.amazonaws.com</code></li>
+    <li><strong>S3 Bucket Name</strong> — The container within S3 where backup objects will be stored</li>
+  </ul>
+
+  <div class="callout c-note">
+    <div class="callout-head">📘 Files vs. Objects</div>
+    <p>In cloud storage terminology, data stored inside an S3 bucket is called an <strong>object</strong> — not a file. When communicating with cloud support engineers, always use the term <em>objects</em>. A bucket is the container; objects are the items inside it. Commvault writes backup data as objects inside the configured bucket.</p>
+  </div>
+
+  <h3>Lab: Creating an AWS IAM User &amp; Access Keys</h3>
+  <ol class="steps">
+    <li><strong>Log in to AWS Console</strong> — Navigate to <code>aws.amazon.com/console</code></li>
+    <li><strong>Search for IAM</strong> — Identity and Access Management → Users → Create User</li>
+    <li><strong>Username</strong> — Use a descriptive service account name, e.g. <code>commvault-svc-account</code></li>
+    <li><strong>Attach permissions</strong> — Search for and attach the <code>AmazonS3FullAccess</code> managed policy</li>
+    <li><strong>Create Access Key</strong> — Under Security Credentials → Create Access Key → select <strong>Third-party service</strong> as the use case</li>
+    <li><strong>Save credentials immediately</strong> — Copy both the Access Key and Secret Access Key. The Secret Key is shown only once and cannot be retrieved later.</li>
+  </ol>
+
+  <div class="callout c-warn">
+    <div class="callout-head">⚠️ Secret Access Key — One-Time Display</div>
+    <p>The Secret Access Key is only displayed at the time of creation. If you close the dialog without saving it, you must generate a new key pair. Always store credentials securely in a password manager or encrypted vault immediately upon creation.</p>
+  </div>
+
+  <h3>Lab: Creating an S3 Bucket</h3>
+  <ol class="steps">
+    <li><strong>Search for S3</strong> in the AWS Console</li>
+    <li><strong>Create Bucket</strong> — Choose General Purpose. Provide a globally unique bucket name.</li>
+    <li><strong>Leave access settings default</strong> — Block all public access should remain enabled</li>
+    <li><strong>Click Create Bucket</strong> — The bucket is now ready to receive backup objects</li>
+  </ol>
+
+  <h3>Lab: Configuring Cloud Library in Command Center</h3>
+  <ol class="steps">
+    <li><strong>Navigate to Storage → Cloud → Add Cloud Storage</strong></li>
+    <li><strong>Select vendor type</strong> — Commvault supports AWS, Azure Blob, GCP, EMC, Oracle Cloud, and others. Select <strong>Amazon S3</strong>.</li>
+    <li><strong>Provide name, credentials, service host, and bucket</strong> — Enter all details supplied by the cloud team</li>
+    <li><strong>Select Media Agent</strong> — The MA acts as the gateway for data transfer to the cloud</li>
+    <li><strong>Save</strong> — The cloud library is now available for use in plans</li>
+  </ol>
+
+  <div class="img-ph"><div class="img-icon">🖼️</div><p>Cloud library configuration — Command Center showing Amazon S3 credential entry, service host, and bucket selection</p></div>
+  <p class="img-caption">Figure: Cloud storage setup in Command Center — the Media Agent acts as the gateway for all data written to the S3 bucket</p>
+
+  <h3>Cloud Storage Backup Data Structure</h3>
+  <p>When Commvault writes backup data to cloud storage, it creates a structured hierarchy within the bucket:</p>
+  <ul class="list">
+    <li><strong>Container-level folders</strong> — Organised by CommCell ID, storage policy, and copy number</li>
+    <li><strong>Chunk files</strong> — Backup data is written in fixed-size chunks (typically 64 MB). Each chunk contains compressed, optionally encrypted, and optionally deduplicated data blocks.</li>
+    <li><strong>SFILE containers</strong> — Commvault's proprietary packaging format for cloud objects. Visible inside the S3 bucket as <code>SFILE</code> named objects.</li>
+    <li><strong>Metadata files</strong> — Separate objects containing the catalogue and index information for each chunk</li>
+  </ul>
+
+  <div class="callout c-exam">
+    <div class="callout-head">🎓 Interview: Cloud Library Configuration</div>
+    <p><em>"What information do you need from the cloud team to configure a cloud library in Commvault?"</em></p>
+    <p style="margin-top:8px;">Answer: "Four pieces of information are required: the <strong>Access Key</strong> and <strong>Secret Access Key</strong> for authentication; the <strong>Service Host</strong> (region endpoint URL such as s3.us-east-1.amazonaws.com); and the <strong>S3 Bucket Name</strong> that has been provisioned for backup storage. In production, the backup admin typically does not create these — they are provided by the cloud or infrastructure team."</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 9: TAPE LIBRARY -->
+<div class="section" id="tape">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-pu">📼</div>
+    <div>
+      <div class="sec-num">Section 09</div>
+      <h2>Tape Library Configuration</h2>
+      <p>Physical and virtual tape library concepts, components, and lab setup</p>
+    </div>
+  </div>
+
+  <p>Tape libraries remain relevant in specific enterprise contexts — government agencies, financial institutions with air-gap requirements, and dark-site environments where no external network connectivity is permitted. Understanding tape terminology and configuration is an important skill for L2 backup administrators.</p>
+
+  <h3>Tape Library Components</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <div style="font-size:22px;margin-bottom:8px;">🤖</div>
+      <h4 style="color:var(--orange);text-transform:none;font-size:14px;letter-spacing:0;">Tape Library (Robotic Arm)</h4>
+      <p style="font-size:13px;">The physical enclosure containing multiple tapes and drives. A <strong>robotic arm</strong> moves tape media between storage slots and drives automatically. Acts as the controller for all media movement operations.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:22px;margin-bottom:8px;">💿</div>
+      <h4 style="color:var(--blue);text-transform:none;font-size:14px;letter-spacing:0;">Tape Drive</h4>
+      <p style="font-size:13px;">The mechanism that reads from and writes to tape media. When a backup job runs, the robotic arm mounts a tape media cartridge into an available drive. A library can have multiple drives for parallel operations.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:22px;margin-bottom:8px;">🏷️</div>
+      <h4 style="color:var(--green);text-transform:none;font-size:14px;letter-spacing:0;">Tape Media (Cartridge)</h4>
+      <p style="font-size:13px;">The physical storage medium — a cartridge containing a magnetic tape reel. Each cartridge has a <strong>barcode label</strong> used by the library management software to identify and track individual tapes.</p>
+    </div>
+  </div>
+
+  <h3>Additional Tape Terminology</h3>
+  <div class="term-grid">
+    <div class="term-card"><div class="tc-label">Barcode</div><div class="tc-def">Unique identifier label on each tape media cartridge. Scanned by the library to track location and status.</div></div>
+    <div class="term-card"><div class="tc-label">IE Slot (I/E Port)</div><div class="tc-def">Import/Export port — the entry point for inserting new tapes into or removing tapes from the library without interrupting operations.</div></div>
+    <div class="term-card"><div class="tc-label">Shelf Slot</div><div class="tc-def">Storage slot inside the library where tape cartridges reside when not mounted in a drive.</div></div>
+    <div class="term-card"><div class="tc-label">Drive Address</div><div class="tc-def">The SCSI or Fibre Channel address identifying each drive in the library to the host operating system.</div></div>
+  </div>
+
+  <div class="callout c-tip">
+    <div class="callout-head">💡 Tape vs. Disk: Deduplication &amp; Compression</div>
+    <p>Tape storage does <strong>not support Commvault deduplication</strong> at the product layer. Only <strong>compression</strong> applies for tape-based backup data. Never configure a DDB partition for a storage pool that exclusively uses tape. Configure tape pools without the deduplication option enabled.</p>
+  </div>
+
+  <h3>Lab: Creating a Virtual Tape Library (VTL)</h3>
+  <p>For lab environments, Commvault provides a <strong>Virtual Library 2.0</strong> utility that emulates a physical tape library. This allows you to practise tape library configuration without physical hardware.</p>
+
+  <ol class="steps">
+    <li><strong>Log in to the Media Agent</strong> — RDP to the Windows Media Agent VM</li>
+    <li><strong>Locate Virtual Library 2.0</strong><p>Navigate to the Commvault base installation folder:</p>
+      <div class="code-block">
+        <div class="code-hdr"><span class="code-lang">Windows</span><div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div></div>
+        <pre><span class="cmt"># Find base path from Commvault Process Manager → Install Location</span>
+<span class="path">C:\Program Files\Commvault\ContentStore\Base\</span>
+<span class="cmt"># Search for: VirtualLibrary2.exe — Run as Administrator</span></pre>
+      </div>
+    </li>
+    <li><strong>Add New Library</strong> — Right-click Libraries → Add New Library. Select the Media Agent IP. Move it to the right side and click OK.</li>
+    <li><strong>Configure Drive Identifiers</strong> — Click Drive Identifiers at the bottom. Right-click inside the empty white space → <strong>Add Drive Identifier and Drive for All Drives</strong>. Select <strong>Virtual Drive</strong> as the drive type. Select the Media Agent. Click OK.</li>
+    <li><strong>Confirm library creation</strong> — The virtual tape library appears with virtual drives listed.</li>
+    <li><strong>Add Virtual Tapes</strong> — Right-click → Element Status. Navigate to the shelf. Click <strong>Add Tapes to Shelf</strong>. Enter a 3-character barcode prefix (e.g. <code>AAA</code>). Specify count. Tapes are created and appear in the slot list.</li>
+  </ol>
+
+  <div class="callout c-warn">
+    <div class="callout-head">⚠️ VTL is for Lab Use Only</div>
+    <p>The Commvault Virtual Tape Library (VTL) emulator is intended for training and lab environments only. In production, tape libraries are physical hardware connected to the Media Agent via Fibre Channel or SAS. Configuration of production tape libraries requires the library to be connected, drivers installed on the MA, and the library discovered by Commvault during the tape configuration wizard.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 10: HYPER-V -->
+<div class="section" id="hyperv">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-gr">🖥️</div>
+    <div>
+      <div class="sec-num">Section 10</div>
+      <h2>Hyper-V Agentless Backup &amp; Restore</h2>
+      <p>Architecture, lab setup, VSA agent configuration, and VM backup/restore workflows</p>
+    </div>
+  </div>
+
+  <p>Hyper-V is Microsoft's hardware virtualisation platform. Most enterprise environments use Hyper-V or VMware vSphere (together accounting for ~90% of virtualisation deployments). Backup administrators must understand how to protect virtual machines running inside Hyper-V — using Commvault's <strong>agentless backup</strong> method via the Virtual Server Agent (VSA).</p>
+
+  <h3>What is Agentless Backup?</h3>
+  <p>In agentless VM backup, <strong>no Commvault agent is installed inside the guest virtual machine</strong> being protected. Instead:</p>
+  <ul class="list">
+    <li>The <strong>Virtual Server Agent (VSA)</strong> is installed on the <strong>Hyper-V host server</strong> (not inside the VMs)</li>
+    <li>Commvault uses the <strong>Hyper-V VSS (Volume Shadow Copy Service)</strong> API to take application-consistent snapshots</li>
+    <li>The VSA coordinates with the hypervisor to capture the entire VM — including disk, memory state, and application data</li>
+    <li>We call this <em>agentless</em> because the protected workload (the guest VM) has no agent installed inside it</li>
+  </ul>
+
+  <div class="callout c-note">
+    <div class="callout-head">📘 Agentless ≠ No Agent at All</div>
+    <p>Despite the term, agentless backup still requires an agent — the <strong>Virtual Server Agent (VSA)</strong> — installed on the <strong>Hyper-V host</strong>. It is <em>agentless</em> from the perspective of the <strong>guest VMs</strong> being protected. This is an important distinction in interviews and client discussions.</p>
+  </div>
+
+  <h3>Hyper-V Architecture Overview</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4 style="color:var(--blue);text-transform:none;font-size:14px;letter-spacing:0;">🖥️ Standalone Hyper-V Node</h4>
+      <p style="font-size:13px;">A single Windows Server with the Hyper-V role enabled. Used in smaller environments. No automatic VM failover capability. Configure Commvault with the server's <strong>hostname or IP + local admin credentials</strong>.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--orange);text-transform:none;font-size:14px;letter-spacing:0;">🔗 Hyper-V Failover Cluster</h4>
+      <p style="font-size:13px;">Multiple Hyper-V nodes grouped in a Windows Failover Cluster. Provides automatic VM failover when a node fails. Configure Commvault with the <strong>cluster IP + cluster admin credentials</strong> — not individual node IPs.</p>
+    </div>
+  </div>
+
+  <h3>Hyper-V vs. VMware — Quick Comparison</h3>
+  <div class="compare">
+    <div class="compare-col">
+      <h4 style="color:var(--blue);">🔵 Hyper-V (Microsoft)</h4>
+      <ul class="list">
+        <li>Hypervisor: <strong>Hyper-V Manager</strong> (standalone) or <strong>Failover Cluster Manager</strong></li>
+        <li>Backup API: <strong>VSS (Volume Shadow Copy Service)</strong></li>
+        <li>Commvault agent: <strong>VSA installed on Hyper-V host</strong></li>
+        <li>SAN shared storage: optional but common in clustered environments</li>
+      </ul>
+    </div>
+    <div class="compare-col">
+      <h4 style="color:var(--green);">🟢 VMware vSphere</h4>
+      <ul class="list">
+        <li>Hypervisor: <strong>ESXi hosts</strong> managed by <strong>vCenter Server</strong></li>
+        <li>Backup API: <strong>VADP (vStorage API for Data Protection)</strong></li>
+        <li>Commvault agent: <strong>VSA installed on a proxy server</strong></li>
+        <li>HA feature (equivalent to Failover Cluster) available through vCenter</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Lab Setup: Configuring a Single-Node Hyper-V Lab</h3>
+  <ol class="steps">
+    <li><strong>Create a new VM in VMware Workstation</strong><p>Allocate at least 8–12 GB RAM and 4 vCPUs. Select Windows Server 2019 or 2022 as the OS type. Disk: 60+ GB. Enable Bridged networking.</p></li>
+    <li><strong>Install Windows Server 2019</strong><p>Use Desktop Experience edition (GUI). Accept the license, custom install on the full disk. Set a memorable administrator password.</p></li>
+    <li><strong>Post-install configuration</strong>
+      <ul class="list" style="margin:8px 0 0;">
+        <li>Disable all three firewall profiles (Domain, Private, Public) — lab only</li>
+        <li>Configure a static IP address</li>
+        <li>Rename the computer to a meaningful name (e.g. <code>HV-Node01</code>)</li>
+      </ul>
+    </li>
+    <li><strong>Install Hyper-V role</strong><p>Open Server Manager → Add Roles and Features → Hyper-V. Complete the wizard. Restart when prompted.</p></li>
+    <li><strong>Install Failover Clustering feature</strong><p>Add Roles and Features → Features → Failover Clustering. Install and restart.</p></li>
+    <li><strong>Create VMs inside Hyper-V</strong><p>Open Hyper-V Manager → New → Virtual Machine. Create one Windows VM and one Linux (Ubuntu) VM for backup testing. Assign 2–4 GB RAM each.</p></li>
+    <li><strong>Configure Failover Cluster</strong><p>Open Failover Cluster Manager → Create Cluster. Add the single Hyper-V node. Assign a cluster name and IP (e.g. <code>HV-Cluster01</code>, IP: 192.168.x.225). Note: the cluster IP is different from the node IP.</p></li>
+  </ol>
+
+  <div class="callout c-warn">
+    <div class="callout-head">⚠️ Cluster IP vs. Node IP</div>
+    <p>When configuring Commvault for a Hyper-V Failover Cluster, always use the <strong>cluster IP address</strong> — not the individual node server IP. The cluster IP is visible in Failover Cluster Manager → Cluster Core Resources. In the example lab: cluster IP = 192.168.x.225, node IP = 192.168.x.115 (different).</p>
+  </div>
+
+  <h3>Configuring the Hyper-V Agent in Command Center</h3>
+  <ol class="steps">
+    <li><strong>Navigate to Protect → Virtualization</strong></li>
+    <li><strong>Click Add Hypervisor</strong> → Select <strong>Hyper-V</strong> as the vendor</li>
+    <li><strong>Enter host details</strong><p>For a failover cluster: enter the <strong>cluster hostname or IP</strong>. For a standalone node: enter the <strong>node hostname or IP</strong>.</p></li>
+    <li><strong>Provide credentials</strong><p>Create a new credential: provide a display name, then the cluster admin username and password. The account must be a member of the <strong>Administrators group</strong> on the cluster or Hyper-V node.</p></li>
+    <li><strong>Define the access node</strong><p>Select the Commvault MA or proxy that will perform the backup operations. This is where the VSA package will be pushed.</p></li>
+    <li><strong>Save</strong> — Commvault discovers the VMs running on the hypervisor</li>
+  </ol>
+
+  <h3>Running a Hyper-V VM Backup</h3>
+  <ol class="steps">
+    <li><strong>Browse to Protect → Virtualization → [Hyper-V Cluster]</strong></li>
+    <li><strong>Select VMs to protect</strong> — Tick the Windows and Linux VMs</li>
+    <li><strong>Assign a plan</strong> — Use an existing plan or create a new one for VM backups</li>
+    <li><strong>Run backup</strong> — Click Backup → Full → Submit. Monitor via the Jobs section.</li>
+  </ol>
+
+  <h3>VM Restore Options</h3>
+  <ul class="list">
+    <li><strong>Full VM Restore</strong> — Restore the entire virtual machine to the same or alternate Hyper-V host</li>
+    <li><strong>Guest File Restore</strong> — Browse inside a VM backup and restore individual files to any accessible path</li>
+    <li><strong>In-place restore</strong> — Overwrite the existing VM on the same Hyper-V host</li>
+    <li><strong>Out-of-place restore</strong> — Restore to a different Hyper-V host, with a new VM name</li>
+  </ul>
+
+  <div class="callout c-exam">
+    <div class="callout-head">🎓 Interview: Hyper-V Agentless Backup</div>
+    <p><em>"How does Commvault protect Hyper-V virtual machines? Why is it called agentless?"</em></p>
+    <p style="margin-top:8px;">Answer: "Commvault protects Hyper-V VMs using the <strong>Virtual Server Agent (VSA)</strong>, which is installed on the <strong>Hyper-V host</strong>, not inside the guest VMs. It uses the <strong>Microsoft VSS API</strong> to create application-consistent snapshots of running VMs. Because no Commvault agent is installed inside the protected guest virtual machines, this is called <strong>agentless backup</strong>. For clustered environments, the backup is configured against the <strong>Failover Cluster</strong> IP — not individual node IPs — so VM protection follows VMs across nodes automatically."</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── SECTION 11: INTERVIEW Q&A -->
+<div class="section" id="interview">
+  <div class="sec-hdr">
+    <div class="sec-icon ic-pu">🎓</div>
+    <div>
+      <div class="sec-num">Section 11</div>
+      <h2>Interview Q&amp;A — Scenario-Based</h2>
+      <p>Real-world questions covering all topics in Part 3</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">What is a Subclient and how does it differ from a Backup Set?</div>
+    <div class="qa-a">A <strong>Backup Set</strong> is the logical collection of all data protected by an agent on a client machine. For a Windows File System agent, the default Backup Set includes all drives. A <strong>Subclient</strong> defines a specific subset of data within a Backup Set — for example, only the D: drive or a specific application folder. Subclients are where you define content, assign a plan, and run backup jobs. In production, custom subclients are configured to protect exactly the data the application or customer team specifies.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">What is the difference between Incremental and Differential backups?</div>
+    <div class="qa-a"><strong>Incremental</strong> backup captures all data changed since the <em>last backup</em> — whether that last backup was a full or another incremental. It produces the smallest backup size and fastest run time, but requires the last full plus all incrementals in sequence for a full restore. <strong>Differential</strong> backup captures all data changed since the <em>last Full backup</em>. It is larger than an incremental (and grows each day), but simplifies restore — you only need the last full plus the single latest differential. Choose incremental for minimal storage consumption; choose differential for faster restore times in RPO-critical environments.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">What is a Synthetic Full backup and why would you use it?</div>
+    <div class="qa-a">A <strong>Synthetic Full</strong> creates a new full backup by consolidating the most recent full backup and all subsequent incrementals — <strong>reading from storage rather than from the source client</strong>. This means no I/O load on the production server during the operation. Commvault automatically schedules a Synthetic Full every 7 days as a safety net via the schedule policy. It is visible in the Java Console schedule policy but not in Command Center for Commvault v11.32 and earlier. The definition: "A backup that consolidates previous incrementals and the last full to create a new synthetic full, without reading from the source."</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">Explain retention days and cycles in Commvault.</div>
+    <div class="qa-a">Retention has two components that <strong>both must be satisfied</strong> before backup data is aged out. <strong>Retention Days</strong> is the minimum number of days the data must be kept. <strong>Cycles</strong> defines how many full-to-full cycles (one full + its incrementals + the next full = one cycle) must complete. Even if 7 retention days have passed, Commvault will not delete backup jobs until the next full backup cycle has completed. This prevents the scenario where your only full backup expires before a new one is written. The Cycles setting is visible in the Java Console Storage Policy properties — it is not exposed in Command Center.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">Why is the CommServe DR backup critical, and what is its process flow?</div>
+    <div class="qa-a">The CommServe database contains all metadata for the entire backup environment — job history, client configurations, storage policies, schedules, and the backup catalogue. If the CommServe fails without a current DR backup, the environment cannot be recovered. The DR backup process: (1) generates a SQL dump of the CommServe database; (2) caches DMP files to a local staging path inside ContentStore\CommserveDR; (3) exports the dumps to a user-defined metadata path (e.g. E:\CommserverDRBackup); (4) optionally uploads a copy to Metallic Cloud; (5) writes the final copy to the CommServeDR Storage Policy on disk. Backup administrators must monitor DR job completion daily.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">What is the difference between Command Center and the Java Console?</div>
+    <div class="qa-a">The <strong>Command Center</strong> is the modern web-based interface introduced in Commvault v11.20, mandatory for new deployments from v11.34. It simplifies operations by combining Storage Policy and Schedule Policy into a single <strong>Plan</strong> object and uses user-friendly terminology (Servers, Plans, Disk Storage). The <strong>Java Console</strong> (CommCell Console) is the legacy Java thick-client that exposes deeper configuration — including Cycles-based retention, CommServeDR Policy management, Aux Copy, and Storage Pools. Both consoles manage the same CommCell; changes in one are reflected in the other. In environments where both are present, follow whichever the organisation standardises on — mixing consoles in production is not recommended.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">What information do you need to configure a cloud library in Commvault?</div>
+    <div class="qa-a">Four pieces of information are required from the cloud team: (1) <strong>Access Key</strong> — the IAM user access key for AWS; (2) <strong>Secret Access Key</strong> — paired credential, shown only once upon creation; (3) <strong>Service Host</strong> — the regional S3 endpoint, e.g. s3.us-east-1.amazonaws.com; (4) <strong>Bucket Name</strong> — the S3 container provisioned for backup storage. In Command Center: Storage → Cloud → Add Cloud Storage. Select the vendor (AWS, Azure, GCP, etc.), enter the credentials, and assign a Media Agent as the gateway. Backup administrators typically do not create cloud resources — they configure using details provided by the cloud operations team.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">Explain Hyper-V agentless backup. What agent is actually required?</div>
+    <div class="qa-a">Hyper-V agentless backup means no Commvault agent is installed <em>inside the guest virtual machines</em> being protected. The <strong>Virtual Server Agent (VSA)</strong> is installed on the <strong>Hyper-V host server</strong>. It uses Microsoft's <strong>VSS API</strong> to create application-consistent snapshots of running VMs. For a Failover Cluster environment, Commvault is configured with the <strong>cluster IP and cluster credentials</strong> — this ensures VMs are always discovered and protected regardless of which node they are running on. For standalone Hyper-V Manager setups, the individual node IP and local admin credentials are used. The term "agentless" specifically refers to the absence of an agent inside the protected guest VM.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">When would you NOT use Commvault deduplication, and why?</div>
+    <div class="qa-a">Commvault deduplication should not be configured in two scenarios: (1) <strong>HP Catalyst / StoreOnce appliances</strong> — These storage platforms perform native deduplication inside the appliance itself. Enabling Commvault dedup on top of this creates "double dedup," which reduces efficiency and can cause performance issues. Commvault formally recommends disabling its dedup for Catalyst targets. (2) <strong>Tape libraries</strong> — Tape storage does not support block-level deduplication at the Commvault layer. Only compression applies to tape-based data. Never configure a DDB partition for a tape-only storage pool.</div>
+  </div>
+
+  <div class="summary">
+    <h4>🗂️ Part 3 — Complete Topic Summary</h4>
+    <ul class="list">
+      <li><strong>Logical architecture</strong> — BackupSet (all data) → Subclient (specific data) → Plan (schedule + storage + retention)</li>
+      <li><strong>Storage types</strong> — Disk (local/shared), Cloud (S3/Azure/GCP), Tape (air-gap/compliance); dedup not supported on tape</li>
+      <li><strong>DDB</strong> — Deduplication Database requires a dedicated drive; separate from backup data mount path</li>
+      <li><strong>Backup types</strong> — Full, Incremental (last backup), Differential (last full), Synthetic Full (from storage), Log (databases only)</li>
+      <li><strong>Cycles</strong> — Full-to-full period; both days AND cycles must expire before jobs age out</li>
+      <li><strong>Console comparison</strong> — Command Center (Plans, Servers) vs. Java Console (Policies, Client Computers, Cycles)</li>
+      <li><strong>CommServe DR</strong> — SQL dump → metadata cache → metadata path → Metallic Cloud → DR Storage Policy. Monitor daily.</li>
+      <li><strong>Cloud library</strong> — Requires: Access Key, Secret Key, Service Host, Bucket Name from cloud team</li>
+      <li><strong>Tape library</strong> — Library (controller) + Drive (read/write) + Media (cartridge with barcode). Use VTL emulator for lab.</li>
+      <li><strong>Hyper-V agentless</strong> — VSA installed on Hyper-V host; uses VSS API; cluster config uses cluster IP not node IP</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <p>Commvault Cloud Tutorial — Part 3 &nbsp;·&nbsp; Sessions 10–17 &nbsp;·&nbsp; Plans, Storage, Backup Types, Cloud, Tape &amp; Hyper-V</p>
+  <p>Authored by <strong>Mohammed Abdul</strong> — Data Protection Architect &nbsp;·&nbsp; Version 11.32 LTS Reference</p>
+</footer>
+
+</body>
+</html>
