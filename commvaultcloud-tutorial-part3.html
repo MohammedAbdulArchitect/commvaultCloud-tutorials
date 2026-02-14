@@ -450,9 +450,9 @@
     <div class="flow-arrow">→</div>
     <div class="flow-step"><div class="fn">4</div><div class="ft">MA deduplicates, compresses, encrypts</div></div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step"><div class="fn">5</div><div class="ft">MA writes to Library (Disk/Cloud/Tape)</div></div>
+    <div class="flow-step"><div class="fn">5</div><div class="ft">MA writes to Library (Disk/Cloud/Tape) &amp; updates Index Cache</div></div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step"><div class="fn">6</div><div class="ft">CommServe updates metadata &amp; index cache</div></div>
+    <div class="flow-step"><div class="fn">6</div><div class="ft">CommServe updates SQL database with job metadata</div></div>
   </div>
 
   <div class="callout c-note">
@@ -508,7 +508,7 @@
 
   <div class="callout c-exam">
     <div class="callout-head">🎓 Interview Tip — Backup Process Flow</div>
-    <p>A common interview question: <em>"Explain the backup process flow for a file system agent."</em> Key points to cover: (1) CommServe initiates the job; (2) the client iDataAgent gathers source data; (3) data is transferred directly to the Media Agent (CommServe never handles data); (4) the MA deduplicates, compresses, encrypts and writes to the library; (5) CommServe updates the metadata database and index cache. Always emphasise that <strong>CommServe never touches backup data</strong>.</p>
+    <p>A common interview question: <em>"Explain the backup process flow for a file system agent."</em> Key points to cover: (1) CommServe initiates the job; (2) the client iDataAgent gathers source data; (3) data is transferred directly to the Media Agent (CommServe never handles data); (4) the MA deduplicates, compresses, encrypts and writes to the library; (5) the MA updates the <strong>Index Cache</strong> (stored on the Media Agent) with file catalogue data — paths, versions, timestamps; (6) CommServe updates its <strong>SQL database</strong> with job metadata: Job ID, client name, subclient, backup type, start/end time, job status, data size, throughput, dedup stats, MediaAgent used, and storage policy used. Always emphasise that <strong>CommServe never touches backup data</strong> — it only orchestrates and records job metadata.</p>
   </div>
 </div>
 
