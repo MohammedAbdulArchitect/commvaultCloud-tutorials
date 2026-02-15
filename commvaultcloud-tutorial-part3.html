@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commvault Cloud Tutorial — Part 3: Plans, Backup Types, Storage &amp; Hyper-V</title>
+<title>Commvault Software Tutorial — Part 3: Plans, Backup Types, Storage &amp; Hyper-V</title>
 <style>
   :root {
     --bg:      #0d1117;
@@ -183,7 +183,7 @@
 <div class="hero">
   <div class="hero-inner">
     <div class="badge">🛡️ Backup Administration Tutorials</div>
-    <h1>Commvault <span>Cloud Tutorial</span><span class="part-pill">Part 3</span></h1>
+    <h1>Commvault <span>Software Tutorial</span><span class="part-pill">Part 3</span></h1>
     <p class="hero-sub">Deep-dive into logical architecture, plans, backup types, storage libraries, ConsoleConsole vs Command Center, CommServe DR, Cloud &amp; Tape libraries, and Hyper-V agentless backup with full lab walkthroughs.</p>
     <div class="hero-meta">
       <div class="meta-item"><div class="dot"></div>Sessions 10 – 17</div>
@@ -379,9 +379,6 @@
     <div class="callout-head">⚠️ Critical: Never Use the OS Drive</div>
     <p>Always use a <strong>dedicated drive</strong> for backup data. Never write backup data to the C: drive (OS drive). Create a separate virtual disk (e.g. 100 GB → E: drive for data, 20 GB → F: drive for DDB) before configuring libraries.</p>
   </div>
-
-  <div class="img-ph"><div class="img-icon">🖼️</div><p>Disk Library configuration — Command Center Storage view showing mount path and DDB partition settings</p></div>
-  <p class="img-caption">Figure: Disk storage configuration with deduplication enabled, showing separate mount path and DDB partition drives</p>
 </div>
 
 <!-- ─────────────────────────────────── SECTION 3: PLANS -->
@@ -663,7 +660,7 @@
     <div class="flow-arrow">→</div>
     <div class="flow-step"><div class="fn">Phase 3</div><div class="ft">Cache copied to defined metadata export path (e.g. E:\CommserveDR)</div></div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step"><div class="fn">Phase 4</div><div class="ft">(Optional) Copy uploaded to Commvault Cloud (formerly Metallic)</div></div>
+    <div class="flow-step"><div class="fn">Phase 4</div><div class="ft">(Optional) Copy uploaded to Commvault Software (formerly Metallic)</div></div>
     <div class="flow-arrow">→</div>
     <div class="flow-step"><div class="fn">Phase 5</div><div class="ft">Final copy written to CommServe DR Storage Policy on disk library</div></div>
   </div>
@@ -675,7 +672,7 @@
     <li><strong>Supporting databases</strong> — AppStudio, CacheDB, HistoryDB, WorkflowEngine — smaller databases that are also included in the DR dump.</li>
     <li><strong>Metadata export path</strong> — A secondary local or network path (e.g. E:\CommserveDRBackup) where DR dumps are exported. <strong>Note this path carefully</strong> — it is your first recovery option if the C: drive fails.</li>
     <li><strong>CommServeDR Storage Policy</strong> — Auto-created when you add the first library. Visible in Java Console → Storage Policies. Not visible in Command Center.</li>
-    <li><strong>Commvault Cloud (formerly Metallic)</strong> — Commvault's own cloud offering. An optional third copy destination for CommServe DR backups.</li>
+    <li><strong>Commvault Software (formerly Metallic)</strong> — Commvault's own cloud offering. An optional third copy destination for CommServe DR backups.</li>
   </ul>
 
   <div class="code-block">
@@ -704,7 +701,7 @@
   <div class="callout c-exam">
     <div class="callout-head">🎓 Interview: CommServe DR Process Flow</div>
     <p><em>"Explain the CommServe DR backup process."</em></p>
-    <p style="margin-top:8px;">Answer: "The CommServe DR backup runs automatically as a scheduled job. It first generates a <strong>SQL dump</strong> of all CommServe databases — the primary commserve.dmp and supporting databases. These dumps are staged to a local cache path, then exported to a user-defined metadata location. Optionally, a copy is uploaded to <strong>Commvault Cloud (formerly Metallic)</strong>. Finally, the DR data is written to the CommServeDR Storage Policy on the configured disk library. This provides three recovery options: local metadata path, cloud copy, and disk library copy."</p>
+    <p style="margin-top:8px;">Answer: "The CommServe DR backup runs automatically as a scheduled job. It first generates a <strong>SQL dump</strong> of all CommServe databases — the primary commserve.dmp and supporting databases. These dumps are staged to a local cache path, then exported to a user-defined metadata location. Optionally, a copy is uploaded to <strong>Commvault Software (formerly Metallic)</strong>. Finally, the DR data is written to the CommServeDR Storage Policy on the configured disk library. This provides three recovery options: local metadata path, cloud copy, and disk library copy."</p>
   </div>
 </div>
 
@@ -1004,7 +1001,7 @@
 
   <div class="qa-item">
     <div class="qa-q">Why is the CommServe DR backup critical, and what is its process flow?</div>
-    <div class="qa-a">The CommServe database contains all metadata for the entire backup environment — job history, client configurations, storage policies, schedules, and the backup catalogue. If the CommServe fails without a current DR backup, the environment cannot be recovered. The DR backup process: (1) generates a SQL dump of the CommServe database; (2) caches DMP files to a local staging path inside ContentStore\CommserveDR; (3) exports the dumps to a user-defined metadata path (e.g. E:\CommserveDRBackup); (4) optionally uploads a copy to <strong>Commvault Cloud (formerly Metallic)</strong>; (5) writes the final copy to the CommServeDR Storage Policy on disk. Backup administrators must monitor DR job completion daily.</div>
+    <div class="qa-a">The CommServe database contains all metadata for the entire backup environment — job history, client configurations, storage policies, schedules, and the backup catalogue. If the CommServe fails without a current DR backup, the environment cannot be recovered. The DR backup process: (1) generates a SQL dump of the CommServe database; (2) caches DMP files to a local staging path inside ContentStore\CommserveDR; (3) exports the dumps to a user-defined metadata path (e.g. E:\CommserveDRBackup); (4) optionally uploads a copy to <strong>Commvault Software (formerly Metallic)</strong>; (5) writes the final copy to the CommServeDR Storage Policy on disk. Backup administrators must monitor DR job completion daily.</div>
   </div>
 
   <div class="qa-item">
@@ -1036,7 +1033,7 @@
       <li><strong>Backup types</strong> — Full, Incremental (last backup), Differential (last full), Synthetic Full (from storage), Log (databases only)</li>
       <li><strong>Cycles</strong> — Full-to-full period; both days AND cycles must expire before jobs age out</li>
       <li><strong>Console comparison</strong> — Command Center (Plans, Servers) vs. Java Console (Policies, Client Computers, Cycles)</li>
-      <li><strong>CommServe DR</strong> — SQL dump → metadata cache → metadata path → Commvault Cloud (formerly Metallic) → DR Storage Policy. Monitor daily.</li>
+      <li><strong>CommServe DR</strong> — SQL dump → metadata cache → metadata path → Commvault Software (formerly Metallic) → DR Storage Policy. Monitor daily.</li>
       <li><strong>Cloud library</strong> — Requires: Access Key, Secret Key, Service Host, Bucket Name from cloud team</li>
       <li><strong>Tape library</strong> — Library (controller) + Drive (read/write) + Media (cartridge with barcode). Use VTL emulator for lab.</li>
       <li><strong>Hyper-V agentless</strong> — VSA installed on Hyper-V host; uses VSS API; cluster config uses cluster IP not node IP</li>
@@ -1048,7 +1045,7 @@
 
 <!-- ═══ FOOTER ═══ -->
 <footer>
-  <p>Commvault Cloud Tutorial — Part 3 &nbsp;·&nbsp; Sessions 10–17 &nbsp;·&nbsp; Plans, Storage, Backup Types, Cloud, Tape &amp; Hyper-V</p>
+  <p>Commvault Software Tutorial — Part 3 &nbsp;·&nbsp; Sessions 10–17 &nbsp;·&nbsp; Plans, Storage, Backup Types, Cloud, Tape &amp; Hyper-V</p>
   <p>Authored by <strong>Mohammed Abdul</strong> — Data Protection Architect &nbsp;·&nbsp; Version 11.32 LTS Reference</p>
 </footer>
 
