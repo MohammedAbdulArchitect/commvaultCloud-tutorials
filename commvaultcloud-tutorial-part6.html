@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Software Administration — Tutorial 6: CommServe LiveSync, HA/DR, WORM Storage & Ransomware Protection</title>
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --surface2:  #1e2530;
+    --surface3:  #252d3a;
+    --border:    #30363d;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --dim:       #6e7681;
+    --orange:    #f0883e;
+    --blue:      #58a6ff;
+    --green:     #3fb950;
+    --purple:    #bc8cff;
+    --red:       #ff7b72;
+    --yellow:    #e3b341;
+    --font-body: 'Segoe UI', Calibri, Arial, Helvetica, sans-serif;
+    --font-head: Georgia, 'Times New Roman', Cambria, serif;
+    --font-code: 'Courier New', Courier, 'Lucida Console', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.8; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1f2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 72px 40px 60px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content:''; position:absolute; top:-80px; right:-80px; width:480px; height:480px;
+    background: radial-gradient(circle, rgba(240,136,62,0.10) 0%, transparent 70%); pointer-events:none;
+  }
+  .hero::after {
+    content:''; position:absolute; bottom:-60px; left:-60px; width:380px; height:380px;
+    background: radial-gradient(circle, rgba(88,166,255,0.07) 0%, transparent 70%); pointer-events:none;
+  }
+  .hero-inner { max-width:900px; margin:0 auto; position:relative; z-index:1; }
+  .badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(240,136,62,0.12); border:1px solid rgba(240,136,62,0.30);
+    color:var(--orange); font-size:12px; font-weight:700; letter-spacing:0.08em;
+    text-transform:uppercase; padding:5px 14px; border-radius:20px; margin-bottom:22px;
+  }
+  .hero h1 { font-family:var(--font-head); font-size:clamp(28px,4.5vw,50px); line-height:1.15; color:var(--text); margin-bottom:16px; }
+  .hero h1 span { color:var(--orange); }
+  .hero-sub { color:var(--muted); font-size:17px; max-width:640px; margin-bottom:30px; }
+  .hero-meta { display:flex; gap:24px; flex-wrap:wrap; }
+  .meta-item { display:flex; align-items:center; gap:8px; color:var(--dim); font-size:13px; }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px rgba(63,185,80,0.5); flex-shrink:0; }
+
+  /* TOC */
+  .toc { background:var(--surface); border-bottom:1px solid var(--border); padding:0 40px; position:sticky; top:0; z-index:100; overflow-x:auto; white-space:nowrap; }
+  .toc ul { display:flex; list-style:none; gap:4px; padding:8px 0; }
+  .toc a { display:block; padding:7px 13px; font-size:13px; font-weight:500; color:var(--muted); text-decoration:none; border-radius:6px; transition:all 0.2s; }
+  .toc a:hover { color:var(--text); background:var(--surface2); }
+
+  /* MAIN */
+  .main { max-width:900px; margin:0 auto; padding:52px 40px 80px; }
+  .section { margin-bottom:72px; }
+  .section-header { display:flex; align-items:center; gap:16px; margin-bottom:28px; padding-bottom:18px; border-bottom:1px solid var(--border); }
+  .sec-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .ic-or { background:rgba(240,136,62,0.14); border:1px solid rgba(240,136,62,0.30); }
+  .ic-bl { background:rgba(88,166,255,0.12); border:1px solid rgba(88,166,255,0.28); }
+  .ic-gr { background:rgba(63,185,80,0.12);  border:1px solid rgba(63,185,80,0.28); }
+  .ic-pu { background:rgba(188,140,255,0.12);border:1px solid rgba(188,140,255,0.28);}
+  .ic-ye { background:rgba(227,179,65,0.12); border:1px solid rgba(227,179,65,0.28); }
+  .ic-re { background:rgba(255,123,114,0.12);border:1px solid rgba(255,123,114,0.28);}
+  .sec-num { font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:var(--dim); margin-bottom:2px; }
+  .section-header h2 { font-family:var(--font-head); font-size:25px; color:var(--text); margin:0; }
+  .section-header p { color:var(--muted); font-size:13px; margin:3px 0 0; }
+  h3 { font-family:var(--font-head); font-size:19px; color:var(--text); margin:36px 0 13px; }
+  h4 { font-size:13px; font-weight:700; color:var(--muted); letter-spacing:0.07em; text-transform:uppercase; margin:24px 0 10px; }
+  p { color:var(--muted); margin-bottom:14px; }
+  strong { color:var(--text); font-weight:600; }
+  a { color:var(--blue); }
+
+  /* CARDS */
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px 26px; margin-bottom:14px; }
+  .card-grid   { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0; }
+  .card-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin:18px 0; }
+  @media(max-width:640px){ .card-grid,.card-grid-3 { grid-template-columns:1fr; } }
+
+  .tier-card { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:20px 22px; border-top:3px solid; }
+  .tc-red    { border-top-color:var(--red); }
+  .tc-green  { border-top-color:var(--green); }
+  .tc-blue   { border-top-color:var(--blue); }
+  .tc-purple { border-top-color:var(--purple); }
+  .tc-yellow { border-top-color:var(--yellow); }
+  .tier-pill { display:inline-block; font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:2px 10px; border-radius:20px; margin-bottom:10px; }
+  .tp-red   { background:rgba(255,123,114,0.14); color:var(--red); }
+  .tp-green { background:rgba(63,185,80,0.13);  color:var(--green); }
+  .tp-blue  { background:rgba(88,166,255,0.12); color:var(--blue); }
+  .tp-purple{ background:rgba(188,140,255,0.12);color:var(--purple);}
+  .tp-yellow{ background:rgba(227,179,65,0.12); color:var(--yellow);}
+  .tier-card h4 { font-size:15px; color:var(--text); text-transform:none; letter-spacing:0; margin:0 0 10px; }
+  .tier-card p  { font-size:13px; margin:0 0 8px; }
+  .tier-card ul { padding-left:18px; margin:0; }
+  .tier-card li { font-size:13px; color:var(--muted); margin:5px 0; }
+
+  /* LISTS */
+  ul.list { list-style:none; padding:0; margin:12px 0 18px; }
+  ul.list li { display:flex; gap:10px; color:var(--muted); font-size:14px; padding:6px 0; border-bottom:1px solid rgba(48,54,61,0.5); }
+  ul.list li:last-child { border-bottom:none; }
+  ul.list li::before { content:'›'; color:var(--orange); font-size:16px; flex-shrink:0; }
+  ul.list li strong { color:var(--text); }
+  ol.steps { list-style:none; padding:0; margin:14px 0; counter-reset:st; }
+  ol.steps li { counter-increment:st; display:flex; gap:14px; margin-bottom:13px; align-items:flex-start; }
+  ol.steps li::before { content:counter(st); width:26px; height:26px; flex-shrink:0; background:var(--surface2); border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--blue); font-family:var(--font-code); margin-top:2px; }
+  ol.steps li p { margin:0; font-size:14px; color:var(--muted); }
+  ol.steps li strong { display:block; font-size:14px; color:var(--text); margin-bottom:2px; }
+
+  /* CALLOUTS */
+  .callout { border-radius:10px; padding:18px 22px; margin:20px 0; border-left:3px solid; }
+  .callout-head { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px; }
+  .callout p { margin:0 0 6px; font-size:14px; }
+  .callout p:last-child { margin:0; }
+  .callout ul.list { margin:8px 0 0; }
+  .callout ul.list li { font-size:13px; }
+  .c-tip  { background:rgba(63,185,80,0.07);   border-color:var(--green);  }
+  .c-tip  .callout-head { color:var(--green); }
+  .c-warn { background:rgba(227,179,65,0.08);  border-color:var(--yellow); }
+  .c-warn .callout-head { color:var(--yellow); }
+  .c-int  { background:rgba(88,166,255,0.07);  border-color:var(--blue);   }
+  .c-int  .callout-head { color:var(--blue); }
+  .c-scen { background:rgba(188,140,255,0.07); border-color:var(--purple); }
+  .c-scen .callout-head { color:var(--purple); }
+  .c-key  { background:rgba(240,136,62,0.07);  border-color:var(--orange); }
+  .c-key  .callout-head { color:var(--orange); }
+  .c-red  { background:rgba(255,123,114,0.07); border-color:var(--red);    }
+  .c-red  .callout-head { color:var(--red); }
+
+  /* FLOW */
+  .flow { display:flex; align-items:stretch; gap:0; margin:22px 0; overflow-x:auto; padding:4px 0; }
+  .flow-step { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px 16px; text-align:center; min-width:110px; flex-shrink:0; display:flex; flex-direction:column; gap:4px; }
+  .flow-step .fn { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--orange); }
+  .flow-step .ft { font-size:12px; font-weight:500; color:var(--text); }
+  .flow-arrow { color:var(--dim); font-size:20px; padding:0 6px; display:flex; align-items:center; flex-shrink:0; }
+
+  /* CODE */
+  pre { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:14px 0; overflow-x:auto; }
+  code { font-family:var(--font-code); font-size:13px; color:var(--green); }
+  pre code { color:var(--text); }
+  .cmd { background:var(--surface3); border:1px solid var(--border); border-radius:6px; padding:10px 16px; margin:8px 0; font-family:var(--font-code); font-size:13px; color:var(--yellow); display:block; }
+  .cmd::before { content:'$ '; color:var(--dim); }
+
+  /* ARCH DIAGRAM */
+  .arch-diagram {
+    background:var(--surface2); border:1px solid var(--border); border-radius:12px;
+    padding:28px; margin:24px 0; text-align:center;
+  }
+  .arch-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--dim); margin-bottom:20px; }
+  .arch-row { display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+  .arch-node {
+    background:var(--surface3); border:1px solid var(--border); border-radius:8px;
+    padding:12px 18px; text-align:center; min-width:120px;
+  }
+  .arch-node.active  { border-color:var(--orange); background:rgba(240,136,62,0.10); }
+  .arch-node.passive { border-color:var(--blue);   background:rgba(88,166,255,0.10); }
+  .arch-node.dr-node { border-color:var(--purple); background:rgba(188,140,255,0.10);}
+  .arch-node.ma-node { border-color:var(--green);  background:rgba(63,185,80,0.10);  }
+  .arch-node.storage { border-color:var(--yellow); background:rgba(227,179,65,0.10); }
+  .arch-node .an-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:4px; }
+  .arch-node .an-name  { font-size:13px; font-weight:600; color:var(--text); }
+  .arch-node .an-ip    { font-size:11px; color:var(--dim); margin-top:2px; font-family:var(--font-code); }
+  .arch-node.active .an-label  { color:var(--orange); }
+  .arch-node.passive .an-label { color:var(--blue); }
+  .arch-node.dr-node .an-label { color:var(--purple); }
+  .arch-node.ma-node .an-label { color:var(--green); }
+  .arch-node.storage .an-label { color:var(--yellow); }
+  .arch-arrow-down { text-align:center; color:var(--dim); font-size:22px; margin:4px 0; }
+  .arch-label { font-size:11px; color:var(--dim); text-align:center; margin-top:4px; }
+  .arch-vsep { width:1px; height:40px; background:var(--border); margin:0 4px; }
+  .arch-hsep { height:1px; background:var(--border); margin:12px 0; }
+  .sync-badge { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:2px 10px; border-radius:20px; margin-top:6px; }
+  .sb-active  { background:rgba(63,185,80,0.15); color:var(--green); border:1px solid rgba(63,185,80,0.3); }
+  .sb-passive { background:rgba(88,166,255,0.12); color:var(--blue); border:1px solid rgba(88,166,255,0.28); }
+  .sb-dr      { background:rgba(188,140,255,0.12); color:var(--purple); border:1px solid rgba(188,140,255,0.28); }
+
+  /* FAILOVER TYPE TABLE */
+  .fo-grid { margin:18px 0; }
+  .fo-row  { display:flex; gap:0; margin-bottom:3px; border-radius:6px; overflow:hidden; }
+  .fo-row.hdr { background:var(--surface3); }
+  .fo-row:not(.hdr) { background:var(--surface2); }
+  .fc1 { width:22%; padding:10px 14px; font-size:13px; font-weight:600; color:var(--text); }
+  .fc2 { width:28%; padding:10px 14px; font-size:13px; color:var(--muted); border-left:1px solid var(--border); }
+  .fc3 { width:22%; padding:10px 14px; font-size:13px; color:var(--muted); border-left:1px solid var(--border); }
+  .fc4 { flex:1; padding:10px 14px; font-size:13px; color:var(--muted); border-left:1px solid var(--border); }
+  .fo-row.hdr .fc1,.fo-row.hdr .fc2,.fo-row.hdr .fc3,.fo-row.hdr .fc4 {
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--dim);
+  }
+
+  /* WORM COMPARISON */
+  .compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0; }
+  @media(max-width:600px){ .compare-grid { grid-template-columns:1fr; } }
+
+  /* SUMMARY BOX */
+  .summary-box { background:linear-gradient(135deg,rgba(240,136,62,0.07),rgba(88,166,255,0.05)); border:1px solid rgba(240,136,62,0.20); border-radius:12px; padding:22px 26px; margin:28px 0; }
+  .summary-box h4 { color:var(--orange); text-transform:none; letter-spacing:0; font-size:15px; margin:0 0 12px; }
+  .summary-box ul.list li { font-size:13px; }
+
+  /* Q&A */
+  .qa-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:12px; }
+  .qa-q { padding:15px 20px; background:var(--surface); border-bottom:1px solid var(--border); font-weight:600; color:var(--text); font-size:14px; display:flex; gap:10px; align-items:flex-start; }
+  .qa-q::before { content:'Q'; color:var(--purple); font-weight:700; flex-shrink:0; }
+  .qa-a { padding:13px 20px 13px 42px; color:var(--muted); font-size:14px; }
+  .qa-a::before { content:'A: '; color:var(--green); font-weight:700; }
+
+  /* ABOUT */
+  .about-wrap { background:var(--surface); border-top:1px solid var(--border); padding:56px 40px; }
+  .about-inner { max-width:900px; margin:0 auto; }
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:28px; }
+  @media(max-width:640px){ .about-grid { grid-template-columns:1fr; } }
+  .about-card { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:24px 26px; }
+  .about-name { font-family:var(--font-head); font-size:20px; color:var(--text); margin-bottom:6px; }
+  .about-role { font-size:13px; color:var(--orange); font-weight:600; margin-bottom:14px; }
+  .badge-grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .tech-badge { font-size:11px; font-weight:700; letter-spacing:0.06em; padding:4px 12px; border-radius:20px; }
+  .tb-cv { background:rgba(240,136,62,0.14); border:1px solid rgba(240,136,62,0.30); color:var(--orange); }
+  .tb-vb { background:rgba(88,166,255,0.12); border:1px solid rgba(88,166,255,0.28); color:var(--blue); }
+  .tb-nb { background:rgba(63,185,80,0.12);  border:1px solid rgba(63,185,80,0.28);  color:var(--green); }
+  .tb-na { background:rgba(188,140,255,0.12);border:1px solid rgba(188,140,255,0.28);color:var(--purple); }
+  .email-card { background:var(--surface3); border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin-top:14px; display:flex; align-items:center; gap:12px; }
+  .email-icon { font-size:20px; }
+  .email-link { color:var(--blue); font-size:14px; text-decoration:none; font-weight:500; }
+  .email-link:hover { text-decoration:underline; }
+
+  /* FOOTER */
+  footer { background:var(--surface); border-top:1px solid var(--border); padding:28px 40px; text-align:center; }
+  footer p { color:var(--dim); font-size:13px; margin:4px 0; }
+
+  /* PROCESS PILL */
+  .process-pill {
+    display:inline-block; font-size:11px; font-weight:700; letter-spacing:0.05em;
+    padding:3px 12px; border-radius:20px; margin:2px 3px;
+  }
+  .pp-active { background:rgba(63,185,80,0.13); color:var(--green); border:1px solid rgba(63,185,80,0.28); }
+  .pp-stop   { background:rgba(255,123,114,0.12); color:var(--red); border:1px solid rgba(255,123,114,0.28); }
+  .pp-sync   { background:rgba(88,166,255,0.12); color:var(--blue); border:1px solid rgba(88,166,255,0.28); }
+  .pp-warn   { background:rgba(227,179,65,0.12); color:var(--yellow); border:1px solid rgba(227,179,65,0.28); }
+
+  /* TIME BADGE */
+  .time-badge { display:inline-block; font-size:12px; font-weight:700; background:rgba(240,136,62,0.12); color:var(--orange); border:1px solid rgba(240,136,62,0.30); padding:3px 12px; border-radius:20px; margin-left:8px; }
+
+  /* WORM VISUAL */
+  .worm-layer { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin-bottom:8px; display:flex; align-items:center; gap:14px; }
+  .worm-icon { font-size:24px; flex-shrink:0; }
+  .worm-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:3px; }
+  .worm-desc  { font-size:13px; color:var(--muted); }
+
+  .img-placeholder {
+    background: var(--surface2);
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 32px 20px;
+    text-align: center;
+    margin: 20px 0;
+    color: var(--dim);
+    font-size: 13px;
+  }
+  .img-placeholder .icon { font-size: 32px; margin-bottom: 8px; }
+  .img-placeholder .caption { font-size: 12px; color: var(--dim); margin-top: 8px; font-style: italic; }
+
+  /* ── NEW: BLOCK DIAGRAMS & PROCESS FLOWS ── */
+
+  /* Diagram wrapper */
+  .diagram {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px 24px; margin: 28px 0;
+  }
+  .diagram-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.10em; color: var(--dim); text-align: center;
+    margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .diagram-title::before, .diagram-title::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+
+  /* Vertical process flow */
+  .vflow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .vflow-step {
+    background: var(--surface3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 20px; width: 100%; max-width: 620px; display: flex; align-items: flex-start; gap: 14px;
+  }
+  .vflow-step.vs-or { border-left: 3px solid var(--orange); }
+  .vflow-step.vs-bl { border-left: 3px solid var(--blue); }
+  .vflow-step.vs-gr { border-left: 3px solid var(--green); }
+  .vflow-step.vs-pu { border-left: 3px solid var(--purple); }
+  .vflow-step.vs-ye { border-left: 3px solid var(--yellow); }
+  .vflow-step.vs-re { border-left: 3px solid var(--red); }
+  .vflow-num {
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    font-family: var(--font-code);
+  }
+  .vn-or { background: rgba(240,136,62,0.18); color: var(--orange); border: 1px solid rgba(240,136,62,0.4); }
+  .vn-bl { background: rgba(88,166,255,0.15); color: var(--blue);   border: 1px solid rgba(88,166,255,0.4); }
+  .vn-gr { background: rgba(63,185,80,0.15);  color: var(--green);  border: 1px solid rgba(63,185,80,0.4); }
+  .vn-pu { background: rgba(188,140,255,0.15);color: var(--purple); border: 1px solid rgba(188,140,255,0.4); }
+  .vn-ye { background: rgba(227,179,65,0.15); color: var(--yellow); border: 1px solid rgba(227,179,65,0.4); }
+  .vn-re { background: rgba(255,123,114,0.15);color: var(--red);    border: 1px solid rgba(255,123,114,0.4); }
+  .vflow-body { flex: 1; }
+  .vflow-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .vflow-desc  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .vflow-arrow { color: var(--dim); font-size: 18px; line-height: 1; padding: 4px 0; }
+  .vflow-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 9px;
+    border-radius: 20px; margin-left: 8px; vertical-align: middle; }
+  .vb-or { background: rgba(240,136,62,0.15); color: var(--orange); }
+  .vb-gr { background: rgba(63,185,80,0.13);  color: var(--green); }
+  .vb-re { background: rgba(255,123,114,0.13);color: var(--red); }
+  .vb-ye { background: rgba(227,179,65,0.13); color: var(--yellow); }
+  .vb-bl { background: rgba(88,166,255,0.13); color: var(--blue); }
+
+  /* Decision / branch flow */
+  .dflow { display: flex; flex-direction: column; align-items: center; }
+  .dflow-node {
+    background: var(--surface3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 20px; text-align: center; font-size: 13px; font-weight: 600;
+    color: var(--text); max-width: 340px; width: 100%;
+  }
+  .dflow-diamond {
+    background: rgba(188,140,255,0.10); border: 2px solid var(--purple);
+    border-radius: 8px; padding: 12px 20px; text-align: center;
+    font-size: 13px; font-weight: 600; color: var(--purple); max-width: 340px; width: 100%;
+    transform: none; margin: 0 auto;
+  }
+  .dflow-arrow { color: var(--dim); font-size: 16px; padding: 4px 0; text-align: center; }
+  .dflow-branches { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 640px; margin: 6px 0; }
+  .dflow-branch-yes .dflow-node { border-color: var(--green); border-left: 3px solid var(--green); }
+  .dflow-branch-no  .dflow-node { border-color: var(--red);   border-left: 3px solid var(--red); }
+  .dflow-branch-label { font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; text-align: center; margin-bottom: 6px; }
+  .bl-yes { color: var(--green); }
+  .bl-no  { color: var(--red); }
+  .bl-alt { color: var(--yellow); }
+  .dflow-outcome {
+    border-radius: 8px; padding: 10px 18px; text-align: center;
+    font-size: 12px; font-weight: 600; max-width: 280px; width: 100%; margin: 0 auto;
+  }
+  .do-green { background: rgba(63,185,80,0.12); border: 1px solid rgba(63,185,80,0.35); color: var(--green); }
+  .do-red   { background: rgba(255,123,114,0.12); border: 1px solid rgba(255,123,114,0.35); color: var(--red); }
+  .do-blue  { background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.35); color: var(--blue); }
+  .do-yellow{ background: rgba(227,179,65,0.12); border: 1px solid rgba(227,179,65,0.35); color: var(--yellow); }
+
+  /* Block / layer diagram */
+  .blk-stack { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+  .blk-row   { display: flex; gap: 8px; }
+  .blk-node  {
+    background: var(--surface3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; flex: 1; text-align: center;
+  }
+  .blk-node .bn-icon  { font-size: 22px; margin-bottom: 6px; }
+  .blk-node .bn-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .blk-node .bn-sub   { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .blk-node.bn-or  { border-top: 2px solid var(--orange); }
+  .blk-node.bn-bl  { border-top: 2px solid var(--blue); }
+  .blk-node.bn-gr  { border-top: 2px solid var(--green); }
+  .blk-node.bn-pu  { border-top: 2px solid var(--purple); }
+  .blk-node.bn-ye  { border-top: 2px solid var(--yellow); }
+  .blk-node.bn-re  { border-top: 2px solid var(--red); }
+  .blk-divider {
+    display: flex; align-items: center; gap: 10px; color: var(--dim);
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+  }
+  .blk-divider::before, .blk-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .blk-arrow-row { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 4px 0; }
+  .blk-arrow-row span { color: var(--dim); font-size: 16px; }
+
+  /* Timeline / lifecycle */
+  .lifecycle { display: flex; align-items: stretch; overflow-x: auto; gap: 0; margin: 20px 0; padding-bottom: 8px; }
+  .lc-phase {
+    background: var(--surface3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 14px; min-width: 130px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 6px; text-align: center;
+  }
+  .lc-phase.lc-or  { border-top: 3px solid var(--orange); }
+  .lc-phase.lc-re  { border-top: 3px solid var(--red); }
+  .lc-phase.lc-ye  { border-top: 3px solid var(--yellow); }
+  .lc-phase.lc-bl  { border-top: 3px solid var(--blue); }
+  .lc-phase.lc-gr  { border-top: 3px solid var(--green); }
+  .lc-phase.lc-pu  { border-top: 3px solid var(--purple); }
+  .lc-icon   { font-size: 20px; }
+  .lc-name   { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+  .lc-phase.lc-or .lc-name  { color: var(--orange); }
+  .lc-phase.lc-re .lc-name  { color: var(--red); }
+  .lc-phase.lc-ye .lc-name  { color: var(--yellow); }
+  .lc-phase.lc-bl .lc-name  { color: var(--blue); }
+  .lc-phase.lc-gr .lc-name  { color: var(--green); }
+  .lc-phase.lc-pu .lc-name  { color: var(--purple); }
+  .lc-detail { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .lc-time   { font-size: 10px; font-weight: 700; color: var(--dim); margin-top: 4px; }
+  .lc-arrow  { color: var(--dim); font-size: 18px; display: flex; align-items: center; padding: 0 4px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="badge">🛡️ Commvault Software Administration</div>
+    <h1>Tutorial 6: <span>CommServe LiveSync,</span> HA/DR Architecture, WORM Storage Lock &amp; Ransomware Protection</h1>
+    <p class="hero-sub">A complete implementation guide covering CommServe high availability design, SQL log shipping replication, all failover types, Linux CommServe deployment, WORM storage immutability, and media agent ransomware hardening.</p>
+    <div class="hero-meta">
+      <div class="meta-item"><div class="dot"></div> Version 11.32 → 11.36 LTS</div>
+      <div class="meta-item">⏱ Advanced Implementation Level</div>
+      <div class="meta-item">🔒 Security &amp; HA Focus</div>
+      <div class="meta-item">🐧 Linux &amp; Windows</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ STICKY NAV ═══════════════ -->
+<nav class="toc">
+  <ul>
+    <li><a href="#overview">01 · Overview</a></li>
+    <li><a href="#livesync-arch">02 · LiveSync Architecture</a></li>
+    <li><a href="#installation">03 · Installation Guide</a></li>
+    <li><a href="#failover-types">04 · Failover Types</a></li>
+    <li><a href="#linux-commserve">05 · Linux CommServe</a></li>
+    <li><a href="#worm">06 · WORM Storage Lock</a></li>
+    <li><a href="#ransomware">07 · Ransomware Protection</a></li>
+    <li><a href="#troubleshooting">08 · Troubleshooting</a></li>
+    <li><a href="#summary">09 · Key Takeaways</a></li>
+    <li><a href="#interview">10 · Interview Q&amp;A</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main">
+
+  <!-- ─── SECTION 1: PROJECT OVERVIEW ─── -->
+  <div class="section" id="overview">
+    <div class="section-header">
+      <div class="sec-icon ic-or">🏗️</div>
+      <div>
+        <div class="sec-num">Section 01</div>
+        <h2>Implementation Project Lifecycle</h2>
+        <p>From RFP to Production: Understanding how enterprise Commvault deployments are designed and delivered</p>
+      </div>
+    </div>
+
+    <p>Enterprise data protection projects follow a structured lifecycle before a single Commvault agent is deployed. Understanding this lifecycle is essential for anyone operating at an L3 implementation or architecture level — it defines why specific design choices are made and how they translate into the operational configuration you manage daily.</p>
+
+    <h3>The Four-Phase Delivery Model</h3>
+
+    <div class="flow">
+      <div class="flow-step"><div class="fn">Phase 1</div><div class="ft">RFP &amp; Vendor Selection</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Phase 2</div><div class="ft">High-Level Design (HLD)</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Phase 3</div><div class="ft">Low-Level Design (LLD)</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Phase 4</div><div class="ft">Implementation &amp; BAU Handover</div></div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>📋 High-Level Design (HLD)</h4>
+        <ul class="list">
+          <li><strong>Prepared by:</strong> Solution architects at the selected vendor</li>
+          <li>Covers GUI requirements, application protection scope, and storage type selection</li>
+          <li>Defines technology decisions: VMware vs Hyper-V, cloud vs on-prem, Kubernetes</li>
+          <li>Presented to all infra teams (storage, backup, compute, network)</li>
+          <li>Backup-specific: frequency, retention policy, RPO/RTO requirements from RFP</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🔧 Low-Level Design (LLD)</h4>
+        <ul class="list">
+          <li><strong>Prepared by:</strong> Subject Matter Experts (SMEs) from HLD baseline</li>
+          <li>Tool selection via POC: Commvault vs Veeam vs Veritas — based on features, pricing, security</li>
+          <li>Detailed CommServe HA design with production + standby + optional DR node</li>
+          <li>Specifies Media Agent redundancy, VSA proxies, storage mount paths</li>
+          <li>Security features: WORM storage, ransomware protection, encryption settings</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Example Enterprise HA Architecture Decision</h3>
+    <p>A typical enterprise Commvault HA design documented in the LLD includes all three node configurations. The architect proposes and the customer approves the configuration most suited to their RTO/cost balance:</p>
+
+    <div class="arch-diagram">
+      <div class="arch-title">Commvault CommServe HA/DR — Three Possible Configurations</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;">Config A · HA Only</div>
+          <div class="arch-node active" style="margin-bottom:8px;"><div class="an-label">Production</div><div class="an-name">CommServe-PROD</div><div class="an-ip">192.168.10.200</div><div><span class="sync-badge sb-active">Active</span></div></div>
+          <div class="arch-arrow-down">⬇ SQL Log Ship</div>
+          <div class="arch-node passive"><div class="an-label">Standby</div><div class="an-name">CommServe-STB</div><div class="an-ip">192.168.10.201</div><div><span class="sync-badge sb-passive">Passive · Same DC</span></div></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;">Config B · DR Only</div>
+          <div class="arch-node active" style="margin-bottom:8px;"><div class="an-label">Production · DC1</div><div class="an-name">CommServe-PROD</div><div class="an-ip">10.10.1.200</div><div><span class="sync-badge sb-active">Active</span></div></div>
+          <div class="arch-arrow-down">⬇ SQL Log Ship (WAN)</div>
+          <div class="arch-node dr-node"><div class="an-label">DR · DC2</div><div class="an-name">CommServe-DR</div><div class="an-ip">10.20.1.210</div><div><span class="sync-badge sb-dr">Passive · Remote DC</span></div></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;">Config C · HA + DR (3-Node)</div>
+          <div class="arch-node active" style="margin-bottom:8px;"><div class="an-label">Production · DC1</div><div class="an-name">CommServe-PROD</div><div class="an-ip">10.10.1.200</div><div><span class="sync-badge sb-active">Active</span></div></div>
+          <div class="arch-arrow-down">⬇ Log Ship</div>
+          <div class="arch-node passive" style="margin-bottom:8px;"><div class="an-label">Standby · DC1</div><div class="an-name">CommServe-STB</div><div class="an-ip">10.10.1.201</div><div><span class="sync-badge sb-passive">Passive</span></div></div>
+          <div class="arch-arrow-down">⬇ Log Ship</div>
+          <div class="arch-node dr-node"><div class="an-label">DR · DC2</div><div class="an-name">CommServe-DR</div><div class="an-ip">10.20.1.210</div><div><span class="sync-badge sb-dr">Passive · Remote</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="arch-label">Active-Passive only — Commvault does NOT support Active-Active CommServe configurations</div>
+
+    <div class="callout c-warn">
+      <div class="callout-head">⚠️ Active-Active Not Supported</div>
+      <p>Commvault CommServe supports only <strong>Active-Passive</strong> configurations. Attempting to run services on both production and DR nodes simultaneously will cause database inconsistency. Services on the DR node must remain stopped until a deliberate failover is performed.</p>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 2: LIVESYNC ARCHITECTURE ─── -->
+  <div class="section" id="livesync-arch">
+    <div class="section-header">
+      <div class="sec-icon ic-bl">🔄</div>
+      <div>
+        <div class="sec-num">Section 02</div>
+        <h2>CommServe LiveSync Architecture</h2>
+        <p>SQL Server log shipping replication — the technology powering CommServe HA/DR</p>
+      </div>
+    </div>
+
+    <p>CommServe LiveSync is Commvault's native HA/DR solution for the CommServe component. Unlike block-level replication (EMC SRDF, Veritas VVR) or array-level replication, LiveSync operates at the <strong>application layer</strong> — specifically leveraging Microsoft SQL Server's built-in replication technology.</p>
+
+    <h3>Replication Technology Deep Dive</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4>🔵 Block-Level Replication (Storage)</h4>
+        <ul class="list">
+          <li><strong>EMC SRDF:</strong> Synchronous block-level replication at SAN level</li>
+          <li><strong>Veritas VVR:</strong> Volume-level replication between storage arrays</li>
+          <li>Replicates entire disk blocks — no application awareness</li>
+          <li>Hardware-dependent, managed by storage team</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🟠 Application-Level Replication (LiveSync)</h4>
+        <ul class="list">
+          <li><strong>SQL Server Log Shipping:</strong> Replicates committed transaction logs</li>
+          <li>Application-aware — replicates only CommServe database changes</li>
+          <li>Software-managed by Commvault, independent of storage hardware</li>
+          <li><strong>Frequency:</strong> Every 15 minutes (default, configurable)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>How LiveSync Replication Works</h3>
+
+    <div class="arch-diagram">
+      <div class="arch-title">LiveSync Data Flow — SQL Log Shipping</div>
+      <div class="arch-row">
+        <div class="arch-node active">
+          <div class="an-label">Production CommServe</div>
+          <div class="an-name">Instance 001</div>
+          <div class="an-ip">192.168.10.200 (Active)</div>
+        </div>
+        <div style="text-align:center;padding:0 12px;">
+          <div style="color:var(--blue);font-size:13px;font-weight:600;">SQL Log Shipping</div>
+          <div style="color:var(--dim);font-size:11px;">Every 15 min · Committed transactions only</div>
+          <div style="font-size:22px;color:var(--orange);">→→→→</div>
+        </div>
+        <div class="arch-node dr-node">
+          <div class="an-label">DR / Standby CommServe</div>
+          <div class="an-name">Instance 001</div>
+          <div class="an-ip">192.168.10.210 (Passive)</div>
+        </div>
+      </div>
+      <div class="arch-hsep"></div>
+      <div class="arch-row">
+        <div class="arch-node ma-node">
+          <div class="an-label">Media Agent</div>
+          <div class="an-name">WinMA-01</div>
+          <div class="an-ip">192.168.10.201</div>
+        </div>
+        <div style="padding:0 12px;color:var(--dim);font-size:13px;">Backup &amp; Restore data flow (unaffected by LiveSync)</div>
+        <div class="arch-node storage">
+          <div class="an-label">Disk Library</div>
+          <div class="an-name">Storage Pool 01</div>
+          <div class="an-ip">Mount Path: E:\CVMountPath</div>
+        </div>
+      </div>
+      <div class="arch-label">LiveSync only replicates CommServe database — backup data on storage remains independent</div>
+    </div>
+
+    <h3>Databases Replicated by LiveSync</h3>
+    <p>The CommServe hosts multiple SQL Server databases. LiveSync replicates all of them from the active node to the passive node:</p>
+    <div class="card-grid-3">
+      <div class="card" style="border-top:2px solid var(--orange);">
+        <h4 style="color:var(--orange);text-transform:none;letter-spacing:0;font-size:14px;">CommServe DB</h4>
+        <p style="font-size:13px;">Primary database — all job metadata, client registrations, schedule policies, storage configurations. Most critical.</p>
+      </div>
+      <div class="card" style="border-top:2px solid var(--blue);">
+        <h4 style="color:var(--blue);text-transform:none;letter-spacing:0;font-size:14px;">AppStudio DB</h4>
+        <p style="font-size:13px;">Workflow engine and application configuration database.</p>
+      </div>
+      <div class="card" style="border-top:2px solid var(--green);">
+        <h4 style="color:var(--green);text-transform:none;letter-spacing:0;font-size:14px;">Supporting DBs</h4>
+        <p style="font-size:13px;">Cache ADB, CV Cloud, DM2, History, Resource Usage, Workflow Engine.</p>
+      </div>
+    </div>
+
+    <div class="callout c-key">
+      <div class="callout-head">🔑 Critical LiveSync Insight</div>
+      <p>LiveSync uses <strong>SQL Server Log Shipping</strong> as its underlying replication mechanism across the 11.x product line. This replicates only <strong>committed transactions</strong>, making it <strong>asynchronous</strong> — not a synchronous real-time mirror. The default replication interval is <strong>15 minutes</strong>. This means a maximum of 15 minutes of potential data loss (job metadata) exists in an unplanned failure scenario.</p>
+    </div>
+
+    <h3>LiveSync Replication Cycle — Process Flow</h3>
+    <p>The 15-minute replication cycle is a continuous automated loop managed by Instance 002 on both nodes. Understanding each phase clarifies what data is at risk in an unplanned failure.</p>
+
+    <div class="diagram">
+      <div class="diagram-title">🔄 SQL Log Shipping — 15-Minute Replication Cycle</div>
+      <div class="vflow">
+
+        <div class="vflow-step vs-or">
+          <div class="vflow-num vn-or">1</div>
+          <div class="vflow-body">
+            <div class="vflow-label">CommServe Engine Writes Transactions <span class="vflow-badge vb-or">Production · Instance 001</span></div>
+            <div class="vflow-desc">All backup job activity — job status updates, schedule changes, client registrations — are committed as SQL transactions to the CommServe database on the active node.</div>
+          </div>
+        </div>
+        <div class="vflow-arrow">▼</div>
+
+        <div class="vflow-step vs-bl">
+          <div class="vflow-num vn-bl">2</div>
+          <div class="vflow-body">
+            <div class="vflow-label">SQL Transaction Log Generated <span class="vflow-badge vb-bl">SQL Server · Active Node</span></div>
+            <div class="vflow-desc">SQL Server continuously writes committed transactions to the transaction log file (.ldf). This log captures every database change since the last shipping cycle.</div>
+          </div>
+        </div>
+        <div class="vflow-arrow">▼</div>
+
+        <div class="vflow-step vs-ye">
+          <div class="vflow-num vn-ye">3</div>
+          <div class="vflow-body">
+            <div class="vflow-label">Log Backup Job Triggers <span class="vflow-badge vb-ye">Every 15 Minutes</span></div>
+            <div class="vflow-desc">Instance 002 (Failover Assistant) on the production node triggers a SQL log backup job on the configured schedule. The log is exported to a shared staging path accessible by both nodes.</div>
+          </div>
+        </div>
+        <div class="vflow-arrow">▼</div>
+
+        <div class="vflow-step vs-pu">
+          <div class="vflow-num vn-pu">4</div>
+          <div class="vflow-body">
+            <div class="vflow-label">Log File Shipped to DR Node <span class="vflow-badge vb-bl">Network Transfer</span></div>
+            <div class="vflow-desc">The exported transaction log file is transferred across the network (LAN or WAN) to the DR/Standby CommServe node. Bandwidth and latency here directly affect replication success.</div>
+          </div>
+        </div>
+        <div class="vflow-arrow">▼</div>
+
+        <div class="vflow-step vs-gr">
+          <div class="vflow-num vn-gr">5</div>
+          <div class="vflow-body">
+            <div class="vflow-label">Log Applied to DR Databases <span class="vflow-badge vb-gr">DR Node · Instance 002</span></div>
+            <div class="vflow-desc">Instance 002 on the DR node restores (applies) the received log file to the CommServe databases in standby/recovery mode. Databases on the DR node are now synchronised to the point-in-time of the last log backup.</div>
+          </div>
+        </div>
+        <div class="vflow-arrow">▼</div>
+
+        <div class="vflow-step vs-re">
+          <div class="vflow-num vn-re">⚠</div>
+          <div class="vflow-body">
+            <div class="vflow-label">RPO Gap — Potential Data Loss Window <span class="vflow-badge vb-re">Risk Zone</span></div>
+            <div class="vflow-desc">Any transactions committed on the active node <em>after</em> the last successful log ship but <em>before</em> the next cycle are not yet on the DR node. In an unplanned failure at the worst moment in the cycle, up to 15 minutes of job metadata may be lost.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <h3>Instance 001 vs Instance 002 — Understanding the Dual Process Manager</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4>⚙️ Instance 001 — CommServe Process Manager</h4>
+        <ul class="list">
+          <li>Primary CommServe services: CommServe Engine, Messaging Queue, Workflow, Web Console</li>
+          <li><strong>Services RUNNING on production, STOPPED on DR</strong> (normal state)</li>
+          <li>This is where all backup and restore operations are orchestrated</li>
+          <li>Installed at: <code>Content Store\</code> (default path)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🔄 Instance 002 — Failover Assistant</h4>
+        <ul class="list">
+          <li>SQL client instance used exclusively for log shipping and failover control</li>
+          <li><strong>Services ALWAYS RUNNING on BOTH nodes</strong> (production and DR)</li>
+          <li>Installed when the <code>CommServe Failover</code> package is selected</li>
+          <li>Installed at: <code>Content Store 2\</code> (separate path)</li>
+          <li>Contains the Failover Assistant UI for initiating all failover operations</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout c-tip">
+      <div class="callout-head">💡 Naming Conventions Used in Production</div>
+      <p>Different organisations use different naming conventions for the same components. All of these refer to the same entities:</p>
+      <ul class="list">
+        <li><strong>Primary CommServe</strong> = Production CommServe = Active Node</li>
+        <li><strong>Standby CommServe</strong> = Passive Node = DR CommServe = Failover Node</li>
+        <li><strong>Instance 002</strong> = Failover Assistant = SQL Client = CommServe_SQL (common renaming)</li>
+      </ul>
+    </div>
+
+    <h3>Automatic vs Manual Failover</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4 style="color:var(--yellow);text-transform:none;letter-spacing:0;font-size:14px;">🤖 Automatic Failover (Rarely Used)</h4>
+        <ul class="list">
+          <li>Requires <strong>3 Media Agents designated as Monitoring Nodes</strong></li>
+          <li>Monitoring nodes continuously poll the production CommServe</li>
+          <li>If all 3 nodes lose connectivity, DR node auto-starts services</li>
+          <li>Risk: Potential <strong>data loss</strong> up to the last replication window (15 min)</li>
+          <li>Split-brain risk during transient network outages (panic reboot scenario)</li>
+          <li><strong>Used by less than 5% of customers</strong> due to data loss risk</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--green);text-transform:none;letter-spacing:0;font-size:14px;">👤 Manual Failover (Industry Standard)</h4>
+        <ul class="list">
+          <li>Backup administrator makes the decision and initiates failover manually</li>
+          <li>Administrator detects failure via monitoring alerts (email/SNMP)</li>
+          <li>Full control over timing — no risk of premature failover</li>
+          <li>Can run a final replication before failover to minimise data loss</li>
+          <li>The High Availability Cluster (HAC) package must be installed on all instances</li>
+          <li><strong>Preferred by 95%+ of enterprise customers</strong></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── SECTION 3: INSTALLATION GUIDE ─── -->
+  <div class="section" id="installation">
+    <div class="section-header">
+      <div class="sec-icon ic-gr">🖥️</div>
+      <div>
+        <div class="sec-num">Section 03</div>
+        <h2>CommServe LiveSync — Lab Build Guide</h2>
+        <p>Step-by-step installation of production and DR CommServe nodes with the 11.32→11.36 upgrade path</p>
+      </div>
+    </div>
+
+    <div class="callout c-int">
+      <div class="callout-head">🎓 Why Install 11.32 First, Then Upgrade to 11.36?</div>
+      <p>Commvault 11.36 restricts new installations to <strong>Command Center only</strong> — the legacy Java-based CommCell Console is not available on a fresh 11.36 install. However, when <strong>upgrading from 11.32 to 11.36</strong>, both the CommCell Console and Command Center remain accessible. This matters because several advanced features (cycle-based retention changes, storage policy management) are only available in the CommCell Console in certain versions. The strategy: install 11.32 first, then upgrade to 11.36.</p>
+    </div>
+
+    <h3>Pre-Installation Checklist — Windows VM Setup</h3>
+    <ol class="steps">
+      <li><strong>Create Virtual Machine</strong><p>Minimum: 4 vCPU cores, 16 GB RAM, 50 GB OS disk. Select Windows Server 2022 (supported for 11.32 and 11.36). Use <strong>bridged networking</strong> for internet access from the VM.</p></li>
+      <li><strong>Configure Static IP Address</strong><p>Navigate to: Network &amp; Sharing Center → NIC Properties → TCP/IPv4 → Use the following IP address. Assign a static IP to prevent DHCP changes after reboot. Production CommServe: <code>192.168.10.200</code> | DR CommServe: <code>192.168.10.210</code></p></li>
+      <li><strong>Set Hostname (Optional but Recommended)</strong><p>Go to Server Manager → Local Server → Computer Name. Assign a meaningful name (e.g., <code>COMMSERVE-PROD</code>) before installation.</p></li>
+      <li><strong>Disable Windows Firewall (Lab Only)</strong><p>Server Manager → Local Server → Windows Defender Firewall → Domain / Private / Public → Off. In production: open TCP ports <strong>8400 and 8403</strong> in the enterprise firewall instead.</p></li>
+      <li><strong>Disable IE Enhanced Security</strong><p>Server Manager → Local Server → IE Enhanced Security → Off for Administrators. Enables normal browser access to Command Center.</p></li>
+      <li><strong>Enable Remote Desktop</strong><p>Server Manager → Local Server → Remote Desktop → Allow remote connections.</p></li>
+      <li><strong>Create a Dedicated Installation Drive</strong><p>Disk Management → right-click unallocated space → New Simple Volume. Create an E: drive (50 GB) for Commvault software. <strong>Best practice:</strong> never install on the C: (OS) drive.</p></li>
+      <li><strong>Download Commvault Software</strong><p>Access <code>store.commvault.com</code> → Media Kit → 11.32 LTS → Full Media Kit (Windows x64, ~10 GB). Extract to the E: drive on the CommServe VM.</p></li>
+    </ol>
+
+    <div class="callout c-warn">
+      <div class="callout-head">⚠️ DR Backup Path — Always Use Network Share</div>
+      <p>During CommServe installation, you are prompted for a <strong>Disaster Recovery Backup Path</strong>. Commvault strictly recommends a <strong>network UNC path</strong> (e.g., <code>\\fileserver\CommvaultDR\</code>), not a local drive. If the CommServe crashes and cannot boot, a local-path DR backup is inaccessible. A network share remains accessible from any live machine for recovery. This can be changed post-installation via: Control Panel → DR Backup Destination.</p>
+    </div>
+
+    <h3>Installing the CommServe Package (11.32)</h3>
+    <ol class="steps">
+      <li><strong>Run Setup.exe from the extracted media kit</strong><p>Select: <em>Install on this computer</em> → <em>Create a New CommServe</em> → <em>Server Component</em> (not All-in-One, unless single-node environment).</p></li>
+      <li><strong>Installation Path</strong><p>Change from default C: to <strong>E:\Program Files\Commvault\</strong> for dedicated drive separation.</p></li>
+      <li><strong>Database Path</strong><p>Specify the CommServe database path (E: drive) and the Disaster Recovery backup path (network share preferred).</p></li>
+      <li><strong>Admin Credentials</strong><p>Default username: <code>admin</code> (cannot be changed). Set a strong password and register a valid email address — required for password recovery and license management.</p></li>
+      <li><strong>Wait for Completion</strong><p>Installation includes SQL Server engine, all Commvault packages, and database creation. <strong>Typical duration: 60–90 minutes.</strong></p></li>
+      <li><strong>Verify Installation</strong><p>Start → Commvault → Process Manager → verify all services are green. Access Command Center at <code>https://[CommServe-IP]/commandcenter</code>.</p></li>
+    </ol>
+
+    <h3>Upgrading to 11.36</h3>
+    <p>Once 11.32 is confirmed operational, upgrade to 11.36 using the full media kit for 11.36:</p>
+    <ol class="steps">
+      <li><strong>Pre-upgrade: Stop Active Jobs</strong><p>In production: Suspend all active backup jobs, disable schedulers, run a CommServe DR backup. In lab: not mandatory.</p></li>
+      <li><strong>Run 11.36 Setup.exe</strong><p>The installer detects the existing 11.32 installation automatically and presents the <em>Upgrade Feature Release</em> option. Select it.</p></li>
+      <li><strong>Skip Full Database Maintenance</strong><p>Unless directed by Commvault support, do not select this option — it extends the upgrade window by several additional hours without operational benefit in most cases.</p></li>
+      <li><strong>Wait for Completion</strong><p><strong>Typical duration: 60–90 minutes.</strong> Post-upgrade version will show as <code>11.36.xx</code> in the Process Manager.</p></li>
+    </ol>
+
+    <h3>Configuring the Software Cache</h3>
+    <p>Before deploying agents to any client, a <strong>software cache</strong> must be configured on the CommServe. Without it, every package push triggers an internet download job.</p>
+    <div class="flow">
+      <div class="flow-step"><div class="fn">Step 1</div><div class="ft">Extract 11.36 Full Media Kit on CommServe (e.g., S:\)</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 2</div><div class="ft">Tools → Add/Remove Software → Copy Software → select extraction path</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 3</div><div class="ft">Copy Software Job runs — transfers packages to cache directory</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Step 4</div><div class="ft">Verify: Cache Configuration shows Windows x32 and x64 rows</div></div>
+    </div>
+
+    <div class="callout c-tip">
+      <div class="callout-head">💡 Commit Cache vs Copy Software</div>
+      <p>Two methods exist for populating the software cache:<br><strong>Copy Software (job-based):</strong> Stage packages in a temporary location → run Copy Software job → Commvault moves them to the cache directory.<br><strong>Commit Cache (manual copy):</strong> Manually copy extracted packages directly into the cache directory → run Commit Cache to update the database. Useful when staging space is limited or when changing the cache directory location.</p>
+    </div>
+
+    <h3>Installing the Failover Package on Production CommServe</h3>
+    <ol class="steps">
+      <li><strong>Run Setup.exe from the media kit on the production CommServe</strong><p>Select: <em>Install on this computer</em> → <em>Advanced Selection</em> → locate and check <strong>CommServe Failover</strong> package.</p></li>
+      <li><strong>Display Name</strong><p>Assign a unique display name (e.g., <code>CommServe_SQL</code>) — do NOT use the same name as the CommServe itself. The IP/hostname will remain the same (same server).</p></li>
+      <li><strong>Verify Instance 002 Created</strong><p>Start → Commvault → you now see two Process Managers: <em>Commvault Process Manager</em> (Instance 001) and <em>Commvault Process Manager - Failover Assistant</em> (Instance 002).</p></li>
+    </ol>
+
+    <div class="callout c-warn">
+      <div class="callout-head">⚠️ High Availability Cluster (HAC) Package — Mandatory for Automatic Failover</div>
+      <p>If the <em>Server Component</em> installation option was chosen instead of <em>All-in-One</em>, the <strong>High Availability Cluster (HAC) package</strong> is not installed automatically. This package is required for automatic failover to function. To add it post-installation: CommCell Console → select CommServe client → All Tasks → Add/Remove Software → Install Software → find <em>High Availability Computing</em> in the Tools section. Install on all four instances: Production Instance 001, Production Instance 002, DR Instance 001, DR Instance 002.</p>
+    </div>
+
+    <h3>Building the DR CommServe Node</h3>
+    <ol class="steps">
+      <li><strong>Create DR Virtual Machine</strong><p>Same OS version and resource profile as production (Windows Server 2022, 4+ vCPU, 16 GB RAM). Assign hostname <code>COMMSERVE-DR</code> and static IP: <code>192.168.10.210</code>.</p></li>
+      <li><strong>Apply Same Prerequisites</strong><p>Disable firewall (lab), enable RDP, assign static IP, create dedicated drive.</p></li>
+      <li><strong>Run Setup.exe → Select Failover Package Only</strong><p>Navigate to: <em>Install on this computer</em> → <em>Join Existing CommServe</em> (or <em>Advanced Selection</em>) → select <strong>CommServe Failover</strong>. The wizard automatically installs <strong>both Instance 002 and Instance 001</strong> — including SQL Server engine — to create a mirror of the production CommServe.</p></li>
+      <li><strong>Provide CommServe Credentials</strong><p>When prompted, enter the credentials for the production CommServe console (admin password), not the local server credentials.</p></li>
+      <li><strong>Verify DR Instances</strong><p>On the DR node, Instance 001 services will be <strong>stopped</strong> by default — this is expected and correct. Instance 002 services run continuously to manage replication.</p></li>
+    </ol>
+
+    <h3>Enabling LiveSync Replication</h3>
+    <ol class="steps">
+      <li><strong>Create a Non-Deduplicated Storage Pool</strong><p>Required as a prerequisite: Command Center → Storage → Add Disk Storage → disable deduplication toggle. This pool is used specifically for LiveSync job data.</p></li>
+      <li><strong>Create a LiveSync Plan</strong><p>Command Center → Manage → Plans → Server Backup Plan. Add a copy pointing to the non-deduplicated disk storage. Define full and incremental schedules.</p></li>
+      <li><strong>Enable CommServe LiveSync</strong><p>Command Center → Manage → System → CommServe LiveSync → Enable Replication. Configure: Automatic Failover (leave disabled), Replication Frequency (default: 15 minutes), Plan (select the LiveSync plan created above).</p></li>
+      <li><strong>Verify Sync Status</strong><p>Failover Assistant → Instance 002 → observe Last Sync Time changing from <em>Not Available</em> to a current timestamp. Status should show green for both nodes.</p></li>
+    </ol>
+  </div>
+
+  <!-- ─── SECTION 4: FAILOVER TYPES ─── -->
+  <div class="section" id="failover-types">
+    <div class="section-header">
+      <div class="sec-icon ic-pu">⚡</div>
+      <div>
+        <div class="sec-num">Section 04</div>
+        <h2>Failover &amp; Failback Types</h2>
+        <p>Covers all five failover scenarios — when to use each, operational impact, and expected duration</p>
+      </div>
+    </div>
+
+    <p>Commvault CommServe LiveSync supports five distinct failover/failback operations. Understanding the use case, downtime impact, and backup continuity for each is essential for operational decision-making and interview preparation.</p>
+
+    <div class="fo-grid">
+      <div class="fo-row hdr">
+        <div class="fc1">Failover Type</div>
+        <div class="fc2">Primary Use Case</div>
+        <div class="fc3">Production Impact</div>
+        <div class="fc4">Backup Operations on DR</div>
+      </div>
+      <div class="fo-row">
+        <div class="fc1"><strong>Test Failover</strong></div>
+        <div class="fc2">Verify DR node readiness. Post-initial setup validation, post-patching verification.</div>
+        <div class="fc3"><span class="process-pill pp-active">No Impact</span> Production services remain running throughout</div>
+        <div class="fc4">DR Instance 001 services START (test only) — no production jobs affected. Immediately fail back after test.</div>
+      </div>
+      <div class="fo-row">
+        <div class="fc1"><strong>Planned Maintenance Failover</strong></div>
+        <div class="fc2">OS/security patching on production CommServe. Short maintenance windows (2–3 hrs).</div>
+        <div class="fc3"><span class="process-pill pp-stop">Services Stopped</span> on production CommServe</div>
+        <div class="fc4"><strong>Restores ONLY</strong> — Console shows Read Only. Scheduled backups DO NOT run. Activity Control all unchecked.</div>
+      </div>
+      <div class="fo-row">
+        <div class="fc1"><strong>Production Failover (Planned)</strong></div>
+        <div class="fc2">Full DR drill activity (6-monthly). Extended maintenance requiring full CommServe capabilities on DR.</div>
+        <div class="fc3"><span class="process-pill pp-stop">Services Stopped</span> on production CommServe</div>
+        <div class="fc4"><strong>Full operation</strong> — backups AND restores run from DR node. Activity Control enabled. Clients routed to DR CommServe.</div>
+      </div>
+      <div class="fo-row">
+        <div class="fc1"><strong>Unplanned Failover</strong></div>
+        <div class="fc2">Data centre outage, hardware failure, OS crash. Emergency response only.</div>
+        <div class="fc3"><span class="process-pill pp-warn">Uncontrolled</span> Production CommServe unavailable</div>
+        <div class="fc4">Full operation on DR node. <strong>Potential metadata loss</strong> up to last replication cycle (up to 15 min).</div>
+      </div>
+      <div class="fo-row">
+        <div class="fc1"><strong>Failback</strong></div>
+        <div class="fc2">Return all operations to production CommServe after any failover type.</div>
+        <div class="fc3"><span class="process-pill pp-sync">Services Restored</span> on production CommServe</div>
+        <div class="fc4">Replication from DR→Production runs automatically before failback completes. Ensure sync before initiating.</div>
+      </div>
+    </div>
+
+    <div class="callout c-warn">
+      <div class="callout-head">⚠️ Plan for 30–60 Minutes per Operation</div>
+      <p>Every failover and failback operation — regardless of available hardware resources — takes approximately <strong>30 minutes</strong> to complete. The process involves multiple pre-checks, replication verification, service shutdown sequencing, SQL database recovery on the target node, and service startup verification. Always allocate a <strong>minimum 3–4 hour change window</strong> for any planned failover activity that includes testing and validation before handback to production.</p>
+    </div>
+
+    <h3>Test Failover — Step-by-Step Process</h3>
+    <div class="flow">
+      <div class="flow-step"><div class="fn">Pre-check</div><div class="ft">Ensure LiveSync sync is up-to-date (green status)</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Trigger</div><div class="ft">Instance 002 Failover Assistant → Failover to DR → Type: Test Failover</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">DR Starts</div><div class="ft">DR Instance 001 services start. Production unaffected.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Verify</div><div class="ft">Confirm DR services green. Run test backup job.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">Fail Back</div><div class="ft">Immediately initiate Test Failback — do not leave in test state</div></div>
+    </div>
+
+    <h3>Unplanned Failover — Decision Flow</h3>
+    <p>When an unexpected outage occurs, the backup administrator must work through a structured decision process before initiating failover to avoid unnecessary operations or split-brain risk.</p>
+
+    <div class="diagram">
+      <div class="diagram-title">🚨 Unplanned Outage — Admin Decision Tree</div>
+      <div class="dflow">
+
+        <div class="dflow-node" style="border-top:3px solid var(--red);">🔴 Production CommServe Unreachable — Monitoring Alert Triggered</div>
+        <div class="dflow-arrow">▼</div>
+
+        <div class="dflow-diamond">Is the outage confirmed? (Ping, RDP, SNMP)</div>
+        <div class="dflow-arrow">▼</div>
+
+        <div class="dflow-branches">
+          <div class="dflow-branch-yes">
+            <div class="dflow-branch-label bl-no">✗ No — Transient Issue</div>
+            <div class="dflow-node">Wait 5–10 min. Monitor recovery. Check if services auto-restart. Do NOT initiate failover — split-brain risk.</div>
+          </div>
+          <div class="dflow-branch-no">
+            <div class="dflow-branch-label bl-yes">✓ Yes — Confirmed Down</div>
+            <div class="dflow-node">Assess severity: hardware failure / OS crash / DC outage. Determine if recovery is possible without failover.</div>
+          </div>
+        </div>
+        <div class="dflow-arrow" style="text-align:right;padding-right:calc(25% - 14px);">▼</div>
+
+        <div class="dflow-diamond">Can production CommServe recover within RTO?</div>
+        <div class="dflow-arrow">▼</div>
+
+        <div class="dflow-branches">
+          <div class="dflow-branch-yes">
+            <div class="dflow-branch-label bl-yes">✓ Yes — Recoverable</div>
+            <div class="dflow-node">Attempt service restart / OS repair. Monitor recovery. Escalate to infrastructure team. Defer failover decision.</div>
+          </div>
+          <div class="dflow-branch-no">
+            <div class="dflow-branch-label bl-no">✗ No — Initiate Failover</div>
+            <div class="dflow-node">Open Instance 002 on DR node → Failover to DR → Unplanned Failover. Notify stakeholders of potential metadata gap (≤15 min).</div>
+          </div>
+        </div>
+        <div class="dflow-arrow" style="text-align:right;padding-right:calc(25% - 14px);">▼</div>
+
+        <div class="dflow-outcome do-blue">DR CommServe Instance 001 starts. Full backup &amp; restore operations resume on DR node. Plan failback once production is restored.</div>
+
+      </div>
+    </div>
+
+    <h3>Complete Failover &amp; Failback Lifecycle</h3>
+    <p>Every planned failover follows a predictable lifecycle. Understanding each phase and its duration helps in planning change windows accurately.</p>
+
+    <div class="diagram">
+      <div class="diagram-title">⏱ Planned Failover → DR Operations → Failback — Full Lifecycle</div>
+      <div class="lifecycle">
+        <div class="lc-phase lc-or">
+          <div class="lc-icon">✅</div>
+          <div class="lc-name">Pre-Check</div>
+          <div class="lc-detail">Verify sync status green. Confirm DR node services (Instance 002) running. Notify stakeholders.</div>
+          <div class="lc-time">~10 min</div>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-phase lc-re">
+          <div class="lc-icon">⏹</div>
+          <div class="lc-name">Stop Production</div>
+          <div class="lc-detail">Instance 001 services stopped on production CommServe. All active backup jobs fail or pause.</div>
+          <div class="lc-time">~5 min</div>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-phase lc-bl">
+          <div class="lc-icon">🔄</div>
+          <div class="lc-name">Final Sync</div>
+          <div class="lc-detail">Last replication cycle forced before cutover. Minimises metadata loss to near-zero.</div>
+          <div class="lc-time">~5 min</div>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-phase lc-pu">
+          <div class="lc-icon">▶</div>
+          <div class="lc-name">DR Starts</div>
+          <div class="lc-detail">DR Instance 001 services start. SQL databases recovered from standby mode. Clients re-routed.</div>
+          <div class="lc-time">~10 min</div>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-phase lc-gr">
+          <div class="lc-icon">🔧</div>
+          <div class="lc-name">DR Operations</div>
+          <div class="lc-detail">Backups and restores run from DR CommServe. Maintenance or DR drill activity performed.</div>
+          <div class="lc-time">Variable</div>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-phase lc-ye">
+          <div class="lc-icon">↩</div>
+          <div class="lc-name">Reverse Sync</div>
+          <div class="lc-detail">DR→Production replication runs. All job metadata created during DR ops replicated back.</div>
+          <div class="lc-time">~5–10 min</div>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-phase lc-gr">
+          <div class="lc-icon">🏠</div>
+          <div class="lc-name">Failback</div>
+          <div class="lc-detail">Production Instance 001 restarts. DR Instance 001 stopped. Clients re-route to production.</div>
+          <div class="lc-time">~30 min</div>
+        </div>
+      </div>
+      <div class="arch-label" style="margin-top:12px;">Total change window recommendation: minimum 3–4 hours including testing and validation</div>
+    </div>
+
+    <h3>Production Failover vs Maintenance Failover — Key Difference</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4 style="color:var(--yellow);text-transform:none;letter-spacing:0;font-size:14px;">🔧 Maintenance Failover</h4>
+        <ul class="list">
+          <li>DR console operates in <strong>Read Only</strong> mode</li>
+          <li>Only <strong>restore requests</strong> can be processed</li>
+          <li>Activity Control panel shows all options <strong>disabled/unchecked</strong></li>
+          <li>Use case: CommServe OS patching where backups can wait but restores must remain available</li>
+          <li>Appropriate for short 2–3 hour change windows</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--green);text-transform:none;letter-spacing:0;font-size:14px;">🔄 Production Planned Failover</h4>
+        <ul class="list">
+          <li>DR console operates as a <strong>fully functional CommServe</strong></li>
+          <li>Both backups AND restores run normally</li>
+          <li>Activity Control panel shows all options <strong>enabled</strong></li>
+          <li>Clients are fully routed through the DR CommServe</li>
+          <li>Use case: Formal DR drill, extended maintenance, datacenter migration</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Failback — Critical Consideration</h3>
+    <div class="callout c-red">
+      <div class="callout-head">🚨 Reverse Replication Before Failback</div>
+      <p>If backup jobs ran on the DR CommServe during a production planned failover (e.g., a DR drill lasting 24+ hours), <strong>those job metadata entries exist only on the DR CommServe database</strong> — they have not yet replicated back to the production CommServe. Before initiating failback, ensure the reverse replication (DR → Production) completes successfully. Initiating failback without completed reverse replication will result in those backup jobs being absent from the production CommServe job history.</p>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 5: LINUX COMMSERVE ─── -->
+  <div class="section" id="linux-commserve">
+    <div class="section-header">
+      <div class="sec-icon ic-re">🐧</div>
+      <div>
+        <div class="sec-num">Section 05</div>
+        <h2>Linux CommServe Deployment</h2>
+        <p>Rocky Linux 9.5 — supported flavors, LVM setup, and installation with cvpkgadd</p>
+      </div>
+    </div>
+
+    <p>Commvault 11.36 introduced official support for <strong>Rocky Linux</strong> as an alternative to Red Hat Enterprise Linux for CommServe deployments. This is particularly relevant in environments standardised on Rocky Linux for cost reasons (Rocky Linux is a free RHEL clone) or in containerised/cloud-native environments.</p>
+
+    <div class="callout c-warn">
+      <div class="callout-head">⚠️ Linux Flavor Compatibility — 11.36 Only</div>
+      <p>CommServe 11.32 does NOT support Rocky Linux — only Red Hat Enterprise Linux. Rocky Linux support was introduced in <strong>version 11.36</strong>. This means the 11.32→11.36 upgrade path cannot be used for a Linux CommServe on Rocky Linux. Install 11.36 directly. Always verify OS compatibility at <code>documentation.commvault.com</code> under System Requirements for the target version.</p>
+    </div>
+
+    <h3>Supported Linux Flavors for CommServe (11.36)</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4 style="color:var(--red);text-transform:none;letter-spacing:0;font-size:14px;">Red Hat Enterprise Linux (RHEL)</h4>
+        <ul class="list">
+          <li>Supported since early Commvault versions</li>
+          <li>RHEL 8.x and RHEL 9.x supported for 11.36</li>
+          <li>Commercial license required — standard in large enterprises</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--blue);text-transform:none;letter-spacing:0;font-size:14px;">Rocky Linux</h4>
+        <ul class="list">
+          <li>Free, open-source RHEL binary-compatible clone</li>
+          <li><strong>Rocky Linux 9.5 supported from CommServe 11.36+</strong></li>
+          <li>Ideal for lab environments and cost-conscious deployments</li>
+          <li>Download the DVD ISO from <code>rockylinux.org</code> (free, ~11 GB)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>LVM Partition Strategy — Best Practice</h3>
+    <p>The recommendation for Linux CommServe is to install Commvault on <code>/opt</code>, separated from the root partition. This requires creating an LVM logical volume on a dedicated disk:</p>
+
+    <pre><code># Step 1: Create Physical Volume on new disk
+pvcreate /dev/sdb
+
+# Step 2: Create Volume Group
+vgcreate vg_commvault /dev/sdb
+
+# Step 3: Create Logical Volume (adjust size as needed)
+lvcreate -L 50G -n lv_opt vg_commvault
+
+# Step 4: Format with XFS (recommended for Commvault on Linux)
+mkfs.xfs /dev/vg_commvault/lv_opt
+
+# Step 5: Mount permanently — add to /etc/fstab
+echo '/dev/vg_commvault/lv_opt  /opt  xfs  defaults  0 0' >> /etc/fstab
+mount -a</code></pre>
+
+    <div class="callout c-tip">
+      <div class="callout-head">💡 Linux Essentials for Backup Engineers</div>
+      <p>At L3 level, you will regularly interact with Linux systems. The following commands are non-negotiable knowledge:</p>
+      <ul class="list">
+        <li><code>su -</code> → Switch to root user</li>
+        <li><code>hostnamectl set-hostname [name]</code> → Change server hostname</li>
+        <li><code>nmtui</code> → Text UI for configuring static IP address</li>
+        <li><code>systemctl restart NetworkManager</code> → Apply network changes</li>
+        <li><code>ip addr show</code> or <code>ifconfig -a</code> → View current IP configuration</li>
+        <li><code>chmod +x [filename]</code> → Add execute permission to installer</li>
+      </ul>
+    </div>
+
+    <h3>Installing Commvault on Linux — cvpkgadd</h3>
+    <p>The Linux installation command is <code>cvpkgadd</code> — the Linux equivalent of running <code>Setup.exe</code> on Windows. The full media kit is downloaded as a <code>.tar</code> archive and extracted before installation.</p>
+
+    <div class="diagram">
+      <div class="diagram-title">🐧 Linux CommServe Installation — End-to-End Flow</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="vflow">
+          <div class="vflow-step vs-bl">
+            <div class="vflow-num vn-bl">1</div>
+            <div class="vflow-body">
+              <div class="vflow-label">Prerequisite Setup</div>
+              <div class="vflow-desc">Static IP via <code>nmtui</code> → hostname via <code>hostnamectl</code> → LVM disk creation → <code>/opt</code> mount point configured in <code>/etc/fstab</code></div>
+            </div>
+          </div>
+          <div class="vflow-arrow">▼</div>
+          <div class="vflow-step vs-or">
+            <div class="vflow-num vn-or">2</div>
+            <div class="vflow-body">
+              <div class="vflow-label">Transfer Media Kit via WinSCP</div>
+              <div class="vflow-desc">Copy <code>.tar</code> file (~10 GB) from Windows workstation to Linux server using SSH/SFTP. Place in staging directory <code>/usr/commvault-media/</code></div>
+            </div>
+          </div>
+          <div class="vflow-arrow">▼</div>
+          <div class="vflow-step vs-ye">
+            <div class="vflow-num vn-ye">3</div>
+            <div class="vflow-body">
+              <div class="vflow-label">Extract &amp; Set Permissions</div>
+              <div class="vflow-desc"><code>tar -xvf commvault_11.36_linux_x64.tar</code><br><code>chmod +x cvpkgadd</code></div>
+            </div>
+          </div>
+        </div>
+        <div class="vflow">
+          <div class="vflow-step vs-pu">
+            <div class="vflow-num vn-pu">4</div>
+            <div class="vflow-body">
+              <div class="vflow-label">Run Installer</div>
+              <div class="vflow-desc"><code>./cvpkgadd</code> → select role (All-In-One or Server Component) → set install path to <code>/opt</code></div>
+            </div>
+          </div>
+          <div class="vflow-arrow">▼</div>
+          <div class="vflow-step vs-bl">
+            <div class="vflow-num vn-bl">5</div>
+            <div class="vflow-body">
+              <div class="vflow-label">Monitor in Second Terminal</div>
+              <div class="vflow-desc"><code>tail -f /var/log/commvault/Log_Files/Install.log</code><br>Watch for errors in real-time. Typical duration: 60–90 min.</div>
+            </div>
+          </div>
+          <div class="vflow-arrow">▼</div>
+          <div class="vflow-step vs-gr">
+            <div class="vflow-num vn-gr">6</div>
+            <div class="vflow-body">
+              <div class="vflow-label">Verify &amp; Access</div>
+              <div class="vflow-desc">Confirm <code>exit status: 0</code> in log → run <code>commvault list</code> to verify services → open Command Center at <code>https://[IP]/commandcenter</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ol class="steps">
+      <li><strong>Copy the Linux Full Media Kit to the CommServe VM</strong><p>Use <strong>WinSCP</strong> to transfer files from a Windows workstation to the Linux CommServe over SSH. Place in <code>/usr/commvault-media/</code> or similar staging directory.</p></li>
+      <li><strong>Extract the tar archive</strong><p><code>tar -xvf commvault_11.36_linux_x64.tar</code></p></li>
+      <li><strong>Add execute permission to the installer</strong><p><code>chmod +x cvpkgadd</code></p></li>
+      <li><strong>Run the installer</strong><p><code>./cvpkgadd</code></p></li>
+      <li><strong>Select installation role</strong><p>Choose <em>All-In-One</em> (CommServe + Media Agent) or <em>Server Component</em> only. Specify <code>/opt</code> as the installation directory.</p></li>
+      <li><strong>Monitor installation logs</strong><p>Open a second terminal window. Monitor progress in real time:</p>
+        <code class="cmd">tail -f /var/log/commvault/Log_Files/UpdateInfo.log</code>
+        <code class="cmd">tail -f /var/log/commvault/Log_Files/Install.log</code>
+      </li>
+    </ol>
+
+    <h3>Verifying Linux CommServe Services</h3>
+    <p>Unlike Windows (which uses Process Manager GUI), Linux CommServe management is command-line based:</p>
+
+    <pre><code># Check all CommServe service status
+commvault list
+
+# View CommServe configuration information (hostname, version, services)
+commvault status
+
+# Start/stop specific services
+commvault start
+commvault stop</code></pre>
+
+    <div class="callout c-key">
+      <div class="callout-head">🔑 Exit Status = 0 Means Success</div>
+      <p>When the Linux installation completes, verify the final exit status in the log: <code>exit status: 0</code> = successful installation. Any non-zero exit status indicates an error. Post successful installation, all log files for the CommServe services are created under <code>/var/log/commvault/Log_Files/</code>.</p>
+    </div>
+
+    <h3>Accessing Command Center from a Linux CommServe</h3>
+    <p>Access the web-based Command Center from any browser using the CommServe IP:</p>
+    <code class="cmd">https://192.168.10.230/commandcenter</code>
+    <p style="font-size:13px;margin-top:6px;">Accept the self-signed certificate warning (click Advanced → Proceed to IP). Use Chrome or Chromium-based Edge for best compatibility — Internet Explorer is no longer supported and should not be used.</p>
+  </div>
+
+  <!-- ─── SECTION 6: WORM STORAGE ─── -->
+  <div class="section" id="worm">
+    <div class="section-header">
+      <div class="sec-icon ic-ye">🔒</div>
+      <div>
+        <div class="sec-num">Section 06</div>
+        <h2>WORM Storage Lock</h2>
+        <p>Write Once Read Many — immutable backup storage for compliance and ransomware defence</p>
+      </div>
+    </div>
+
+    <p>WORM (Write Once Read Many) is a data storage principle where, once written, data cannot be modified or deleted until a defined retention period has expired. Commvault's WORM Storage Lock feature implements this principle at the storage pool level, providing a last line of defence against data tampering — whether by malicious insiders, ransomware attackers, or accidental actions by administrators.</p>
+
+    <div class="arch-diagram">
+      <div class="arch-title">WORM Storage Lock — Protection Layers</div>
+      <div class="worm-layer" style="border-left:3px solid var(--orange);">
+        <div class="worm-icon">🗄️</div>
+        <div>
+          <div class="worm-title">Storage Pool / Disk Library Mount Path</div>
+          <div class="worm-desc"><strong>Storage Lock</strong> prevents manual modification or deletion of backup objects (chunks/volumes) stored on the mount path. Even a storage admin cannot delete or rename these files while the lock is active. Only the Commvault process can remove data after retention-based aging completes.</div>
+        </div>
+      </div>
+      <div class="worm-layer" style="border-left:3px solid var(--blue);">
+        <div class="worm-icon">📋</div>
+        <div>
+          <div class="worm-title">CommServe Database — Backup Job Records</div>
+          <div class="worm-desc"><strong>Compliance Lock</strong> prevents deletion of backup job entries from the CommServe database (the job history). A backup admin with Master-level access cannot delete backup jobs or reduce retention below the configured minimum. Ensures job continuity records cannot be erased.</div>
+        </div>
+      </div>
+      <div class="worm-layer" style="border-left:3px solid var(--green);">
+        <div class="worm-icon">⏰</div>
+        <div>
+          <div class="worm-title">Retention Enforcement</div>
+          <div class="worm-desc">The WORM lock period is governed by the <strong>maximum retention of all storage policies</strong> associated with the storage pool. If one policy has 14-day retention and another has 30-day retention, ALL objects are locked for <strong>30 days</strong> (the maximum). Retention can be <strong>increased</strong> but <strong>NOT reduced</strong> once WORM is enabled.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Storage Lock vs Compliance Lock — The Critical Distinction</h3>
+    <div class="compare-grid">
+      <div class="tier-card tc-yellow">
+        <div class="tier-pill tp-yellow">Storage Lock</div>
+        <h4>Protects the Physical Data</h4>
+        <p>Locks the actual backup data files (chunks/volumes) on the disk library mount path against modification, renaming, or deletion.</p>
+        <ul>
+          <li>Prevents a rogue storage admin from deleting the mount path folder</li>
+          <li>Prevents a ransomware attacker (who gained access to the media agent) from encrypting/deleting backup data</li>
+          <li><strong>Cannot be disabled</strong> — only expired through retention aging</li>
+        </ul>
+      </div>
+      <div class="tier-card tc-blue">
+        <div class="tier-pill tp-blue">Compliance Lock</div>
+        <h4>Protects the Job Records</h4>
+        <p>Prevents deletion of backup job entries from the CommServe console (Command Center or CommCell Console).</p>
+        <ul>
+          <li>Prevents a backup admin from accidentally deleting the wrong client's jobs</li>
+          <li>Prevents retention reduction — cannot lower retention below set value</li>
+          <li><strong>Can be disabled</strong> using an auth code from Commvault support</li>
+          <li>Enabled <strong>automatically</strong> when Storage Lock is enabled</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout c-warn">
+      <div class="callout-head">⚠️ WORM is Irreversible — Plan Retention Carefully First</div>
+      <p>Once WORM Storage Lock is enabled on a storage pool, the Storage Lock <strong>cannot be disabled</strong>. The only way to remove it is to decommission the entire storage pool and recreate it. The Compliance Lock can be disabled with a multi-step process requiring an auth code from Commvault Support. Before enabling WORM, <strong>review and finalize the retention settings</strong> of all plans/storage policies associated with that pool. Remember: the maximum retention across all policies defines the WORM lock duration.</p>
+    </div>
+
+    <h3>What WORM Prevents and Permits</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4 style="color:var(--red);text-transform:none;letter-spacing:0;font-size:14px;">🚫 Actions BLOCKED by WORM</h4>
+        <ul class="list">
+          <li>Manually deleting backup objects/volumes from the mount path folder (Storage Lock)</li>
+          <li>Renaming backup data files on the mount path (Storage Lock)</li>
+          <li>Deleting backup jobs from CommCell Console or Command Center (Compliance Lock)</li>
+          <li>Reducing storage policy/plan retention below current value (Compliance Lock)</li>
+          <li>Deleting the mount path folder or disk library (Storage Lock)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--green);text-transform:none;letter-spacing:0;font-size:14px;">✅ Actions PERMITTED with WORM Enabled</h4>
+        <ul class="list">
+          <li>Commvault process deleting aged-out backup data (after retention expires)</li>
+          <li><strong>Increasing</strong> retention (only direction allowed)</li>
+          <li>Creating new files <em>outside</em> the mount path folder on the same disk</li>
+          <li>Running new backup jobs to the WORM-protected storage</li>
+          <li>Performing restores from WORM-protected data</li>
+          <li>Disabling Compliance Lock (with Commvault Support auth code)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Should You Enable WORM? — Pre-Enablement Decision Flow</h3>
+    <p>WORM Storage Lock is irreversible. Work through this checklist before enabling it on any storage pool.</p>
+
+    <div class="diagram">
+      <div class="diagram-title">🔒 WORM Storage Lock — Pre-Enablement Decision Checklist</div>
+      <div class="dflow">
+
+        <div class="dflow-node" style="border-top:3px solid var(--yellow);">📋 Request to enable WORM on a Storage Pool</div>
+        <div class="dflow-arrow">▼</div>
+
+        <div class="dflow-diamond">Have all associated storage plans/policies been reviewed for correct retention?</div>
+        <div class="dflow-arrow">▼</div>
+
+        <div class="dflow-branches">
+          <div class="dflow-branch-yes">
+            <div class="dflow-branch-label bl-no">✗ No</div>
+            <div class="dflow-node">STOP — Review and finalise all plan retentions first. The maximum retention value across all policies will define the WORM lock duration. Adjust now; you cannot reduce after.</div>
+          </div>
+          <div class="dflow-branch-no">
+            <div class="dflow-branch-label bl-yes">✓ Yes</div>
+            <div class="dflow-node">Good. Proceed to next check.</div>
+          </div>
+        </div>
+        <div class="dflow-arrow" style="text-align:right;padding-right:calc(25% - 14px);">▼</div>
+
+        <div class="dflow-diamond">Is the storage pool library type Disk or Cloud? (Not Tape)</div>
+        <div class="dflow-arrow">▼</div>
+
+        <div class="dflow-branches">
+          <div class="dflow-branch-yes">
+            <div class="dflow-branch-label bl-no">✗ Tape Library</div>
+            <div class="dflow-node">WORM Storage Lock does not apply to tape. Use physical write-protect mechanisms on the tape media instead.</div>
+          </div>
+          <div class="dflow-branch-no">
+            <div class="dflow-branch-label bl-yes">✓ Disk or Cloud</div>
+            <div class="dflow-node">Supported. Proceed to enablement.</div>
+          </div>
+        </div>
+        <div class="dflow-arrow" style="text-align:right;padding-right:calc(25% - 14px);">▼</div>
+
+        <div class="dflow-diamond">Is there a business/regulatory requirement driving this? (compliance, legal hold, ransomware defence)</div>
+        <div class="dflow-arrow">▼</div>
+
+        <div class="dflow-branches">
+          <div class="dflow-branch-yes">
+            <div class="dflow-branch-label bl-no">✗ No Clear Requirement</div>
+            <div class="dflow-node">Reconsider — once enabled, cannot be undone. Confirm requirement with security or compliance team before proceeding.</div>
+          </div>
+          <div class="dflow-branch-no">
+            <div class="dflow-branch-label bl-yes">✓ Yes — Requirement Confirmed</div>
+            <div class="dflow-node">Proceed. Navigate to Command Center → Storage → pool → Configuration → WORM → type CONFIRM → click OK.</div>
+          </div>
+        </div>
+        <div class="dflow-arrow" style="text-align:right;padding-right:calc(25% - 14px);">▼</div>
+
+        <div class="dflow-outcome do-green">✅ WORM Storage Lock + Compliance Lock enabled. Verify by attempting to delete a file in the mount path — OS returns "The disk is write-protected."</div>
+
+      </div>
+    </div>
+
+    <h3>Enabling WORM Storage Lock — Procedure</h3>
+    <p>Both Command Center and CommCell Console can be used. Changes in either console are reflected automatically in the other.</p>
+
+    <div class="callout c-int">
+      <div class="callout-head">📍 Command Center Navigation Path</div>
+      <p>Storage → [Select Disk Storage Pool] → Configuration tab → WORM section → Move the "WORM Storage Lock" toggle to the right → Read the warning carefully → Type "CONFIRM" → Click OK. The Compliance Lock toggle will also be enabled automatically.</p>
+    </div>
+
+    <ol class="steps">
+      <li><strong>Review retention of all associated plans</strong><p>Identify the maximum retention across all storage policies/plans pointing to this pool — this determines the WORM lock duration. Adjust if needed BEFORE enabling WORM.</p></li>
+      <li><strong>CommCell Console alternative path</strong><p>Storage Resources → Storage Pools → right-click storage pool → Properties → Storage Pool Copy → enable WORM.</p></li>
+      <li><strong>Confirm the action</strong><p>The system requires typing <code>CONFIRM</code> to acknowledge the irreversibility. Read the warning: retention cannot be lowered, data cannot be deleted manually, compliance lock will also be enabled.</p></li>
+      <li><strong>Verify protection is active</strong><p>Attempt to delete a file in the mount path folder from Windows Explorer — the system should return: <em>"The disk is write-protected."</em></p></li>
+    </ol>
+
+    <h3>Disabling Compliance Lock (When Required)</h3>
+    <p>The Compliance Lock (but NOT Storage Lock) can be disabled with Commvault Support intervention:</p>
+    <ul class="list">
+      <li><strong>Obtain auth code:</strong> Log into the Commvault Support Portal → request auth code with detailed justification for compliance lock removal</li>
+      <li>Run the provided script with the auth code against the CommServe</li>
+      <li>Once compliance lock is disabled, retention can be reduced and jobs can be manually deleted</li>
+      <li>Note: Storage Lock data will remain locked until the retention period expires on each individual object</li>
+    </ul>
+
+    <h3>WORM Storage Lock — Library Support Matrix</h3>
+    <div class="card-grid-3">
+      <div class="card">
+        <h4 style="color:var(--green);text-transform:none;letter-spacing:0;font-size:14px;">✅ Disk Libraries</h4>
+        <p style="font-size:13px;">Fully supported for both deduplication and non-deduplication disk libraries. Applies to local disk, NAS-attached, and SAN-attached mount paths.</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--blue);text-transform:none;letter-spacing:0;font-size:14px;">✅ Cloud Libraries</h4>
+        <p style="font-size:13px;">Supported for major cloud providers (AWS S3, Azure Blob, GCP). Refer to documentation for specific vendor support matrix at your version. Metallic Cloud: Compliance Lock supported; Storage Lock support varies.</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--red);text-transform:none;letter-spacing:0;font-size:14px;">❌ Tape Libraries</h4>
+        <p style="font-size:13px;">WORM Storage Lock is NOT applicable to tape libraries. Physical tape media has its own write-protection mechanisms outside of Commvault.</p>
+      </div>
+    </div>
+
+    <h3>WORM vs Ransomware Protection — Understanding the Difference</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4 style="color:var(--yellow);text-transform:none;letter-spacing:0;font-size:14px;">🔐 WORM Storage Lock</h4>
+        <ul class="list">
+          <li>Applied at <strong>storage pool level</strong></li>
+          <li>Makes data <strong>immutable</strong> for the retention period</li>
+          <li>Compliance/regulatory requirement ("immutable backups")</li>
+          <li>Protects disk and cloud libraries</li>
+          <li>Primary use: <strong>meeting legal and regulatory retention requirements</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--red);text-transform:none;letter-spacing:0;font-size:14px;">🛡️ Ransomware Protection</h4>
+        <ul class="list">
+          <li>Applied at <strong>media agent level</strong></li>
+          <li>Hardens the media agent OS with ACLs and role-based security</li>
+          <li>Detects and prevents suspicious activity on the media agent</li>
+          <li>Protects only <strong>disk library</strong> data (not cloud or tape)</li>
+          <li>Primary use: <strong>active cyber attack prevention and detection</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 7: RANSOMWARE PROTECTION ─── -->
+  <div class="section" id="ransomware">
+    <div class="section-header">
+      <div class="sec-icon ic-re">🛡️</div>
+      <div>
+        <div class="sec-num">Section 07</div>
+        <h2>Ransomware Protection for Media Agents</h2>
+        <p>OS hardening, ACL enforcement, and disk library data protection against cyber threats</p>
+      </div>
+    </div>
+
+    <p>Ransomware protection in Commvault is a media-agent-level security feature that hardens the media agent's operating system against unauthorised access to disk library data. Unlike WORM (which locks data after writing), ransomware protection is an <strong>active defence mechanism</strong> that prevents malicious processes from accessing or modifying the mount path in the first place.</p>
+
+    <h3>Why Disk Libraries Are Specifically Vulnerable</h3>
+    <p>The distinction between cloud, tape, and disk libraries is fundamental to understanding why ransomware protection targets disk libraries specifically:</p>
+
+    <div class="card-grid-3">
+      <div class="card">
+        <h4 style="color:var(--green);text-transform:none;letter-spacing:0;font-size:14px;">☁️ Cloud Library</h4>
+        <p style="font-size:13px;">Access requires API calls with authentication tokens (Azure Storage Explorer, AWS S3 Browser). Cannot be directly browsed or modified from the media agent file system — inherently protected by cloud access controls.</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--yellow);text-transform:none;letter-spacing:0;font-size:14px;">📼 Tape Library</h4>
+        <p style="font-size:13px;">Physical media — requires SCSI/fibre channel communication. Cannot be directly accessed via file system operations. Physical tape ejection provides inherent air-gap protection.</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--red);text-transform:none;letter-spacing:0;font-size:14px;">💾 Disk Library</h4>
+        <p style="font-size:13px;">Mount path is a folder on the media agent's local disk or NAS share. <strong>Directly accessible via Windows Explorer or Linux shell.</strong> If an attacker gains OS-level access to the media agent, they can directly read, modify, delete, or encrypt backup data files.</p>
+      </div>
+    </div>
+
+    <div class="callout c-key">
+      <div class="callout-head">🔑 Core Concept: Ransomware Protection Scope</div>
+      <p>Ransomware Protection is designed exclusively for <strong>disk library mount paths</strong>. It works by applying file system-level ACLs (Access Control Lists) and role-based security policies to the mount path folder. Only the Commvault Media Agent service account is granted write access. All other processes — including local administrator accounts — are restricted to read-only or no access. This prevents a compromised OS or malicious process from encrypting or deleting backup data even with administrator credentials.</p>
+    </div>
+
+    <h3>Defence-in-Depth — Ransomware Protection Architecture</h3>
+    <p>Ransomware protection works across multiple layers. Understanding which component protects what helps you design and explain the full architecture.</p>
+
+    <div class="diagram">
+      <div class="diagram-title">🛡️ Commvault Ransomware Defence — Block Architecture</div>
+
+      <div class="blk-stack">
+
+        <div class="blk-divider">Attacker Entry Points</div>
+        <div class="blk-row">
+          <div class="blk-node bn-re">
+            <div class="bn-icon">💻</div>
+            <div class="bn-title">Compromised Admin Account</div>
+            <div class="bn-sub">Domain admin credentials stolen via phishing or credential dump</div>
+          </div>
+          <div class="blk-node bn-re">
+            <div class="bn-icon">🦠</div>
+            <div class="bn-title">Malware / Ransomware Process</div>
+            <div class="bn-sub">Malicious process executing on media agent OS with local admin rights</div>
+          </div>
+          <div class="blk-node bn-re">
+            <div class="bn-icon">🔓</div>
+            <div class="bn-title">Insider Threat</div>
+            <div class="bn-sub">Rogue administrator with direct OS or console access</div>
+          </div>
+        </div>
+
+        <div class="blk-arrow-row">
+          <span>▼</span><span style="font-size:11px;color:var(--dim);">Attack Reaches Media Agent</span><span>▼</span>
+        </div>
+
+        <div class="blk-divider">Layer 1 — OS Hardening (Ransomware Protection)</div>
+        <div class="blk-row">
+          <div class="blk-node bn-or">
+            <div class="bn-icon">🔐</div>
+            <div class="bn-title">ACL Enforcement on Mount Path</div>
+            <div class="bn-sub">Only Commvault service account can write. Local admin blocked. Applies from v11.28 on Windows by default.</div>
+          </div>
+          <div class="blk-node bn-or">
+            <div class="bn-icon">👁</div>
+            <div class="bn-title">Anomaly Detection</div>
+            <div class="bn-sub">Suspicious activity patterns on media agent OS trigger alerts. Unusual process access attempts logged.</div>
+          </div>
+          <div class="blk-node bn-or">
+            <div class="bn-icon">🐧</div>
+            <div class="bn-title">Linux Manual Hardening</div>
+            <div class="bn-sub">Linux media agents require manual CLI enablement. Modifies file system permissions on mount path folder.</div>
+          </div>
+        </div>
+
+        <div class="blk-arrow-row">
+          <span>▼</span><span style="font-size:11px;color:var(--dim);">If ACL Bypassed or Data Already Written</span><span>▼</span>
+        </div>
+
+        <div class="blk-divider">Layer 2 — Data Immutability (WORM Storage Lock)</div>
+        <div class="blk-row">
+          <div class="blk-node bn-bl">
+            <div class="bn-icon">🗄️</div>
+            <div class="bn-title">Storage Lock</div>
+            <div class="bn-sub">Backup data objects on mount path are write-protected. Cannot be renamed, modified, or deleted until retention expires.</div>
+          </div>
+          <div class="blk-node bn-bl">
+            <div class="bn-icon">📋</div>
+            <div class="bn-title">Compliance Lock</div>
+            <div class="bn-sub">Backup job records in CommServe DB cannot be deleted or have retention reduced. Console-level protection.</div>
+          </div>
+          <div class="blk-node bn-bl">
+            <div class="bn-icon">⏰</div>
+            <div class="bn-title">Retention Enforcement</div>
+            <div class="bn-sub">Only Commvault's internal aging process can remove data — after the defined retention period has fully expired.</div>
+          </div>
+        </div>
+
+        <div class="blk-arrow-row">
+          <span>▼</span><span style="font-size:11px;color:var(--dim);">Result</span><span>▼</span>
+        </div>
+
+        <div class="blk-row">
+          <div class="blk-node bn-gr" style="text-align:center;">
+            <div class="bn-icon">✅</div>
+            <div class="bn-title">Backup Data Integrity Preserved</div>
+            <div class="bn-sub">Even with full OS-level compromise, backup data remains accessible and unencrypted for restore operations. Recovery capability is maintained.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <h3>Default Behaviour by Version and OS</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4 style="color:var(--blue);text-transform:none;letter-spacing:0;font-size:14px;">Windows Media Agent (11.28+)</h4>
+        <ul class="list">
+          <li>Ransomware protection is <strong>ENABLED BY DEFAULT</strong> from version 11.28 onwards</li>
+          <li>No manual action required for new Windows media agent installations</li>
+          <li>Status visible in Command Center: Manage → Infrastructure → Media Agents → Control toggle</li>
+          <li>Toggle shows current state (on/off) — can be manually toggled if needed</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--yellow);text-transform:none;letter-spacing:0;font-size:14px;">Linux Media Agent</h4>
+        <ul class="list">
+          <li>Toggle in Command Center shows <strong>disabled by default</strong></li>
+          <li>Must be <strong>enabled manually</strong> by running specific CLI commands on the Linux media agent</li>
+          <li>Requires careful execution — commands modify file system permissions</li>
+          <li>Only supported on certified Linux OS versions per the compatibility matrix</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Enabling Ransomware Protection — Windows Media Agent</h3>
+    <ol class="steps">
+      <li><strong>Navigate to Command Center</strong><p>Manage → Infrastructure → Media Agents → click on the target media agent.</p></li>
+      <li><strong>Locate the Control section</strong><p>Find the <em>Ransomware Protection</em> toggle in the Control panel.</p></li>
+      <li><strong>Enable the toggle</strong><p>Move the toggle to the <em>On</em> position. Commvault applies ACL changes to all configured disk library mount paths on this media agent.</p></li>
+      <li><strong>Verify protection</strong><p>Navigate to the mount path folder via Windows Explorer. Attempt to rename or delete a backup data file — the OS should deny the operation. Note: files <em>outside</em> the mount path folder (e.g., parent directory) remain accessible normally.</p></li>
+    </ol>
+
+    <h3>What Ransomware Protection Hardens</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4>🔐 Access Controls Applied</h4>
+        <ul class="list">
+          <li>File-level and folder-level ACLs on all mount path contents</li>
+          <li>Role-based security — only the Commvault service account can write</li>
+          <li>Prevents process injection into the Commvault service from modifying data</li>
+          <li>Detects suspicious activity patterns on the media agent OS</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>📊 Scope of Protection</h4>
+        <ul class="list">
+          <li><strong>Protects:</strong> Disk library mount paths only</li>
+          <li><strong>Does NOT protect:</strong> Cloud libraries, tape libraries, Metallic cloud</li>
+          <li><strong>Does NOT protect:</strong> Files outside the mount path folder on the same disk</li>
+          <li><strong>Retention:</strong> Normal retention rules still apply — can be reduced or changed</li>
+          <li>Unlike WORM — <strong>reversible</strong>, no compliance lock component</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout c-scen">
+      <div class="callout-head">🌍 Real-World Attack Scenario: Why Both Features Are Used Together</div>
+      <p>A sophisticated ransomware attacker compromises a backup administrator's domain account. With this account, they gain RDP access to the media agent server (Windows). They attempt to encrypt all backup data in the disk library mount path. <br><br><strong>With only Ransomware Protection:</strong> File system ACLs block the encryption process — backup data is protected.<br><strong>With only WORM:</strong> The attacker could overwrite individual files (WORM prevents deletion, not all overwrite scenarios on some filesystems).<br><strong>With both Ransomware Protection + WORM:</strong> Maximum defence — ACLs block file access, and WORM ensures any data that does exist cannot be legally deleted until retention expires. Together, they provide defence-in-depth for backup data.</p>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 8: TROUBLESHOOTING ─── -->
+  <div class="section" id="troubleshooting">
+    <div class="section-header">
+      <div class="sec-icon ic-or">🔍</div>
+      <div>
+        <div class="sec-num">Section 08</div>
+        <h2>Troubleshooting Framework</h2>
+        <p>Key tools, log locations, and the break-fix mindset for L3 operations</p>
+      </div>
+    </div>
+
+    <h3>Key Troubleshooting Tools by Category</h3>    <div class="card-grid">
+      <div class="card">
+        <h4>🌐 Network Troubleshooting</h4>
+        <ul class="list">
+          <li><strong>CV Ping:</strong> Commvault-native port connectivity test between components</li>
+          <li><strong>CV Network Test Tool:</strong> Bandwidth measurement between CommServe and Media Agent</li>
+          <li><strong>Wireshark (Windows) / tcpdump (Linux):</strong> Packet capture for deep network analysis</li>
+          <li><strong>ping / tracert (Windows) / traceroute (Linux):</strong> Basic connectivity and path analysis</li>
+          <li>Key ports to verify: TCP <strong>8400</strong> (CommServe) and <strong>8403</strong> (Media Agent)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>💾 Storage Troubleshooting</h4>
+        <ul class="list">
+          <li><strong>CVDiskPerf:</strong> Mount path throughput measurement — identifies slow disk I/O</li>
+          <li><strong>IOmeter:</strong> IOPS testing specifically for DDB (Deduplication Database) storage</li>
+          <li><strong>Cloud Test Tool:</strong> Upload/download speed measurement to cloud storage targets</li>
+          <li><strong>Tape Tool GUI:</strong> Tape library and drive issue diagnosis</li>
+          <li><strong>ARM Tool:</strong> Drive mount/unmount issues on tape libraries</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Linux Log Locations — Essential for CommServe and Media Agent</h3>
+    <pre><code># Default Commvault log directory on Linux
+/var/log/commvault/Log_Files/
+
+# Installation logs (verify during/after installation)
+/var/log/commvault/Log_Files/Install.log
+/var/log/commvault/Log_Files/UpdateInfo.log
+/var/log/commvault/Log_Files/UpdateInfo.dbg
+
+# Real-time log monitoring
+tail -f /var/log/commvault/Log_Files/Install.log
+
+# List log files by time (newest last)
+ls -ltrh /var/log/commvault/Log_Files/</code></pre>
+
+    <h3>The L3 Break-Fix Mindset</h3>
+    <div class="callout c-int">
+      <div class="callout-head">🎓 Structured Troubleshooting Approach</div>
+      <p>When a documented procedure is followed correctly but the expected result is not achieved, apply this structured approach before escalating:</p>
+      <ol class="steps">
+        <li><strong>Verify you followed documentation precisely</strong><p>Re-read the official documentation step by step. Rule out user error before suspecting a product bug.</p></li>
+        <li><strong>Check the version-specific maintenance release notes</strong><p>Navigate to documentation.commvault.com → your version (e.g., 11.36) → Maintenance Releases → List of Updates. Search for your specific symptom area (e.g., "LiveSync"). Known bugs with recent fixes are listed here.</p></li>
+        <li><strong>Apply the latest maintenance release if a relevant fix exists</strong><p>Download the Maintenance Release update installer → run it (single executable, automated). Retest the issue.</p></li>
+        <li><strong>Open a Commvault support case if unresolved</strong><p>Document: exact steps followed, error messages, logs collected, product version and maintenance release level. State clearly: "I have followed the documentation steps and the expected outcome is not achieved."</p></li>
+      </ol>
+    </div>
+
+    <h3>CommServe Repair Procedure</h3>
+    <p>If CommServe services fail to start after configuration changes (e.g., IP address modifications) and registry edits do not resolve the issue, a software repair is available without full reinstallation:</p>
+    <ol class="steps">
+      <li><strong>Locate the base package in the installation directory</strong><p>Navigate to: <code>E:\Program Files\Commvault\ContentStore\HWCache\</code> — the original setup files are cached here.</p></li>
+      <li><strong>Run Setup.exe</strong><p>The installer detects the existing installation and presents a <em>Repair</em> option.</p></li>
+      <li><strong>Select Repair existing instance</strong><p>Do not select maintenance release. The repair process rebuilds corrupted or missing registry entries and service configurations.</p></li>
+    </ol>
+  </div>
+
+  <!-- ─── SECTION 9: KEY TAKEAWAYS ─── -->
+  <div class="section" id="summary">
+    <div class="section-header">
+      <div class="sec-icon ic-ye">⭐</div>
+      <div>
+        <div class="sec-num">Section 09</div>
+        <h2>Key Takeaways</h2>
+        <p>Everything critical from Tutorial 6</p>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h4>Tutorial 6 — Core Concepts Summary</h4>
+      <ul class="list">
+        <li><strong>CommServe LiveSync</strong> uses SQL Server Log Shipping (application-level replication), not block-level replication. Replication interval: 15 minutes by default.</li>
+        <li><strong>Active-Passive only</strong> — Commvault does NOT support Active-Active CommServe configurations.</li>
+        <li><strong>Instance 001</strong> = CommServe process manager (stop on DR, run on production). <strong>Instance 002</strong> = Failover Assistant (always running on both nodes).</li>
+        <li><strong>Install 11.32 first, then upgrade to 11.36</strong> to retain access to both CommCell Console and Command Center.</li>
+        <li><strong>HAC package</strong> is required on all four instances for automatic failover. May be missing if "Server Component" was selected during installation.</li>
+        <li><strong>5 Failover Types:</strong> Test → Maintenance → Production Planned → Unplanned → Failback. Each has specific use cases and downtime profiles.</li>
+        <li><strong>Maintenance Failover</strong> = Restores only on DR. <strong>Production Planned Failover</strong> = Full backup+restore capability on DR.</li>
+        <li><strong>Rocky Linux 9.5</strong> is supported for CommServe from version 11.36 only (not 11.32).</li>
+        <li><strong>WORM Storage Lock</strong> = Immutable storage for compliance. Storage Lock: irreversible. Compliance Lock: reversible with auth code.</li>
+        <li><strong>Ransomware Protection</strong> = Media agent OS hardening via ACLs. Disk libraries only. Default ON for Windows (11.28+), manual for Linux.</li>
+        <li><strong>DR Backup Path</strong> must always be a network share — not a local drive. Local DR backup is inaccessible if CommServe cannot boot.</li>
+        <li><strong>Software Cache</strong> must be populated before any client agent deployments. Use Copy Software (job-based) or manual extraction + Commit Cache.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 10: INTERVIEW Q&A ─── -->
+  <div class="section" id="interview">
+    <div class="section-header">
+      <div class="sec-icon ic-pu">🎓</div>
+      <div>
+        <div class="sec-num">Section 10</div>
+        <h2>Scenario-Based Interview Questions</h2>
+        <p>Real-world implementation and design questions for L3 Commvault roles</p>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">What is CommServe LiveSync and what replication technology does it use?</div>
+      <div class="qa-a">CommServe LiveSync is Commvault's native HA/DR solution for the CommServe component. Unlike block-level storage replication (EMC SRDF, Veritas VVR), LiveSync operates at the application layer by leveraging <strong>Microsoft SQL Server Log Shipping</strong> to replicate all CommServe databases from the active node to the passive node. The default replication interval is 15 minutes, meaning replication is asynchronous — it is not a real-time continuous mirror. The purpose is to minimise CommServe downtime by allowing an immediate failover to a pre-configured passive node rather than rebuilding the CommServe from scratch using the DR backup files.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Why would you recommend manual failover over automatic failover for most enterprise customers?</div>
+      <div class="qa-a">Automatic failover introduces a significant risk of false triggering — for example, a virtual machine panic reboot recovers within 60 seconds, but if the monitoring nodes detect the outage first, the services fail over to the DR node. When the production CommServe recovers, there is now a potential split-brain situation, and up to 15 minutes of job metadata from the last replication cycle is missing on the DR node. Additionally, a full failover and failback cycle takes approximately 30 minutes each — 60 minutes total — during which all backup jobs fail regardless. For these reasons, 95%+ of enterprise customers use <strong>manual failover</strong>, relying on monitoring alerts (email/SNMP) to notify the backup admin of an unplanned outage, who then manually initiates failover with full knowledge of the situation.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">What is the difference between production maintenance failover and production planned failover?</div>
+      <div class="qa-a">Both stop services on the production CommServe, but differ in what is permitted on the DR node. <strong>Production Maintenance Failover</strong> places the DR CommCell Console in Read Only mode — only restore requests can be processed, and no scheduled backups run. The Activity Control panel shows all options disabled. This is used for CommServe OS patching where restores must remain available during the change window. <strong>Production Planned Failover</strong> is a complete failover where the DR CommServe assumes full production CommServe responsibilities — both backups and restores run normally, Activity Control is fully enabled, and all clients route their backup traffic to the DR CommServe. This is used for formal DR drills or extended maintenance requiring full backup continuity.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">A customer says their backups are "immutable". How do you verify this in Commvault and what technology underpins it?</div>
+      <div class="qa-a">Navigate to Command Center → Storage → select the disk or cloud storage pool → Configuration tab → look for the WORM section. If the WORM Storage Lock toggle is enabled, the storage is immutable. The underlying technology is Commvault's <strong>WORM Storage Lock feature</strong>, which applies two protection layers: (1) <strong>Storage Lock</strong> — applies write-protection at the file system level to the disk library mount path, preventing modification, deletion, or renaming of backup data objects until the retention period (defined by the maximum retention across all associated storage policies) expires; and (2) <strong>Compliance Lock</strong> — prevents backup job deletion from the CommServe console and prevents retention reduction. Together these ensure backup data cannot be tampered with by humans or malicious processes for the defined retention period.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Why is ransomware protection applied to media agents specifically, and why does it target disk libraries only?</div>
+      <div class="qa-a">Ransomware protection is applied at the media agent level because the media agent is the component with <strong>direct file system access to disk library mount paths</strong>. An attacker who gains OS-level access to a media agent can directly read, modify, or encrypt backup data files stored in the mount path folder — no special tools required. Cloud libraries require API authentication (Azure Storage Explorer, S3 Browser) and cannot be directly accessed from the media agent file system. Tape libraries use SCSI/fibre channel protocols with physical media, not file system access. Ransomware protection works by applying strict ACLs to the mount path — only the Commvault service account retains write permission. All other processes, including local administrator accounts, are restricted. From version 11.28, this protection is <strong>enabled by default on Windows media agents</strong>; Linux media agents require manual enablement via CLI commands.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">What are the two main pre-requisites before enabling WORM Storage Lock on a storage pool?</div>
+      <div class="qa-a">Two critical prerequisites must be addressed. First, <strong>review and finalise the retention settings</strong> of all storage plans/policies associated with the storage pool. Once WORM is enabled, retention cannot be reduced — only increased. The WORM lock duration is governed by the maximum retention across all policies pointing to the pool. Accidentally setting WORM on a pool with a 1-year retention policy means all data in that pool is locked for a minimum of 1 year. Second, understand that <strong>WORM Storage Lock cannot be disabled</strong> after enablement — the only path is decommissioning the entire storage pool. The Compliance Lock component can be disabled (with Commvault Support auth code), but the Storage Lock is permanent until each data object's individual retention period expires.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Why would you install Commvault 11.32 first instead of directly installing 11.36 in a new environment?</div>
+      <div class="qa-a">Commvault 11.36, when installed fresh on a new server, restricts users to <strong>Command Center only</strong> — the legacy CommCell Console (Java-based) is not accessible. However, when upgrading from 11.32 to 11.36, both consoles remain available because the upgrade path preserves the console access. The CommCell Console is important because several features — including advanced storage policy management, cycle-based retention configuration, and certain scheduling options — are either only available or significantly more accessible in the CommCell Console. For new customers comfortable exclusively with Command Center, direct 11.36 installation is acceptable. For environments requiring CommCell Console access (which is common in large enterprises with complex configurations), the 11.32 → 11.36 upgrade path is the recommended approach.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Explain the CommServe Disaster Recovery (DR) backup best practice and why a local path is insufficient.</div>
+      <div class="qa-a">The CommServe DR backup generates SQL database dump files of all CommServe databases (CommServe.dmp and supporting databases) at regular intervals to the configured DR Backup Destination path. Best practice is to use a <strong>network UNC share path</strong> (e.g., <code>\\fileserver\CommvaultDR\</code>) rather than a local drive path. The reason: if the CommServe server suffers a catastrophic failure (OS corruption, hardware failure, cannot boot), a local-path DR backup is inaccessible — you cannot mount the drive or access the files without recovering the server first. A network share path remains accessible from any other live server on the network. This means you can immediately begin the CommServe recovery process on a new machine using the DR files, significantly reducing RTO. Additionally, DR backup operates in two phases: Phase 1 writes dump files to the metadata destination (network share), and Phase 2 copies these files to the CommServe DR Storage Policy library, which can be disk, cloud, or tape.</div>
+    </div>
+
+    <div class="callout c-int">
+      <div class="callout-head">🎯 Model Interview Answer — LiveSync Architecture</div>
+      <p>Structure your answer: <em>"CommServe LiveSync is Commvault's HA/DR solution for the CommServe itself. It uses SQL Server Log Shipping — an application-level replication technology — to replicate all CommServe databases from the active node to the passive node every 15 minutes. This is an asynchronous replication, meaning there can be up to 15 minutes of potential metadata loss in an unplanned failure. The architecture requires a Failover Assistant (Instance 002) to be installed on both nodes — this is the SQL client instance that manages the replication process. Instance 001 is the main CommServe service process, which runs on production and remains stopped on the passive node until a failover is performed. Commvault supports three deployment models: production-only, production plus standby in the same DC (HA), and production plus standby in the same DC plus a DR node in a remote DC (full HA/DR). All configurations are Active-Passive — Active-Active is not supported."</em></p>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ═══════════════ ABOUT THE AUTHOR ═══════════════ -->
+<div class="about-wrap" id="about">
+  <div class="about-inner">
+    <div style="margin-bottom:8px;">
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--dim);">About the Author</span>
+    </div>
+    <h3 style="font-family:var(--font-head);font-size:22px;color:var(--text);margin:0 0 20px;">Mohammed Abdul</h3>
+
+    <div class="about-card" style="max-width:600px;">
+      <div class="about-name">Mohammed Abdul</div>
+      <div class="about-role">Data Protection Architect · 15+ Years Experience</div>
+      <p style="font-size:14px;margin-bottom:14px;">Mohammed Abdul is a Data Protection Architect with more than 15 years of experience in Hybrid Cloud, having worked with global clients across financial services, healthcare, government, and technology industries.</p>
+      <p style="font-size:14px;margin-bottom:14px;">With extensive expertise in enterprise backup and recovery solutions, Mohammed specialises in helping organisations design and implement robust, compliance-ready data protection strategies at enterprise scale.</p>
+      <div class="badge-grid">
+        <span class="tech-badge tb-cv">Commvault</span>
+        <span class="tech-badge tb-vb">Veeam</span>
+        <span class="tech-badge tb-nb">NetBackup</span>
+        <span class="tech-badge tb-na">NetApp</span>
+      </div>
+      <div class="email-card">
+        <div class="email-icon">📧</div>
+        <div>
+          <div style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">For Queries</div>
+          <a class="email-link" href="mailto:abdul.md.20000102@gmail.com">abdul.md.20000102@gmail.com</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout c-warn" style="margin-top:22px;max-width:600px;">
+      <div class="callout-head">📌 Disclaimer</div>
+      <p>This content is for educational purposes and tutorial material. Always refer to official Commvault documentation at <strong>documentation.commvault.com</strong> and follow your organisation's change management procedures for production implementations. IP addresses, hostnames, and configuration values in this tutorial are examples — replace with your actual environment values.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <p>
