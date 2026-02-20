@@ -1,0 +1,2471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Software Administration – Tutorial 7 | Data Protection Mastery</title>
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #0f2040;
+    --navy-light: #162b52;
+    --accent: #00c8ff;
+    --accent2: #00e5a0;
+    --accent3: #ff6b35;
+    --accent4: #a78bfa;
+    --gold: #f5c842;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --card: #0d1f3c;
+    --card-border: rgba(0,200,255,0.12);
+    --warn-bg: rgba(255,107,53,0.08);
+    --warn-border: #ff6b35;
+    --tip-bg: rgba(0,229,160,0.08);
+    --tip-border: #00e5a0;
+    --note-bg: rgba(0,200,255,0.08);
+    --note-border: #00c8ff;
+    --exam-bg: rgba(167,139,250,0.08);
+    --exam-border: #a78bfa;
+    --best-bg: rgba(245,200,66,0.08);
+    --best-border: #f5c842;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', Calibri, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: rgba(10,22,40,0.97);
+    border-bottom: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: 54px;
+  }
+
+  .nav-brand {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    margin-right: 16px;
+    white-space: nowrap;
+  }
+
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  nav a:hover {
+    color: var(--accent);
+    background: rgba(0,200,255,0.08);
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0a1628 0%, #0f2040 40%, #0a2a1a 100%);
+    padding: 80px 48px 64px;
+    border-bottom: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,200,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 30%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,229,160,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,200,255,0.1);
+    border: 1px solid rgba(0,200,255,0.3);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1.2;
+    color: #fff;
+    max-width: 800px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-desc {
+    color: var(--text-muted);
+    max-width: 680px;
+    font-size: 16px;
+    margin-bottom: 36px;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .tag {
+    background: var(--navy-light);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .tag.hot { border-color: var(--accent3); color: var(--accent3); }
+  .tag.blue { border-color: var(--accent); color: var(--accent); }
+  .tag.green { border-color: var(--accent2); color: var(--accent2); }
+  .tag.purple { border-color: var(--accent4); color: var(--accent4); }
+
+  /* TOC */
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    padding: 40px 48px;
+    background: var(--navy-mid);
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .toc-item:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .toc-num {
+    background: rgba(0,200,255,0.1);
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  /* MAIN */
+  .main-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 64px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .section-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .icon-blue { background: rgba(0,200,255,0.12); }
+  .icon-green { background: rgba(0,229,160,0.12); }
+  .icon-orange { background: rgba(255,107,53,0.12); }
+  .icon-purple { background: rgba(167,139,250,0.12); }
+  .icon-gold { background: rgba(245,200,66,0.12); }
+
+  .section-title {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(20px, 2.5vw, 28px);
+    color: #fff;
+  }
+
+  .section-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .card h3 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent);
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .card h4 {
+    color: var(--accent2);
+    font-size: 14px;
+    margin: 18px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .card p { color: var(--text-muted); margin-bottom: 12px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .card ul, .card ol { padding-left: 20px; }
+  .card li { color: var(--text-muted); margin-bottom: 8px; }
+  .card li strong { color: var(--text); }
+
+  /* GRID 2 */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* CALLOUTS */
+  .callout {
+    border-left: 3px solid;
+    border-radius: 0 8px 8px 0;
+    padding: 18px 22px;
+    margin: 20px 0;
+  }
+
+  .callout-title {
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .callout p { font-size: 14px; margin-bottom: 0; }
+
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.warn .callout-title { color: var(--warn-border); }
+  .callout.warn p { color: #fca97a; }
+
+  .callout.tip { background: var(--tip-bg); border-color: var(--tip-border); }
+  .callout.tip .callout-title { color: var(--tip-border); }
+  .callout.tip p { color: #6ee7b7; }
+
+  .callout.note { background: var(--note-bg); border-color: var(--note-border); }
+  .callout.note .callout-title { color: var(--note-border); }
+  .callout.note p { color: #7dd3f0; }
+
+  .callout.exam { background: var(--exam-bg); border-color: var(--exam-border); }
+  .callout.exam .callout-title { color: var(--exam-border); }
+  .callout.exam p, .callout.exam li { color: #c4b5fd; }
+
+  .callout.best { background: var(--best-bg); border-color: var(--best-border); }
+  .callout.best .callout-title { color: var(--best-border); }
+  .callout.best p, .callout.best li { color: #fde68a; }
+
+  .callout ul { padding-left: 20px; margin-top: 8px; }
+  .callout li { margin-bottom: 6px; font-size: 14px; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: #060e1c;
+    border: 1px solid rgba(0,200,255,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .code-header {
+    background: rgba(0,200,255,0.06);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0,200,255,0.1);
+  }
+
+  .code-lang {
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #28c840; }
+
+  .code-body {
+    padding: 18px 20px;
+    font-family: 'Courier New', Courier, 'Lucida Console', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c9e7ff;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-body .cmd { color: #00e5a0; }
+  .code-body .comment { color: #4a6580; font-style: italic; }
+  .code-body .param { color: #f5c842; }
+  .code-body .val { color: #ff9f7e; }
+  .code-body .path { color: #a78bfa; }
+
+  /* FLOW DIAGRAMS */
+  .flow {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 20px 0;
+  }
+
+  .flow-title {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent);
+    font-size: 15px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+  }
+
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 44px;
+    bottom: -2px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  .flow-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(0,200,255,0.12);
+    border: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--accent);
+    flex-shrink: 0;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 28px;
+  }
+
+  .flow-content { padding-top: 6px; }
+  .flow-content strong { color: #fff; display: block; margin-bottom: 4px; }
+  .flow-content p { color: var(--text-muted); font-size: 13px; }
+
+  /* HORIZONTAL FLOW */
+  .hflow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    margin: 16px 0;
+    justify-content: center;
+  }
+
+  .hflow-box {
+    background: var(--navy-light);
+    border: 1px solid rgba(0,200,255,0.2);
+    border-radius: 8px;
+    padding: 10px 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text);
+    min-width: 120px;
+  }
+
+  .hflow-box small { display: block; color: var(--text-dim); font-size: 11px; margin-top: 2px; }
+  .hflow-box.active { border-color: var(--accent); background: rgba(0,200,255,0.08); }
+  .hflow-box.active small { color: var(--accent); }
+  .hflow-arrow { color: var(--text-dim); font-size: 18px; }
+
+  /* ARCH DIAGRAM */
+  .arch {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 20px 0;
+  }
+
+  .arch-title {
+    font-family: Georgia, serif;
+    color: var(--accent);
+    text-align: center;
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .arch-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .arch-box {
+    border-radius: 8px;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .arch-box small { display: block; font-size: 10px; opacity: 0.7; margin-top: 3px; font-weight: 400; }
+
+  .abox-blue { background: rgba(0,200,255,0.12); border: 1px solid rgba(0,200,255,0.3); color: #7ee8fa; }
+  .abox-green { background: rgba(0,229,160,0.12); border: 1px solid rgba(0,229,160,0.3); color: #6ee7b7; }
+  .abox-orange { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.3); color: #fca97a; }
+  .abox-purple { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); color: #c4b5fd; }
+  .abox-gold { background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.3); color: #fde68a; }
+
+  .arch-connector {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 22px;
+    line-height: 1;
+    margin: -4px 0;
+  }
+
+  /* COMPARISON BOXES */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+
+  .cmp-box {
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .cmp-box h5 {
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+  }
+
+  .cmp-box ul { padding-left: 18px; }
+  .cmp-box li { font-size: 13px; margin-bottom: 6px; }
+
+  .cmp-a { background: rgba(0,200,255,0.06); border: 1px solid rgba(0,200,255,0.2); }
+  .cmp-a h5 { color: var(--accent); }
+  .cmp-a li { color: #7ee8fa; }
+
+  .cmp-b { background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.2); }
+  .cmp-b h5 { color: var(--accent2); }
+  .cmp-b li { color: #6ee7b7; }
+
+  /* METRIC BOXES */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .metric {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+  }
+
+  .metric-val {
+    font-family: Georgia, serif;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .metric-val.orange { color: var(--accent3); }
+  .metric-val.green { color: var(--accent2); }
+  .metric-val.purple { color: var(--accent4); }
+
+  .metric-label { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+  .metric-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Q&A */
+  .qa-block {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .qa-q {
+    background: rgba(167,139,250,0.08);
+    border-bottom: 1px solid rgba(167,139,250,0.15);
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #c4b5fd;
+    font-weight: 500;
+  }
+
+  .qa-q::before { content: 'Q  '; opacity: 0.5; font-family: monospace; }
+
+  .qa-a {
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .qa-a::before { content: 'A  '; color: var(--accent2); font-weight: bold; font-family: monospace; }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--card-border);
+    margin: 40px 0;
+  }
+
+  /* INLINE CODE */
+  code {
+    font-family: 'Courier New', Courier, 'Lucida Console', monospace;
+    background: rgba(0,200,255,0.08);
+    border: 1px solid rgba(0,200,255,0.15);
+    color: var(--accent);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12.5px;
+  }
+
+  /* HIGHLIGHT */
+  .hl { color: var(--accent); font-weight: 500; }
+  .hl-green { color: var(--accent2); font-weight: 500; }
+  .hl-orange { color: var(--accent3); }
+  .hl-gold { color: var(--gold); }
+
+  /* AUTHOR SECTION */
+  .author-section {
+    background: linear-gradient(135deg, #0a1628, #0d2040);
+    border-top: 1px solid var(--card-border);
+    padding: 60px 48px;
+  }
+
+  .author-title {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    color: var(--accent);
+    margin-bottom: 28px;
+    text-align: center;
+  }
+
+  .author-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 36px;
+    max-width: 800px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .author-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    flex-shrink: 0;
+  }
+
+  .author-info { flex: 1; min-width: 240px; }
+
+  .author-name {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .author-role { color: var(--accent); font-size: 14px; margin-bottom: 14px; }
+
+  .author-bio { color: var(--text-muted); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+
+  .badge {
+    background: var(--navy-light);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .badge.cv { border-color: var(--accent); color: var(--accent); }
+  .badge.veeam { border-color: var(--accent2); color: var(--accent2); }
+  .badge.nb { border-color: var(--accent3); color: var(--accent3); }
+  .badge.netapp { border-color: var(--accent4); color: var(--accent4); }
+
+  .contact-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,200,255,0.08);
+    border: 1px solid rgba(0,200,255,0.25);
+    border-radius: 8px;
+    padding: 10px 18px;
+    text-decoration: none;
+    color: var(--accent);
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .contact-card:hover { background: rgba(0,200,255,0.15); }
+
+  .disclaimer {
+    background: var(--warn-bg);
+    border: 1px solid rgba(255,107,53,0.25);
+    border-radius: 8px;
+    padding: 18px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .disclaimer p { font-size: 13px; color: #fca97a; line-height: 1.6; }
+
+  /* FOOTER */
+  footer {
+    background: #060e1c;
+    border-top: 1px solid var(--card-border);
+    padding: 24px 48px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  /* PROGRESS BAR */
+  .topic-progress {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 32px;
+  }
+
+  .tp-seg {
+    height: 3px;
+    flex: 1;
+    border-radius: 2px;
+    background: var(--card-border);
+  }
+
+  .tp-seg.done { background: var(--accent); }
+
+  /* TABLE-FREE comparison strips */
+  .strip-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 12px 18px;
+    margin-bottom: 8px;
+  }
+
+  .strip-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    min-width: 160px;
+    flex-shrink: 0;
+  }
+
+  .strip-val {
+    font-size: 13px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .strip-badge {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    border: 1px solid;
+    flex-shrink: 0;
+  }
+
+  .sb-ok { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.07); }
+  .sb-warn { border-color: var(--accent3); color: var(--accent3); background: rgba(255,107,53,0.07); }
+  .sb-info { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.07); }
+
+  /* STATUS INDICATORS */
+  .status-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    border: 1px solid;
+  }
+
+  .sp-green { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.08); }
+  .sp-red { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
+  .sp-yellow { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.08); }
+  .sp-blue { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.08); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">⚙ Commvault Admin · Tutorial 7</span>
+  <a href="#ransomware">🛡 Ransomware (Linux)</a>
+  <a href="#storage-perf">📊 Storage Perf</a>
+  <a href="#cloud-tools">☁ Cloud Tools</a>
+  <a href="#ma-refresh">🔄 MA Refresh</a>
+  <a href="#ma-recovery">🆘 MA Recovery</a>
+  <a href="#kubernetes">☸ Kubernetes</a>
+  <a href="#qa">💬 Interview Q&A</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🎓 Self-Paced Tutorial · Advanced Level</div>
+  <h1>Commvault Software Administration<br><span>Tutorial 7 — Storage, Recovery & Kubernetes</span></h1>
+  <p class="hero-desc">
+    A comprehensive deep-dive into Linux Media Agent ransomware protection, storage performance diagnostics, 
+    Media Agent hardware refresh and recovery, and Kubernetes backup/restore with Commvault. 
+    Covering advanced troubleshooting, real-world tooling, and enterprise-grade procedures.
+  </p>
+  <div class="hero-tags">
+    <span class="tag hot">🔥 Ransomware Protection</span>
+    <span class="tag blue">📊 cvdiskperf &amp; IOMeter</span>
+    <span class="tag green">☁ Cloud Performance Testing</span>
+    <span class="tag blue">🔄 Media Agent Refresh</span>
+    <span class="tag hot">🆘 MA Recovery</span>
+    <span class="tag purple">☸ Kubernetes Backups</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc-grid">
+  <a class="toc-item" href="#ransomware"><span class="toc-num">01</span> Linux MA Ransomware Protection</a>
+  <a class="toc-item" href="#storage-perf"><span class="toc-num">02</span> Storage Performance Concepts</a>
+  <a class="toc-item" href="#cvdiskperf"><span class="toc-num">03</span> cvdiskperf Tool (Windows &amp; Linux)</a>
+  <a class="toc-item" href="#iometer"><span class="toc-num">04</span> IOMeter &amp; IOPS Testing</a>
+  <a class="toc-item" href="#cloud-tools"><span class="toc-num">05</span> Cloud Library Performance Tools</a>
+  <a class="toc-item" href="#ma-refresh"><span class="toc-num">06</span> Media Agent Hardware Refresh</a>
+  <a class="toc-item" href="#ma-recovery"><span class="toc-num">07</span> Media Agent Recovery</a>
+  <a class="toc-item" href="#ddb-recovery"><span class="toc-num">08</span> DDB Store: Seal vs Verification</a>
+  <a class="toc-item" href="#kubernetes"><span class="toc-num">09</span> Kubernetes Backup &amp; Restore</a>
+  <a class="toc-item" href="#k8s-setup"><span class="toc-num">10</span> Kubernetes Cluster Setup</a>
+  <a class="toc-item" href="#k8s-config"><span class="toc-num">11</span> Commvault K8s Configuration</a>
+  <a class="toc-item" href="#qa"><span class="toc-num">12</span> Interview Q&amp;A</a>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+<!-- ============================= SECTION 1: RANSOMWARE LINUX ============================= -->
+<section id="ransomware" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🛡</div>
+    <div>
+      <div class="section-title">Linux Media Agent: Ransomware Protection</div>
+      <div class="section-subtitle">Enabling ImmutableData storage protection on Ubuntu-based Media Agents</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Overview</h3>
+    <p>Ransomware protection in Commvault leverages immutable storage at the file-system level to prevent unauthorized modification or deletion of backup data. On <strong>Windows Media Agents</strong>, this feature can be enabled through a simple GUI toggle and may even auto-enable by default. On <strong>Linux Media Agents</strong>, however, the process requires deliberate manual steps — including package prerequisites, a soft-link creation, and executing the <code>cvsecurity</code> binary.</p>
+    <p>In environments with multiple Linux Media Agents, the manual procedure should be validated on a single node before being automated via shell scripts across the fleet.</p>
+  </div>
+
+  <div class="card">
+    <h3>Understanding the Disk Library Folder Structure</h3>
+    <p>Before enabling ransomware protection, it is important to understand the directory layout that Commvault creates on a Linux-based disk library mount path:</p>
+    <div class="hflow">
+      <div class="hflow-box active">Mount Path (e.g. <code>/disklib</code>)<small>Library Root</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box">Filesystem Label Folder<small>Alphanumeric, auto-created</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box">CVMagnetic<small>Data container</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Volumes<small>Data directories</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box">Chunks<small>Metadata + Data files</small></div>
+    </div>
+    <p>This hierarchy — <strong>Mount Path → Label Folder → CVMagnetic → Volumes → Chunks</strong> — is consistent across all Commvault disk library deployments. The chunk files contain the actual backup data alongside their metadata.</p>
+  </div>
+
+  <div class="flow">
+    <div class="flow-title">⚡ Step-by-Step: Enabling Ransomware Protection on Linux Media Agent (Ubuntu 20)</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <strong>Backup the FSTAB file</strong>
+          <p>The <code>/etc/fstab</code> file holds mount path entries. Ransomware protection will modify it — always back it up first. Also note your Commvault instance name (default: <code>Instance001</code>).</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <strong>Place the Media Agent in Maintenance Mode</strong>
+          <p>From the Command Center or CommCell Console, mark the target Media Agent for maintenance. This suspends job scheduling to that MA. Either console action is sufficient — you do not need to do it from both.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <strong>Verify OS Version</strong>
+          <p>Run the OS verification command to confirm the Ubuntu version. The steps differ slightly between Ubuntu 20 and Red Hat / CentOS distributions.</p>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+            <div class="code-body"><span class="cmd">cat</span> /etc/*release</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <strong>Create the Required Soft Link (Ubuntu 20 / Red Hat)</strong>
+          <p>This step is mandatory for Ubuntu 20 as well, even though the documentation primarily labels it for Red Hat/CentOS. Skipping this causes a Python dependency error during the enable step.</p>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash — soft link creation</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+            <div class="code-body"><span class="comment"># Create symbolic link required by cvsecurity binary</span>
+<span class="cmd">ln</span> -s /path/to/python3 /usr/bin/python</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-content">
+          <strong>Install Required Dependent Packages</strong>
+          <p>The <code>cvsecurity</code> binary lists required packages before execution. For Ubuntu 20, these must be installed prior to enabling ransomware protection.</p>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash — package installation</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+            <div class="code-body"><span class="comment"># Install all required dependent packages (exact command shown by cvsecurity)</span>
+<span class="cmd">apt-get</span> install -y &lt;package1&gt; &lt;package2&gt; &lt;package3&gt;</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-content">
+          <strong>Enable Ransomware Protection (Set SELinux to Enforcing)</strong>
+          <p>Navigate to the Commvault base directory on the Linux MA (<code>/opt/commvault/MediaAgent64/</code>) and run the <code>cvsecurity.py</code> Python script to resume protection. Ransomware protection is implemented via <strong>SELinux enforcement</strong> — enabling protection sets SELinux to <em>enforcing</em> mode.</p>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash — enable protection &amp; verify</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+            <div class="code-body"><span class="path">cd /opt/commvault/MediaAgent64</span>
+
+<span class="comment"># Enable ransomware protection (sets SELinux to enforcing)</span>
+<span class="cmd">./cvsecurity.py</span> resume_protection <span class="param">-i</span> <span class="val">Instance001</span>
+
+<span class="comment"># Verify SELinux is now in enforcing mode</span>
+<span class="cmd">sestatus</span>
+<span class="comment"># Expected: Current mode: enforcing</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">7</div>
+        <div class="flow-content">
+          <strong>Remove Maintenance Mode</strong>
+          <p>Once protection is confirmed active (status: <code>enforcing</code>), remove the MA from maintenance mode in the console to resume backup jobs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠ Warning — Temporary Protection Bypass</div>
+    <p>Certain maintenance tasks (such as running disk performance tests on a protected Linux MA) require temporarily setting SELinux to <code>permissive</code> mode using <code>cvsecurity.py pause_protection</code>. <strong>Always re-enable protection immediately after completing the task</strong> using <code>resume_protection</code>. Never leave a Media Agent in permissive mode unattended.</p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash — pause &amp; resume ransomware protection (SELinux workflow)</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+    <div class="code-body"><span class="path">cd /opt/commvault/MediaAgent64</span>
+
+<span class="comment"># Step 1: Pause protection (sets SELinux to permissive)</span>
+<span class="cmd">./cvsecurity.py</span> pause_protection <span class="param">-i</span> <span class="val">Instance001</span>
+
+<span class="comment"># Step 2: Verify SELinux is now permissive</span>
+<span class="cmd">sestatus</span>
+<span class="comment"># Expected: Current mode: permissive</span>
+
+<span class="comment"># Step 3: Run disk performance test</span>
+<span class="cmd">cvdiskperf</span> <span class="param">-d</span> <span class="val">/disklib</span> <span class="param">-f</span> <span class="val">4</span> <span class="param">-t</span> <span class="val">4</span> <span class="param">-b</span> <span class="val">512</span>
+
+<span class="comment"># Step 4: Resume protection (sets SELinux back to enforcing)</span>
+<span class="cmd">./cvsecurity.py</span> resume_protection <span class="param">-i</span> <span class="val">Instance001</span>
+
+<span class="comment"># Step 5: Verify SELinux is back to enforcing</span>
+<span class="cmd">sestatus</span>
+<span class="comment"># Expected: Current mode: enforcing</span></div>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-title">💡 Automation Tip</div>
+    <p>Once the manual procedure is validated on a single Media Agent, the entire sequence can be scripted and executed remotely via SSH across multiple Linux Media Agents using a loop or configuration management tool like Ansible. Always validate manually on one node first.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 2: STORAGE PERFORMANCE ============================= -->
+<section id="storage-perf" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">📊</div>
+    <div>
+      <div class="section-title">Storage Performance Concepts &amp; Sizing</div>
+      <div class="section-subtitle">Identifying environment size and the role of IOPS, throughput, and FET/BET</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Key Storage Performance Factors</h3>
+    <p>When analyzing backup storage slowness — particularly if the job details show most time spent on <em>write operations</em> — the following two pillars are the primary areas of investigation:</p>
+    <div class="grid-2">
+      <div class="metric">
+        <div class="metric-val">IOPS</div>
+        <div class="metric-label">Input/Output Operations Per Second</div>
+        <div class="metric-desc">Critical for DDB Partition &amp; Index Cache</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val orange">MB/s</div>
+        <div class="metric-label">Throughput (Read/Write)</div>
+        <div class="metric-desc">Critical for Disk Library Mount Paths</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Sizing Your Environment: FET vs BET</h3>
+    <p>Commvault's recommended IOPS values depend on the size classification of your environment (Medium, Large, Extra-Large). To classify your environment, you must first determine either the <strong>Front-End Terabyte (FET)</strong> or <strong>Back-End Terabyte (BET)</strong>.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">If using <strong>Software DDB</strong> deduplication</span>
+      <span class="strip-val">Use <strong>BET (Back-End Terabyte)</strong> — the actual storage consumed after dedup</span>
+      <span class="strip-badge sb-info">BET Sizing</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">If using <strong>Storage-Level Dedup</strong> (no software DDB)</span>
+      <span class="strip-val">Use <strong>FET (Front-End Terabyte)</strong> — total data presented for backup</span>
+      <span class="strip-badge sb-ok">FET Sizing</span>
+    </div>
+
+    <h4>How to Find FET and BET in Your Environment</h4>
+
+    <div class="strip-row">
+      <span class="strip-label">📋 FET Location</span>
+      <span class="strip-val">Command Center → Reports → <strong>Chargeback Report</strong> → Front-End Backup Size column</span>
+      <span class="strip-badge sb-info">Reports Section</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">🗄 BET Location</span>
+      <span class="strip-val">Command Center → Reports → <strong>Storage Utilization</strong> → User Space column</span>
+      <span class="strip-badge sb-ok">Storage Reports</span>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-title">📘 Note — Multi-Tenant Environments</div>
+    <p>In the Chargeback Report, the <em>Company</em> column is relevant only if your organization manages multiple tenants (MSP/multi-project setups). In single-company deployments, this column can be safely ignored. Use a time range of "Last Month" to get a representative FET value.</p>
+  </div>
+
+  <div class="card">
+    <h3>Sequential vs. Random I/O — Why It Matters</h3>
+    <p>Storage I/O operations are classified as either <strong>sequential</strong> or <strong>random</strong> — and this distinction is critical when interpreting performance benchmarks.</p>
+    <div class="compare">
+      <div class="cmp-box cmp-a">
+        <h5>🎞 Sequential I/O</h5>
+        <ul>
+          <li>Data written/read in consecutive blocks (Block 1 → Block 2 → Block 3)</li>
+          <li>Typical of tape devices — the platter moves in a continuous stream</li>
+          <li>Higher raw throughput numbers than random</li>
+          <li>Not representative of real-world disk library behavior</li>
+        </ul>
+      </div>
+      <div class="cmp-box cmp-b">
+        <h5>🔀 Random I/O</h5>
+        <ul>
+          <li>OS selects any available free block, not necessarily contiguous</li>
+          <li>Typical of disk/SSD devices — free blocks reused non-sequentially</li>
+          <li>Lower throughput than sequential but reflects real production load</li>
+          <li><strong>Always use random mode</strong> when benchmarking disk libraries</li>
+        </ul>
+      </div>
+    </div>
+    <p>Think of it this way: a tape recorder plays from start to finish — that's sequential. A modern hard disk picks the nearest free sector, like using a notepad where you write on any blank page — that's random.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 3: CVDISKPERF ============================= -->
+<section id="cvdiskperf" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🔬</div>
+    <div>
+      <div class="section-title">cvdiskperf Tool — Disk Throughput Testing</div>
+      <div class="section-subtitle">Measuring read/write/delete throughput on disk library mount paths</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Tool Overview</h3>
+    <p>The <code>cvdiskperf</code> binary is Commvault's built-in disk throughput measurement tool. It simulates backup-like I/O patterns to measure read, write, and delete speeds on a given mount path. It is available on both <strong>Windows</strong> and <strong>Linux</strong> Media Agents, but <em>not</em> applicable to cloud libraries (a separate cloud test tool covers those).</p>
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val">Write</div>
+        <div class="metric-label">Throughput (GB/hr per thread)</div>
+        <div class="metric-desc">Critical for Backup Operations</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val green">Read</div>
+        <div class="metric-label">Throughput (GB/hr per thread)</div>
+        <div class="metric-desc">Critical for Restore Operations</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val purple">Both</div>
+        <div class="metric-label">Read + Write Throughput</div>
+        <div class="metric-desc">Critical for Synthetic Full Jobs</div>
+      </div>
+    </div>
+    <div class="callout best">
+      <div class="callout-title">✅ Best Practice Benchmark</div>
+      <p>As a general guideline (not an official Commvault requirement), a per-thread write throughput of approximately <strong>500 GB/hour</strong> is considered a good baseline for disk library performance in production environments. Document benchmark results at implementation time for future reference.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running cvdiskperf on Windows Media Agent</h3>
+    <p>Navigate to the Commvault base installation folder, then run the tool. The binary is located at the Commvault ContentStore base directory.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">cmd — Windows sequential mode</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Navigate to Commvault base folder</span>
+<span class="cmd">cd</span> <span class="path">"C:\Program Files\Commvault\ContentStore\Base"</span>
+
+<span class="comment"># Run sequential throughput test (for reference only)</span>
+<span class="cmd">cvdiskperf.exe</span> <span class="param">-d</span> <span class="val">E:\</span> <span class="param">-f</span> <span class="val">4</span> <span class="param">-t</span> <span class="val">4</span> <span class="param">-b</span> <span class="val">512</span> <span class="param">-o</span> <span class="val">C:\tmp\output_seq.csv</span> <span class="param">-sequential</span>
+
+<span class="comment"># Run RANDOM throughput test (use this for actual benchmarking)</span>
+<span class="cmd">cvdiskperf.exe</span> <span class="param">-d</span> <span class="val">E:\</span> <span class="param">-f</span> <span class="val">4</span> <span class="param">-t</span> <span class="val">4</span> <span class="param">-b</span> <span class="val">512</span> <span class="param">-o</span> <span class="val">C:\tmp\output_rand.csv</span></div>
+    </div>
+
+    <h4>Parameter Reference</h4>
+    <div class="strip-row"><span class="strip-label"><code>-d &lt;path&gt;</code></span><span class="strip-val">Mount path of the disk library (e.g., E:\ for Windows)</span><span class="strip-badge sb-info">Required</span></div>
+    <div class="strip-row"><span class="strip-label"><code>-f &lt;count&gt;</code></span><span class="strip-val">Number of test files to create (file count)</span><span class="strip-badge sb-ok">Default: 4</span></div>
+    <div class="strip-row"><span class="strip-label"><code>-t &lt;threads&gt;</code></span><span class="strip-val">Number of parallel I/O threads (simulates concurrent operations)</span><span class="strip-badge sb-ok">Default: 4</span></div>
+    <div class="strip-row"><span class="strip-label"><code>-b &lt;blocksize&gt;</code></span><span class="strip-val">Block size in KB (Commvault default: 512)</span><span class="strip-badge sb-info">Recommended: 512</span></div>
+    <div class="strip-row"><span class="strip-label"><code>-o &lt;file&gt;</code></span><span class="strip-val">Output CSV file path (tmp folder must exist)</span><span class="strip-badge sb-ok">Required</span></div>
+    <div class="strip-row"><span class="strip-label"><code>-sequential</code></span><span class="strip-val">Run in sequential mode (remove this flag for random mode)</span><span class="strip-badge sb-warn">For Reference Only</span></div>
+  </div>
+
+  <div class="card">
+    <h3>Running cvdiskperf on Linux Media Agent</h3>
+    <p>On Linux, the procedure is similar but requires temporarily bypassing ransomware protection if it is enabled. Stop Commvault services on the Media Agent (not the CommServe) before running if you need a completely isolated measurement.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — Linux cvdiskperf</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Step 1: Pause ransomware protection (sets SELinux to permissive)</span>
+<span class="path">cd /opt/commvault/MediaAgent64</span>
+<span class="cmd">./cvsecurity.py</span> pause_protection <span class="param">-i</span> <span class="val">Instance001</span>
+
+<span class="comment"># Verify SELinux is permissive before proceeding</span>
+<span class="cmd">sestatus</span>   <span class="comment"># Expected: Current mode: permissive</span>
+
+<span class="comment"># Step 2: Run disk performance test</span>
+<span class="cmd">cvdiskperf</span> <span class="param">-d</span> <span class="val">/disklib</span> <span class="param">-f</span> <span class="val">4</span> <span class="param">-t</span> <span class="val">4</span> <span class="param">-b</span> <span class="val">512</span>
+
+<span class="comment"># Step 3: Resume ransomware protection (sets SELinux back to enforcing)</span>
+<span class="cmd">./cvsecurity.py</span> resume_protection <span class="param">-i</span> <span class="val">Instance001</span>
+
+<span class="comment"># Step 4: Verify SELinux is enforcing again</span>
+<span class="cmd">sestatus</span>   <span class="comment"># Expected: Current mode: enforcing</span></div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠ When to Stop Services</div>
+    <p>For <code>cvdiskperf</code>, stopping Commvault services on the Media Agent is <strong>optional</strong> — you can run it while backups are active. However, to present results to a storage team without any Commvault workload interference, stop services on the MA first (not on the CommServe). For IOMeter, service shutdown is <strong>mandatory</strong>.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 4: IOMETER ============================= -->
+<section id="iometer" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">⚡</div>
+    <div>
+      <div class="section-title">IOMeter — IOPS Testing for DDB &amp; Index Cache</div>
+      <div class="section-subtitle">Measuring disk I/O response time and IOPS for DDB partition performance validation</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why IOMeter?</h3>
+    <p>While <code>cvdiskperf</code> measures throughput (GB/hour), <strong>IOMeter</strong> is used to measure <strong>IOPS</strong> and <strong>I/O response latency</strong> — both critical for the DDB (Deduplication Database) partition and Index Cache. The DDB performs thousands of small random lookups per second; high latency here directly causes backup slowness.</p>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val">&lt;2ms</div>
+        <div class="metric-label">Max I/O Response Time</div>
+        <div class="metric-desc">Commvault recommended maximum for DDB partition</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val green">&lt;1ms</div>
+        <div class="metric-label">Average I/O Response Time</div>
+        <div class="metric-desc">Typical healthy average for production workloads</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val orange">500GB</div>
+        <div class="metric-label">Min Free Space Required</div>
+        <div class="metric-desc">Default IOMeter test file size on DDB drive</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running IOMeter on Windows Media Agent</h3>
+    <p>IOMeter is a GUI application available in the Commvault base directory. It must be run with Commvault services <strong>stopped</strong> on the Media Agent to avoid corrupting the DDB partition or Index Cache during active testing.</p>
+
+    <div class="flow">
+      <div class="flow-title">IOMeter Configuration Procedure (Windows)</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Stop Commvault Services on the Media Agent</strong>
+            <p>Navigate to Windows Task Manager → Services tab and stop the Commvault service. This is mandatory before running IOMeter.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Launch IOMeter from CommVault Base Directory</strong>
+            <p>Navigate to <code>C:\Program Files\Commvault\ContentStore\Base\</code> and run <code>iometer.exe</code> as Administrator.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Convert Free Space to Sectors</strong>
+            <p>IOMeter measures disk size in sectors (blocks), not GB/MB. If you have less than 500 GB free, convert your available space: 1 GB ≈ 2,097,152 sectors. Use a unit converter (e.g., unitconverter.net: 1 GB → blocks) to get the sector count and enter it as the Maximum Disk Size.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Configure Worker Threads</strong>
+            <p>Set up worker threads (each worker = one I/O thread). Configure all workers with: Transfer Request Size = <strong>4KB</strong>, Read/Write distribution = <strong>50%/50%</strong>, Random/Sequential distribution = <strong>50%/50%</strong>. Use <strong>8 workers total</strong> as recommended by Commvault documentation.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Select Target Drive and Start Test</strong>
+            <p>Select only the DDB drive (e.g., F:\) as the target. Set Result Update Frequency to 5 seconds and test duration to <strong>30 minutes</strong>. Click the flag icon to start. Results are saved as a CSV file.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Analyze Results in Excel</strong>
+            <p>Open the output <code>.csv</code> file in Excel. Focus on: <strong>Read IOPS</strong>, <strong>Write IOPS</strong>, <strong>Average I/O Response Time</strong>, and <strong>Maximum I/O Response Time</strong>. The maximum should not exceed 2ms per Commvault's recommendation. Share this report with your storage team or Commvault Technical Support.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running IOMeter on Linux Media Agent (Dynamo Mode)</h3>
+    <p>Linux does not have a GUI, so IOMeter uses a client-server model. The Linux MA runs <code>Dynamo</code> (a headless agent) and sends results to a Windows machine running the IOMeter GUI. Services on the Linux MA must be stopped.</p>
+
+    <div class="arch">
+      <div class="arch-title">Linux IOMeter Architecture — Dynamo Client / IOMeter GUI</div>
+      <div class="arch-row">
+        <div class="arch-box abox-purple">Linux Media Agent<small>Runs Dynamo (headless agent)</small></div>
+        <div class="arch-box abox-blue">Network<small>TCP data relay</small></div>
+        <div class="arch-box abox-green">Windows Machine<small>Runs IOMeter GUI (viewer)</small></div>
+      </div>
+      <div class="arch-connector">⬇ Dynamo sends I/O results to IOMeter GUI ⬇</div>
+      <div class="arch-row" style="margin-top:12px">
+        <div class="arch-box abox-orange">DDB Partition (<code>/gdb</code>)<small>Actual target drive being tested</small></div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — Linux Dynamo command</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># On Linux Media Agent — stop Commvault services first</span>
+<span class="cmd">commvault</span> stop
+
+<span class="comment"># Navigate to Commvault base and start Dynamo</span>
+<span class="path">cd /opt/commvault/MediaAgent64</span>
+<span class="cmd">./dynamo</span> <span class="param">-i</span> <span class="val">192.168.10.50</span>  <span class="comment"># -i = IP of THIS Linux MA</span>
+         <span class="param">-m</span> <span class="val">192.168.10.20</span>  <span class="comment"># -m = IP of Windows machine running IOMeter GUI</span>
+
+<span class="comment"># On Windows — open IOMeter (do NOT stop Windows services)</span>
+<span class="comment"># The Linux MA appears in the "All Managers" section</span>
+<span class="comment"># Select /gdb partition as target and configure workers as described above</span></div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Why Multiple Worker Threads?</div>
+      <p>Running IOMeter with a single worker thread underrepresents real-world performance. In production, multiple backup jobs write to the DDB simultaneously. Using 8 worker threads accurately stresses the disk with concurrent I/O, giving you results that reflect actual production load conditions.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 5: CLOUD TOOLS ============================= -->
+<section id="cloud-tools" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">☁</div>
+    <div>
+      <div class="section-title">Cloud Library Performance &amp; Diagnostic Tools</div>
+      <div class="section-subtitle">Cloud test tool, upload/download benchmarking, and Cloud Storage Explorer</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Understanding Cloud Library Data Flow</h3>
+    <p>Unlike disk libraries where data is written locally, cloud backup data flows through the Media Agent before reaching cloud storage. The client never communicates directly with the cloud:</p>
+    <div class="hflow">
+      <div class="hflow-box active">Client Machine<small>Source data</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Media Agent<small>Data Mover</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Cloud Storage<small>S3 / Azure / GCP</small></div>
+    </div>
+    <p>The Media Agent is the data mover and processes all data streams. Cloud performance is therefore a function of the <strong>network link quality</strong> between the Media Agent and the cloud endpoint, not just the storage service itself.</p>
+  </div>
+
+  <div class="card">
+    <h3>Cloud Test Tool — Access Options</h3>
+    <p>The cloud test tool is available in the Commvault base directory and supports two authentication modes:</p>
+
+    <div class="strip-row">
+      <span class="strip-label">Option 1: Access Keys</span>
+      <span class="strip-val">Provide AWS Access Key + Secret Access Key directly. Requires cloud team engagement to obtain keys.</span>
+      <span class="strip-badge sb-warn">Requires Keys</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Option 2: CommServe Credentials</span>
+      <span class="strip-val">Select "Configure Cloud Device" option → enter CommCell Console credentials. Commvault retrieves stored cloud library credentials automatically.</span>
+      <span class="strip-badge sb-ok">Recommended</span>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Preferred Method — Use CommServe Credentials</div>
+      <p>When access keys are not readily available with the backup team, use Option 2: the tool fetches cloud credentials directly from the CommServe database, displaying all configured cloud libraries. This eliminates the need to involve the cloud team just for a connectivity test.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Cloud Test Operations</h3>
+    <p>Once connected to a cloud library, the cloud test tool offers several diagnostic operations:</p>
+
+    <div class="strip-row">
+      <span class="strip-label">🔍 Access Functionality Check</span>
+      <span class="strip-val">Tests end-to-end connectivity from Media Agent to cloud bucket. Use when the cloud library shows offline in the console. Share results with cloud/network team.</span>
+      <span class="strip-badge sb-warn">Troubleshooting</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">⬆⬇ Upload/Download Speed Test</span>
+      <span class="strip-val">Measures actual throughput between Media Agent and cloud storage. Use when backup jobs on cloud libraries show poor throughput in job details.</span>
+      <span class="strip-badge sb-info">Performance</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">📤 Upload Test File</span>
+      <span class="strip-val">Uploads a single test file to validate write access to the bucket.</span>
+      <span class="strip-badge sb-ok">Validation</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">📥 Download Test File</span>
+      <span class="strip-val">Downloads the previously uploaded test file to validate read access and latency.</span>
+      <span class="strip-badge sb-ok">Validation</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">cmd — cloud test tool with 100MB file</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Navigate to CommVault base directory</span>
+<span class="path">cd "C:\Program Files\Commvault\ContentStore\Base"</span>
+
+<span class="comment"># Launch cloud test tool (interactive CLI)</span>
+<span class="cmd">CloudTestTool.exe</span>
+
+<span class="comment"># Select: 1 = Configure Cloud Device (uses CommServe credentials)</span>
+<span class="comment"># Select your configured S3 library from the list</span>
+<span class="comment"># Select: Upload/Download Speed Test</span>
+<span class="comment"># Enter file size: 100 (for 100 MB — recommended minimum for accurate results)</span>
+<span class="comment"># For 1 GB test: enter 1000</span></div>
+    </div>
+
+    <p>Test file cleanup: Commvault automatically removes test files from the cloud bucket after testing. If cleanup does not occur, request the cloud storage team to remove the test objects.</p>
+  </div>
+
+  <div class="card">
+    <h3>Cloud Storage Explorer</h3>
+    <p>The Cloud Storage Explorer is a read-only browser for cloud bucket contents, available <strong>only on Windows Media Agents</strong>. It is not available on Linux Media Agents.</p>
+    <p>Key capabilities of Cloud Storage Explorer:</p>
+    <ul>
+      <li>Browse folder and file structure within cloud buckets</li>
+      <li>Verify <strong>storage class</strong> of objects (Standard, Infrequent Access, Glacier, etc.)</li>
+      <li>Confirm CVMagnetic folder structure and volume presence</li>
+      <li>View file sizes and modification timestamps</li>
+    </ul>
+    <div class="callout note">
+      <div class="callout-title">📘 Linux Alternative</div>
+      <p>On Linux Media Agents, Cloud Storage Explorer is unavailable. To inspect cloud bucket contents, either engage your cloud support team or access the cloud vendor's web console (e.g., AWS Console, Azure Portal) directly.</p>
+    </div>
+    <div class="callout best">
+      <div class="callout-title">✅ Non-Vendor S3-Compatible Storage</div>
+      <p>If your cloud storage vendor is not natively listed in Commvault (e.g., Wasabi), check if the vendor supports the S3-compatible API. If yes, select the <strong>S3 Compatible</strong> option in Commvault cloud library configuration. Verify the vendor type in the cloud library mount path properties.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 6: MA REFRESH ============================= -->
+<section id="ma-refresh" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🔄</div>
+    <div>
+      <div class="section-title">Media Agent Hardware Refresh (Migration)</div>
+      <div class="section-subtitle">Moving an active Media Agent role to new server hardware</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>CommCell Environment Overview</h3>
+    <p>A typical Commvault CommCell consists of several roles, each with different refresh/recovery considerations:</p>
+    <div class="arch">
+      <div class="arch-title">CommCell Component Architecture</div>
+      <div class="arch-row">
+        <div class="arch-box abox-blue">CommServe (Production)<small>Control plane, database</small></div>
+        <div class="arch-box abox-blue">CommServe (DR)<small>Disaster recovery node</small></div>
+      </div>
+      <div class="arch-connector">⬇</div>
+      <div class="arch-row">
+        <div class="arch-box abox-green">Media Agent(s)<small>Data mover · storage management</small></div>
+        <div class="arch-box abox-orange">Virtual Server Agent (VSA)<small>VMware/Azure/AWS proxy</small></div>
+        <div class="arch-box abox-purple">Access Node<small>NDMP · NFS · SMB backups</small></div>
+      </div>
+      <div class="arch-connector">⬇</div>
+      <div class="arch-row">
+        <div class="arch-box abox-gold">Client Machines<small>Application servers · endpoints</small></div>
+      </div>
+    </div>
+    <p><strong>Media Agent Refresh</strong> applies when your existing MA is still accessible and operational, but needs to be migrated to new hardware. When the MA is <em>not</em> accessible (crashed, hardware failure), the appropriate process is <a href="#ma-recovery" style="color:var(--accent)">Media Agent Recovery</a>.</p>
+  </div>
+
+  <div class="card">
+    <h3>Pre-Refresh Assessment Checklist</h3>
+    <p>Before executing a Media Agent migration, document the following from the existing MA in the CommCell Console:</p>
+    <div class="flow">
+      <div class="flow-title">Pre-Refresh Information Gathering</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Identify Libraries Hosted on the MA</strong>
+            <p>Navigate to Storage Resources → Media Agent → [select MA]. The Libraries view shows all disk, cloud, and tape libraries hosted on this node. Document each library name and type.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Document DDB Partitions</strong>
+            <p>Check the MA Properties for DDB partition details. Note the partition path(s), associated storage policy names, and total size. These must be replicated on the new MA with identical paths.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Document Index Cache Location</strong>
+            <p>Note the index cache drive and path. The new MA must have a drive provisioned with the same or greater capacity for the index cache.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Media Agent Refresh Methods</h3>
+    <div class="grid-2">
+      <div>
+        <h4>Method 1: Manual Migration</h4>
+        <ul>
+          <li>Install identical packages on new MA</li>
+          <li>Move storage associations (SAN remapping, etc.)</li>
+          <li>Update DDB and index cache paths</li>
+          <li>Applicable to all library types: disk, cloud, tape</li>
+          <li>More control and visibility at each step</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Method 2: Replace MA Tool</h4>
+        <ul>
+          <li>Automated tool provided by Commvault</li>
+          <li>Significantly faster than manual method</li>
+          <li><strong>Limitation:</strong> Only works for disk library mount paths and DDB partitions</li>
+          <li>Cloud libraries and tape libraries require manual steps</li>
+          <li>Not suitable for all environments</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Critical — Unsupported Recovery Methods</div>
+      <p>Using VM snapshots, OS-level cloning, or system-level backups to recover a CommServe or Media Agent is <strong>not supported</strong> by Commvault. One documented case shows a customer who reverted a CommServe VM snapshot after a failed OS upgrade — this led to backup failures and eventual data loss. Commvault Support declined responsibility because the recovery method was not documented or supported. Always follow the procedures outlined in official Commvault documentation.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Installing Packages on the New Media Agent</h3>
+    <p>To identify what packages are installed on the current MA, go to CommCell Console → Client Computers → right-click the MA → View Installed Software. Install the same package set locally on the new MA. Do not attempt to push packages from the CommServe if the new MA has not yet registered.</p>
+    <div class="callout best">
+      <div class="callout-title">✅ Best Practice — Package Matching</div>
+      <p>The new Media Agent must have the exact same Commvault version and service pack level as the existing CommServe. Version mismatches can prevent the MA from registering or cause unpredictable behavior during data movement operations.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 7: MA RECOVERY ============================= -->
+<section id="ma-recovery" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🆘</div>
+    <div>
+      <div class="section-title">Media Agent Recovery — When the MA is Offline</div>
+      <div class="section-subtitle">Rebuilding a failed Media Agent from scratch when the original is inaccessible</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Scenarios That Trigger MA Recovery</h3>
+    <p>Media Agent recovery (as opposed to refresh) is initiated when the existing MA is <em>completely inaccessible</em> — not just slow or degraded, but genuinely unreachable at both the OS and Commvault levels. Common triggers include:</p>
+    <div class="status-row">
+      <span class="status-pill sp-red">💥 Physical Hardware Failure</span>
+      <span class="status-pill sp-red">🔥 OS Crash / BSOD</span>
+      <span class="status-pill sp-red">💾 Disk Corruption</span>
+      <span class="status-pill sp-yellow">🔌 Network Isolation</span>
+      <span class="status-pill sp-yellow">⚡ Power Failure</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>MA Recovery Method 1 — Full Rebuild</h3>
+    <p>The rebuild approach provisions a completely new server and reconstructs the MA configuration to match the original. It does not require any data from the old MA to begin.</p>
+
+    <div class="flow">
+      <div class="flow-title">Media Agent Full Rebuild Procedure</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Provision a New Server (Same Specs)</strong>
+            <p>Request a new physical server or VM with identical specs to the failed MA — same vCPU count, RAM, and disk sizes. For VMs, engage your virtualization team (VMware, Hyper-V, etc.).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Install the Same OS Version</strong>
+            <p>Install the exact same operating system version as the old MA (e.g., Windows Server 2022). This ensures binary compatibility with Commvault packages.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Configure Identical Hostname and IP Address</strong>
+            <p>Assign the same hostname and IP address as the failed MA. This is critical — the CommServe looks up the MA by these identifiers. Using a different hostname or IP will cause a duplicate entry conflict and the MA will not connect correctly.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">powershell — set hostname</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="comment"># Set hostname to match original MA (example: CORPMA-WIN01)</span>
+<span class="cmd">Rename-Computer</span> <span class="param">-NewName</span> <span class="val">"CORPMA-WIN01"</span> <span class="param">-Restart</span>
+
+<span class="comment"># Set static IP (example values — use actual production values)</span>
+<span class="cmd">New-NetIPAddress</span> <span class="param">-IPAddress</span> <span class="val">"10.20.30.100"</span> <span class="param">-PrefixLength</span> <span class="val">24</span> <span class="param">-DefaultGateway</span> <span class="val">"10.20.30.1"</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Install Commvault Packages Locally</strong>
+            <p>Copy the Commvault setup files to the new server. Install locally (do not push from CommServe) using the same packages and version as the failed MA. During installation, specify the same CommServe hostname/IP that was used originally.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>MA Comes Online in CommCell Console</strong>
+            <p>Once installation completes and the Commvault services start, the MA should automatically appear online in the CommCell Console — because it re-presents the same hostname and IP that the CommServe already has registered.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Reconnect Storage Resources</strong>
+            <p>Handle storage reconnection based on library type (see section below). DDB and Index Cache drives must be provisioned and configured. Verify connectivity with a test backup job.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Storage Reconnection After MA Rebuild</h3>
+    <p>After the MA rebuild, storage resources must be reconnected. The approach differs by storage type:</p>
+
+    <div class="strip-row">
+      <span class="strip-label">📡 SAN-Based Disk Library</span>
+      <span class="strip-val">Unzone the LUN from the old MA WWN. Rezone/map the LUN to the new MA's WWN. Rescan disks on the new MA — the drive should appear with the original data intact.</span>
+      <span class="strip-badge sb-ok">Data Preserved</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">💾 Direct-Attached Storage (DAS)</span>
+      <span class="strip-val">No remote remapping possible. Wait for hardware repair or accept data loss. If accepting data loss, create CVMagnetic folder structure manually and run DDB Verification.</span>
+      <span class="strip-badge sb-warn">Data Loss Risk</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">☁ Cloud Library</span>
+      <span class="strip-val">No data loss. Cloud data is remote and unaffected by MA hardware failure. Simply reconnect the cloud library configuration on the new MA.</span>
+      <span class="strip-badge sb-ok">No Data Loss</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">📼 Tape Library</span>
+      <span class="strip-val">No data loss. Physically reconnect tape library cables to the new MA. Run storage detection (Storage → Expert Storage Configuration → Detect/Configure Device).</span>
+      <span class="strip-badge sb-ok">No Data Loss</span>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Connectivity Verification After Rebuild</div>
+      <p>If the MA shows offline after rebuild despite correct hostname and IP, run a telnet test to the CommServe on port 443. If telnet fails, engage the network team to investigate firewall rules or routing issues between the new MA and CommServe.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 8: DDB RECOVERY ============================= -->
+<section id="ddb-recovery" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🗄</div>
+    <div>
+      <div class="section-title">DDB Store Management: Seal vs. Full Verification</div>
+      <div class="section-subtitle">Handling DDB data loss — choosing between sealing a store or running verification</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>When DDB Data is Lost</h3>
+    <p>If disk library data (and its associated DDB signatures) is lost due to storage failure, Commvault does not automatically know the data is gone. Without intervention, new backup jobs will attempt to reference missing chunks and fail. Two approaches exist to resolve this:</p>
+
+    <div class="compare">
+      <div class="cmp-box cmp-a">
+        <h5>🔒 Seal the DDB Store</h5>
+        <ul>
+          <li>Tells Commvault: "Do not reference this store for new jobs"</li>
+          <li>A new sub-store is created automatically</li>
+          <li>All intact signatures in the old store are abandoned</li>
+          <li>New backups recreate all chunks — storage grows temporarily</li>
+          <li>No deduplication savings from old store for first full backup</li>
+          <li><strong>Best when:</strong> All data in the store is lost</li>
+        </ul>
+      </div>
+      <div class="cmp-box cmp-b">
+        <h5>🔍 DDB Full Verification</h5>
+        <ul>
+          <li>Commvault checks each signature → verifies chunk on storage</li>
+          <li>Missing chunks are flagged as "bad"</li>
+          <li>New jobs skip bad chunks, creating new ones only for missing data</li>
+          <li>Intact chunks (good data) continue to be referenced</li>
+          <li>More efficient — avoids duplicating still-valid data</li>
+          <li><strong>Best when:</strong> Partial data loss (some mount paths still have data)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Key Distinction</div>
+      <p>When you <strong>seal</strong> the store, even chunks that are still present on storage will be duplicated in the next backup — because the old store is fully abandoned. With <strong>DDB Full Verification</strong>, only the actually missing chunks are recreated. If storage growth is a concern and some data is still intact, always prefer verification over sealing.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running DDB Full Verification</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">procedure — CommCell Console</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Navigate to: Storage Resources → Storage Pools → [Your Pool]</span>
+<span class="comment"># Right-click the library → Alt Task → Run Data Verification Job</span>
+<span class="comment"># IMPORTANT: Uncheck the "Incremental" option to run FULL verification</span>
+<span class="comment"># (Incremental only checks jobs not previously verified — may miss pre-crash jobs)</span>
+
+<span class="comment"># After verification completes, check job logs for:</span>
+<span class="comment">#   - Number of bad chunks identified</span>
+<span class="comment">#   - Jobs that reference corrupted/missing data</span></div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Incremental vs. Full Verification</div>
+      <p>By default, Commvault runs <strong>incremental</strong> DDB verification, which only checks jobs not previously verified. After a crash or data loss event, you must run <strong>full verification</strong> (uncheck the incremental option) to inspect all backup jobs and identify every missing chunk across the entire history — including jobs that were already "verified" before the failure occurred.</p>
+    </div>
+
+    <h4>How to Seal a DDB Store</h4>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">procedure — CommCell Console</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Navigate to: Storage Resources → Storage Pools → [Your Pool]</span>
+<span class="comment"># Right-click the DDB Store name</span>
+<span class="comment"># Select "Seal DDB Store"</span>
+<span class="comment"># Type the store name in the confirmation dialog and click OK</span>
+
+<span class="comment"># After sealing, a new Store ID is created automatically</span>
+<span class="comment"># Example: Old Store ID = 42 → New Store ID = 44 (after seal)</span>
+<span class="comment"># New backup jobs will build a fresh signature base in the new store</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Restoring CVMagnetic Folder Structure After Data Loss</h3>
+    <p>When a mount path loses its data but the library must come back online (e.g., after DAS failure with new disk provisioned), Commvault requires the CVMagnetic folder structure to exist before it can recognize the mount path:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">cmd / bash — recreate CVMagnetic structure</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># On Windows (example: F:\ is the new blank disk for the mount path)</span>
+<span class="cmd">mkdir</span> <span class="path">F:\CVMagnetic</span>
+
+<span class="comment"># On Linux (example: /disklib is the mount path)</span>
+<span class="cmd">mkdir</span> <span class="param">-p</span> <span class="path">/disklib/CVMagnetic</span>
+
+<span class="comment"># Once this structure exists, Commvault will detect the mount path as online</span>
+<span class="comment"># Then run DDB Full Verification to mark missing chunks as bad</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 9: KUBERNETES ============================= -->
+<section id="kubernetes" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">☸</div>
+    <div>
+      <div class="section-title">Kubernetes Backup &amp; Recovery with Commvault</div>
+      <div class="section-subtitle">Architecture, supported workloads, and the backup lifecycle for container environments</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Kubernetes Fundamentals for Backup Admins</h3>
+    <p>Kubernetes (K8s) is an open-source container orchestration platform. Containers (pods) provide isolated runtime environments for applications. As a backup administrator, you do not need to master Kubernetes internals, but you must understand the key concepts that directly affect backup scope, capability, and configuration.</p>
+
+    <div class="arch">
+      <div class="arch-title">Kubernetes Architecture — Backup Admin Perspective</div>
+      <div class="arch-row">
+        <div class="arch-box abox-blue">Master Node<small>Control Plane · etcd · API Server</small></div>
+      </div>
+      <div class="arch-connector">⬇ Controls</div>
+      <div class="arch-row">
+        <div class="arch-box abox-green">Worker Node 1<small>Application Pods</small></div>
+        <div class="arch-box abox-green">Worker Node 2<small>Application Pods</small></div>
+        <div class="arch-box abox-green">Worker Node N<small>Application Pods</small></div>
+      </div>
+      <div class="arch-connector">⬇ Pods use</div>
+      <div class="arch-row">
+        <div class="arch-box abox-orange">Persistent Volume Claims (PVC)<small>Storage bound to pods</small></div>
+        <div class="arch-box abox-purple">ConfigMaps / Secrets<small>Configuration data</small></div>
+        <div class="arch-box abox-gold">Namespaces<small>Logical groupings</small></div>
+      </div>
+      <div class="arch-connector">⬇ Backed up by</div>
+      <div class="arch-row">
+        <div class="arch-box abox-blue">Commvault Access Node (VSA)<small>Installed VSA package · agentless backup</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Kubernetes Distributions &amp; Flavors</h3>
+    <div class="grid-2">
+      <div>
+        <h4>On-Premises / Unmanaged</h4>
+        <ul>
+          <li><strong>Vanilla Kubernetes</strong> — Open-source, self-managed</li>
+          <li><strong>Red Hat OpenShift</strong> — Enterprise Kubernetes distribution</li>
+          <li><strong>Rancher</strong> — Multi-cluster Kubernetes management</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Cloud-Managed (Managed Services)</h4>
+        <ul>
+          <li><strong>EKS</strong> — Amazon Elastic Kubernetes Service</li>
+          <li><strong>AKS</strong> — Azure Kubernetes Service</li>
+          <li><strong>GKE</strong> — Google Kubernetes Engine</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Managed vs. Unmanaged — etcd Backup Difference</div>
+      <p>In <strong>vanilla / on-premises</strong> Kubernetes, Commvault can back up the etcd database (the cluster's "brain" storing all configuration data). In <strong>managed Kubernetes clusters</strong> (EKS, AKS, GKE), the cloud provider manages etcd directly and does not expose direct access to third-party tools. This is not a Commvault limitation — it is a deliberate security restriction by cloud vendors to prevent accidental cluster corruption. All other backup capabilities remain identical between managed and unmanaged clusters.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What Commvault CAN Backup in Kubernetes</h3>
+    <ul>
+      <li><strong>Complete cluster namespaces</strong> — including all resources (namespace-scoped and cluster-scoped)</li>
+      <li><strong>Secrets &amp; ConfigMaps</strong> — application configuration and sensitive data</li>
+      <li><strong>Storage Classes</strong> — cluster-level storage definitions</li>
+      <li><strong>Persistent Volume Claims (PVC)</strong> — storage claimed by pods</li>
+      <li><strong>Persistent Volumes (PV)</strong> — storage actively bound to running pods</li>
+      <li><strong>Helm chart-deployed applications</strong> — pods deployed via Helm automation</li>
+      <li><strong>kubectl-deployed resources</strong> — pods deployed via CLI YAML manifests</li>
+      <li><strong>etcd database</strong> — on-premises/vanilla clusters only</li>
+    </ul>
+
+    <h4>What Commvault CANNOT Backup</h4>
+    <ul>
+      <li>In-tree storage volume plugins</li>
+      <li>Temporary/ephemeral storage volumes</li>
+      <li>PKI certificates</li>
+      <li>Windows-based containers (Linux containers only)</li>
+      <li>Certain bundled applications (Robin.io, etc.)</li>
+      <li>etcd in managed Kubernetes clusters (EKS, AKS, GKE)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>PVC vs PV — The Key Distinction</h3>
+    <div class="compare">
+      <div class="cmp-box cmp-a">
+        <h5>📋 Persistent Volume Claim (PVC)</h5>
+        <ul>
+          <li>Storage requested via YAML manifest</li>
+          <li>Not yet bound to any running pod</li>
+          <li>"Claimed" but not yet "consumed"</li>
+          <li>Equivalent: Reserved parking spot, no car yet</li>
+        </ul>
+      </div>
+      <div class="cmp-box cmp-b">
+        <h5>💽 Persistent Volume (PV)</h5>
+        <ul>
+          <li>Storage actively bound to a running pod</li>
+          <li>Pod is writing/reading from this volume</li>
+          <li>Snapshot required during backup</li>
+          <li>Equivalent: Reserved spot with a car parked in it</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Kubernetes Backup Types</h3>
+    <p>Commvault provides three distinct backup types for Kubernetes environments, each with different scope and use cases:</p>
+    <div class="strip-row">
+      <span class="strip-label">🌐 Full Cluster Backup</span>
+      <span class="strip-val">Selects <em>all namespaces</em> (including system namespaces) and all cluster-scoped API resources. A special application group configuration.</span>
+      <span class="strip-badge sb-info">Widest Scope</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">📦 Namespace Backup</span>
+      <span class="strip-val">Default method. Protects all API resources within the parent namespace. Namespaces can be selected by label or by browsing the cluster live.</span>
+      <span class="strip-badge sb-ok">Default Method</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">🎯 Application Backup</span>
+      <span class="strip-val">Targets an individual application (Pod, DaemonSet, Deployment, StatefulSet, or Helm Chart). Intelligently infers related resources such as Secrets, ConfigMaps, and Namespaces.</span>
+      <span class="strip-badge sb-ok">Granular</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Backup Modes: Snapshot-Based vs. Streaming</h3>
+    <p>All three backup types can operate in one of two modes, determined automatically by whether a <code>VolumeSnapshotClass</code> object is configured in the cluster:</p>
+    <div class="compare">
+      <div class="cmp-box cmp-a">
+        <h5>📸 CSI Snapshot-Based (Preferred)</h5>
+        <ul>
+          <li>Requires <code>VolumeSnapshotClass</code> configured in cluster</li>
+          <li>Uses CSI driver to snapshot PVCs in parallel per application</li>
+          <li>Snapshots created sequentially per app by the access node</li>
+          <li>Protected in parallel after snapshots complete</li>
+          <li>Temporary pod and PVC created from snapshot to read data</li>
+          <li>All temporary resources cleaned up after backup</li>
+        </ul>
+      </div>
+      <div class="cmp-box cmp-b">
+        <h5>🌊 Streaming (Legacy Fallback)</h5>
+        <ul>
+          <li>Used when <code>VolumeSnapshotClass</code> is NOT configured</li>
+          <li>Creates a temporary pod and mounts the PVC directly</li>
+          <li>Reads data through the Kubernetes API Server</li>
+          <li>No snapshot taken — data read live from the volume</li>
+          <li>Temporary pod deleted after backup completes</li>
+          <li>Less preferred — not application-consistent</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>CSI Snapshot-Based Backup Process (Step by Step)</h3>
+    <p>The following is the exact sequence Commvault follows for a snapshot-based Kubernetes backup, as documented in the official Commvault 11.40 documentation:</p>
+
+    <div class="flow">
+      <div class="flow-title">Commvault Kubernetes CSI Snapshot Backup Lifecycle</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Discover Applications</strong>
+            <p>Commvault discovers applications based on the application group content definition — namespaces, labels, or discrete application selections. All targeted PersistentVolumeClaims (PVCs) within the backup namespace are identified.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2a</div>
+          <div class="flow-content">
+            <strong>Determine VolumeSnapshotClass for Each PVC</strong>
+            <p>For each PVC associated with the application, Commvault determines the appropriate VolumeSnapshotClass. By default, it uses the VolumeSnapshotClass associated with the StorageClass of the PVC. To override, add the label <code>cv-snapshotter: &lt;volumesnapshotclass-name&gt;</code> to the StorageClass.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash — label StorageClass with specific snapshotter</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="cmd">kubectl</span> patch storageclass my-storageclass \
+  --patch '{"metadata":{"labels":{"cv-snapshotter":"my-vsc-name"}}}'</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2b</div>
+          <div class="flow-content">
+            <strong>Create VolumeSnapshot of Each PVC</strong>
+            <p>Commvault triggers the CSI driver to create a <code>VolumeSnapshot</code> object for each PVC. Snapshot creation runs <strong>sequentially per application</strong> by the access node, even though the subsequent backup transfer runs in parallel.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2c</div>
+          <div class="flow-content">
+            <strong>Create a Temporary PVC from the Snapshot</strong>
+            <p>Commvault creates a <strong>temporary PVC</strong> sourced from the VolumeSnapshot — not a PV directly. By default, the same StorageClass as the source PVC is used for this temporary PVC. To specify a different StorageClass, add the label <code>cv-backup-storageclass:&lt;storage_class_name&gt;</code> to the VolumeSnapshotClass.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash — label VolumeSnapshotClass with backup StorageClass</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="cmd">kubectl</span> patch volumesnapshotclass my-vsc \
+  --patch '{"metadata":{"labels":{"cv-backup-storageclass":"my-backup-sc"}}}'</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2d</div>
+          <div class="flow-content">
+            <strong>Create a Temporary Pod with the Temporary PVC Mounted</strong>
+            <p>Commvault creates a temporary pod and mounts the <strong>temporary PVC</strong> (created in step 2c) into it. This pod reads data through the Kubernetes API Server and streams it to the backup destination. The temporary pod uses the temporary PVC — not the original production PVC — ensuring the live workload is never directly accessed during backup.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Cleanup Temporary Resources</strong>
+            <p>After backup data transfer completes, Commvault deletes: the <strong>temporary pod</strong>, the <strong>temporary VolumeSnapshot</strong>, and the <strong>temporary PVC</strong>. If the backup or access node fails mid-operation, temporary resources may not be cleaned up automatically — see Restrictions and Known Issues for Kubernetes in the Commvault documentation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hflow" style="margin-top:16px">
+      <div class="hflow-box active">1. Discover Apps &amp; PVCs<small>Application group content</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">2a. Determine VolumeSnapshotClass<small>Per PVC</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">2b. Create VolumeSnapshot<small>Sequential per app</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">2c. Create Temp PVC<small>From snapshot</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">2d. Temp Pod Created<small>Temp PVC mounted · reads via API Server</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">3. Cleanup<small>Delete pod, snapshot, PVC</small></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Streaming Backup Process (No VolumeSnapshotClass)</h3>
+    <p>When the Kubernetes cluster does not have a <code>VolumeSnapshotClass</code> configured, Commvault falls back to streaming backups:</p>
+    <div class="flow">
+      <div class="flow-title">Streaming Backup Lifecycle</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Discover Applications</strong>
+            <p>Applications are discovered based on the application group content definition, same as snapshot-based backups.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Create Temporary Pod with Volume Mounted Directly</strong>
+            <p>For each PVC associated with the applications in the backup namespace, Commvault creates a temporary pod and mounts the original volume directly (no snapshot). Data is read live through the Kubernetes API Server.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Delete Temporary Pod</strong>
+            <p>After backup data transfer completes, the temporary pod is deleted. Unlike snapshot-based backups, there is no VolumeSnapshot or temporary PVC to clean up.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Failure Handling &amp; Job Restarts</h3>
+    <div class="strip-row">
+      <span class="strip-label">Individual app fails</span>
+      <span class="strip-val">Access node restarts the app-specific job from the beginning. Previous failed backup data is discarded and re-transferred.</span>
+      <span class="strip-badge sb-ok">Auto-Retry</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Child access node fails</span>
+      <span class="strip-val">Operations handled by that access node are rescheduled on another available access node.</span>
+      <span class="strip-badge sb-ok">Rescheduled</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Coordinator access node fails</span>
+      <span class="strip-val">Partial or complete failure status registered. Job is <strong>not</strong> restarted automatically.</span>
+      <span class="strip-badge sb-warn">Job Fails</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Temporary worker pod fails</span>
+      <span class="strip-val">Job is not restarted. Marked as <em>Completed with Errors</em>.</span>
+      <span class="strip-badge sb-warn">Errors</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Backup job restarts (default)</span>
+      <span class="strip-val">10 restart attempts, every 20 minutes. Restore jobs retry up to 144 times, every 20 minutes.</span>
+      <span class="strip-badge sb-info">Configurable</span>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Temporary Resource Cleanup on Failure</div>
+      <p>If a Kubernetes backup or restore operation is interrupted (access node failure, pod crash, network loss), Commvault may not have an opportunity to remove temporary VolumeSnapshots, volumes, and Commvault temporary worker pods. These orphaned resources must be cleaned up manually. Refer to the "Cleanup of Temporary Resources" section in <em>Restrictions and Known Issues for Kubernetes</em> in the Commvault documentation.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 10: K8S SETUP ============================= -->
+<section id="k8s-setup" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🏗</div>
+    <div>
+      <div class="section-title">Kubernetes Cluster Setup for Lab Environment</div>
+      <div class="section-subtitle">Ubuntu 22 single-node cluster with containerd and Calico networking</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Lab Prerequisites</h3>
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val">2+</div>
+        <div class="metric-label">vCPU (minimum)</div>
+        <div class="metric-desc">4 recommended</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val green">4GB+</div>
+        <div class="metric-label">RAM (minimum)</div>
+        <div class="metric-desc">8GB recommended</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val orange">50GB</div>
+        <div class="metric-label">Disk (minimum)</div>
+        <div class="metric-desc">OS + container images</div>
+      </div>
+    </div>
+    <p>A single-node cluster (where the master node also acts as the worker node) is sufficient for lab purposes. The backup and restore process is identical regardless of cluster size — a single-node lab provides the same Commvault configuration experience as a multi-node production cluster.</p>
+  </div>
+
+  <div class="card">
+    <h3>Cluster Setup Steps (Ubuntu 22)</h3>
+    <div class="flow">
+      <div class="flow-title">Kubernetes Installation on Ubuntu 22</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Configure Static IP &amp; Enable SSH</strong>
+            <p>Assign a static IP to the VM and ensure SSH is reachable. Use SSH for all subsequent steps to enable copy-paste of commands.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Disable Swap &amp; Load Kernel Modules</strong>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="cmd">swapoff</span> -a
+<span class="cmd">sed</span> -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+<span class="comment"># Load required kernel modules</span>
+<span class="cmd">modprobe</span> overlay
+<span class="cmd">modprobe</span> br_netfilter
+
+<span class="comment"># Configure sysctl for Kubernetes networking</span>
+<span class="cmd">cat</span> &lt;&lt;EOF | <span class="cmd">tee</span> /etc/sysctl.d/kubernetes.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+<span class="cmd">sysctl</span> --system</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Install Container Runtime (containerd)</strong>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="cmd">apt-get</span> update
+<span class="cmd">apt-get</span> install -y containerd
+<span class="cmd">mkdir</span> -p /etc/containerd
+<span class="cmd">containerd</span> config default | <span class="cmd">tee</span> /etc/containerd/config.toml
+<span class="cmd">systemctl</span> restart containerd
+<span class="cmd">systemctl</span> enable containerd</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Install Kubernetes Packages (kubeadm, kubelet, kubectl)</strong>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="cmd">apt-get</span> install -y apt-transport-https ca-certificates curl
+<span class="cmd">curl</span> -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | <span class="cmd">apt-key</span> add -
+<span class="cmd">echo</span> "deb https://apt.kubernetes.io/ kubernetes-xenial main" | <span class="cmd">tee</span> /etc/apt/sources.list.d/kubernetes.list
+<span class="cmd">apt-get</span> update
+<span class="cmd">apt-get</span> install -y kubelet kubeadm kubectl
+<span class="cmd">apt-mark</span> hold kubelet kubeadm kubectl</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Initialize Cluster &amp; Configure kubectl</strong>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="cmd">kubeadm</span> init --pod-network-cidr=192.168.0.0/16
+
+<span class="comment"># Set up kubectl access for regular user</span>
+<span class="cmd">mkdir</span> -p $HOME/.kube
+<span class="cmd">cp</span> -i /etc/kubernetes/admin.conf $HOME/.kube/config
+<span class="cmd">chown</span> $(id -u):$(id -g) $HOME/.kube/config</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Install Pod Network (Calico)</strong>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="cmd">kubectl</span> apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">7</div>
+          <div class="flow-content">
+            <strong>Remove Master Node Taint (Single-Node Lab Only)</strong>
+            <p>By default, the master node does not schedule application pods. For a single-node lab, remove this taint to allow application pods on the master.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="cmd">kubectl</span> taint nodes --all node-role.kubernetes.io/control-plane-</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">8</div>
+          <div class="flow-content">
+            <strong>Install Volume Snapshot CRDs &amp; CSI Snapshot Controller</strong>
+            <p>Required for Commvault to take snapshots of Persistent Volumes. Without this, PVC-based backups cannot proceed.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body"><span class="comment"># Install Volume Snapshot CRDs</span>
+<span class="cmd">kubectl</span> apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/main/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+<span class="cmd">kubectl</span> apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/main/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+<span class="cmd">kubectl</span> apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/main/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+
+<span class="comment"># Install Snapshot Controller</span>
+<span class="cmd">kubectl</span> apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/main/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
+<span class="cmd">kubectl</span> apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/main/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Cluster Validation Commands</h3>
+    <p>After cluster setup, validate the environment by running the following commands. Share these with your Kubernetes admin when deploying in production. All commands must return healthy output before configuring Commvault.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — Kubernetes cluster validation</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Verify cluster control plane info (use this IP in Commvault config)</span>
+<span class="cmd">kubectl</span> cluster-info
+
+<span class="comment"># All nodes must show "Ready" status</span>
+<span class="cmd">kubectl</span> get nodes
+
+<span class="comment"># Check all system pods are Running</span>
+<span class="cmd">kubectl</span> get pods -n kube-system
+
+<span class="comment"># Verify CSI drivers are installed and running</span>
+<span class="cmd">kubectl</span> get pods -n kube-system | <span class="cmd">grep</span> csi
+
+<span class="comment"># Check storage classes</span>
+<span class="cmd">kubectl</span> get storageclass
+
+<span class="comment"># Verify Volume Snapshot Classes exist (required for PV backup)</span>
+<span class="cmd">kubectl</span> get volumesnapshotclass
+
+<span class="comment"># List all namespaces</span>
+<span class="cmd">kubectl</span> get namespaces
+
+<span class="comment"># Check no resource limits are blocking pod scheduling</span>
+<span class="cmd">kubectl</span> describe node | <span class="cmd">grep</span> -A 5 "Taints"</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 11: K8S COMMVAULT CONFIG ============================= -->
+<section id="k8s-config" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">⚙</div>
+    <div>
+      <div class="section-title">Configuring Kubernetes in Commvault</div>
+      <div class="section-subtitle">Service accounts, access nodes, cluster registration, and application groups</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Configuration Overview — 4 Steps</h3>
+    <p>Kubernetes cluster configuration is available <strong>only in the Command Center</strong> (not in the legacy CommCell Console). The entire configuration workflow comprises four sequential steps:</p>
+
+    <div class="hflow">
+      <div class="hflow-box active">Step 1<br>Service Account<small>Create K8s service account with cluster role</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Step 2<br>Access Node<small>Install VSA package · designate as K8s proxy</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Step 3<br>Cluster Config<small>Register cluster in Commvault using API server URL + token</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Step 4<br>Application Group<small>Define namespaces / workloads to protect</small></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 1: Creating the Kubernetes Service Account</h3>
+    <p>Commvault requires a Kubernetes service account with appropriate cluster-level permissions to discover and backup resources. Share the official Commvault documentation with your Kubernetes admin to create the service account.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — Create service account (run on K8s master node)</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Option 1: Cluster Admin Role (full access — simpler, for lab use)</span>
+<span class="cmd">kubectl</span> create serviceaccount commvault-sa -n default
+<span class="cmd">kubectl</span> create clusterrolebinding commvault-admin-binding \
+  --clusterrole=cluster-admin \
+  --serviceaccount=default:commvault-sa
+
+<span class="comment"># Option 2: Restricted Role (backups and restores only — for production)</span>
+<span class="comment"># Ask K8s admin to bind the "commvault" role instead of cluster-admin</span>
+<span class="cmd">kubectl</span> create clusterrolebinding commvault-binding \
+  --clusterrole=commvault \
+  --serviceaccount=default:commvault-sa
+
+<span class="comment"># Create a secret for the service account token</span>
+<span class="cmd">kubectl</span> apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: commvault-sa-secret
+  annotations:
+    kubernetes.io/service-account.name: commvault-sa
+type: kubernetes.io/service-account-token
+EOF
+
+<span class="comment"># Extract the token — copy this for Commvault configuration</span>
+<span class="cmd">kubectl</span> get secret commvault-sa-secret -o jsonpath='{.data.token}' | <span class="cmd">base64</span> -d</div>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">✅ Production Best Practice — Least Privilege</div>
+      <p>In production environments, use the Commvault-specific restricted role (<code>commvault</code>) rather than <code>cluster-admin</code>. The restricted role grants only the permissions required for backup and restore operations, following the principle of least privilege. Share the exact role YAML from the Commvault documentation with your Kubernetes admin for review before implementation.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 2: Access Node — VSA Package Requirement</h3>
+    <p>Kubernetes backups in Commvault are agentless — no agent is installed inside pods. Instead, a designated server (the <strong>Access Node</strong>) acts as a proxy. This server must have the Commvault <strong>Virtual Server Agent (VSA)</strong> package installed.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">Access Node Role</span>
+      <span class="strip-val">Communicates with the Kubernetes API Server to orchestrate discovery, snapshots, and data movement</span>
+      <span class="strip-badge sb-info">Mandatory</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Required Package</span>
+      <span class="strip-val">Virtual Server Agent (VSA) must be installed on the Access Node server</span>
+      <span class="strip-badge sb-ok">VSA Package</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Network Requirement</span>
+      <span class="strip-val">Access Node must be able to reach the Kubernetes API Server (kube-apiserver) — verify connectivity before configuring</span>
+      <span class="strip-badge sb-warn">Check Firewall</span>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Do Not Install VSA on CommServe (Production)</div>
+      <p>In lab environments, installing VSA and Media Agent packages on the CommServe is acceptable to conserve resources. In production, always use dedicated Access Node / Media Agent servers. The CommServe is critical infrastructure — adding proxy workloads to it increases risk and is not a supported configuration for production use.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 3: Registering the Kubernetes Cluster in Commvault</h3>
+    <p>In the Command Center, navigate to Protect → Kubernetes → Add Cluster. You will need:</p>
+    <ul>
+      <li><strong>Control Plane URL</strong> — from <code>kubectl cluster-info</code> output (e.g., <code>https://10.0.0.10:6443</code>)</li>
+      <li><strong>Service Account Name</strong> — e.g., <code>commvault-sa</code></li>
+      <li><strong>Service Account Token</strong> — extracted in Step 1</li>
+      <li><strong>Access Node</strong> — the server with VSA package installed</li>
+    </ul>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Configuration Location</div>
+      <p>Kubernetes cluster configuration is only available in the <strong>Command Center</strong> (the modern web UI). The legacy CommCell Console does not provide Kubernetes configuration options. Always use the Command Center for all Kubernetes-related tasks.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 4: Creating an Application Group</h3>
+    <p>The Application Group (subclient equivalent for Kubernetes) defines what to back up. Configure:</p>
+    <ul>
+      <li>Select the registered Kubernetes cluster</li>
+      <li>Choose namespaces or specific labels to include</li>
+      <li>Select backup storage (disk library, cloud library)</li>
+      <li>Optionally configure application-consistent backup options</li>
+      <li>Associate a storage policy / plan</li>
+    </ul>
+    <p>After the Application Group is saved, run a manual backup to validate the end-to-end flow: discovery → snapshot → data transfer → cleanup.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= SECTION 12: Q&A ============================= -->
+<section id="qa" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">💬</div>
+    <div>
+      <div class="section-title">Scenario-Based Interview Q&amp;A</div>
+      <div class="section-subtitle">Real-world questions from backup engineering and technical interviews</div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A Commvault backup job on a cloud library is running very slowly. The job details show most time spent on network write operations. How do you diagnose this?</div>
+    <div class="qa-a">Run the Commvault Cloud Test Tool from the Media Agent that hosts the cloud library. Select "Upload/Download Speed Test" with a file size of at least 100–1000 MB to get accurate throughput measurements. Compare the result against the baseline documented at implementation. If the speed has degraded significantly, engage the network or cloud team — likely causes include VPN congestion, ISP throttling, or cloud-side rate limiting. Also verify there are no firewall ACL changes since implementation.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">Your Linux Media Agent has ransomware protection enabled and you need to run cvdiskperf for a storage benchmarking exercise. What is the procedure?</div>
+    <div class="qa-a">On a Commvault Linux Media Agent, ransomware protection is implemented via SELinux enforcement. To run maintenance tasks such as disk performance testing, you must first place the MA in maintenance mode in the Command Center, then temporarily set SELinux to permissive using: <code>./cvsecurity.py pause_protection -i Instance001</code> (run from <code>/opt/commvault/MediaAgent64</code>). Verify the mode change with <code>sestatus</code> — it should show <em>Current mode: permissive</em>. Then run the disk performance test using <code>cvdiskperf</code>. After the test, immediately re-enable protection with <code>./cvsecurity.py resume_protection -i Instance001</code> and confirm with <code>sestatus</code> that it shows <em>Current mode: enforcing</em>. Never leave a Media Agent in permissive mode unattended.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is the difference between Media Agent Refresh and Media Agent Recovery? When do you use each?</div>
+    <div class="qa-a">Media Agent Refresh (or migration) is used when the existing MA is still online and accessible — you are deliberately moving the MA role to new hardware (e.g., end-of-life server, planned OS upgrade). Media Agent Recovery is used when the existing MA is inaccessible due to hardware failure, OS crash, or other disaster scenarios. In a refresh, you can use Commvault's Replace MA tool or manual migration steps while the old MA is still running. In a recovery, you must rebuild from scratch on a new server using the same hostname and IP as the failed MA.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A Media Agent disk library mount path lost all its data due to a DAS failure. The hardware team says the data is irrecoverable. What are your options and which do you recommend?</div>
+    <div class="qa-a">Two options: (1) Seal the DDB Store — Commvault creates a new sub-store and new backup jobs build fresh signatures. All chunks are recreated from scratch, causing temporary storage growth and loss of deduplication savings for the first full backup. (2) DDB Full Verification — Commvault scans all signatures, identifies missing chunks, marks them as bad, and only recreates missing data in future jobs. Option 2 (DDB Full Verification) is preferred when you have partial data — it preserves references to intact chunks and minimizes storage growth. Option 1 (Seal) is simpler but causes more duplication. Always run Full Verification with the incremental option unchecked for a complete post-failure scan.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is the significance of the IOMeter Max I/O Response Time recommendation of less than 2ms for DDB partitions?</div>
+    <div class="qa-a">The DDB (Deduplication Database) performs thousands of small random I/O lookups per second during backup operations. Each lookup checks whether an incoming data chunk is already stored (to avoid duplication). High I/O latency on the DDB partition directly translates to backup job slowness because jobs wait for DDB lookups to complete before writing data. Commvault recommends a maximum I/O response time of less than 2ms to ensure DDB lookups do not become a bottleneck. Consistently exceeding this threshold — especially exceeding 100ms — indicates the DDB partition storage needs to be upgraded or moved to faster storage (SSD/NVMe).</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">Why can't Commvault back up the etcd database on a managed Kubernetes cluster like EKS or AKS?</div>
+    <div class="qa-a">etcd is the core configuration database of Kubernetes, storing cluster state, secrets, pod definitions, and all resource configurations. In managed Kubernetes services (EKS, AKS, GKE), the cloud provider controls and manages etcd directly. To prevent accidental corruption or security risks from third-party access, cloud vendors deliberately do not expose etcd access to users or external tools. This is not a limitation of Commvault — it is an intentional access restriction enforced by the cloud provider. On self-managed (vanilla) Kubernetes clusters, where the cluster admin has full control, Commvault can back up etcd. The impact for managed clusters: cluster-level reconstruction must rely on cloud vendor-provided etcd backup/restore mechanisms in conjunction with Commvault's namespace and workload backups.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">How do you determine whether to use FET or BET when sizing a Commvault environment for IOPS recommendations?</div>
+    <div class="qa-a">The choice depends on your deduplication architecture. If you are using Commvault's software-based DDB deduplication, use the BET (Back-End Terabyte) — the actual storage consumed after deduplication, found in the Storage Utilization report (User Space column). If you are using storage-level deduplication (no software DDB), use the FET (Front-End Terabyte) — the total data presented for backup, found in the Chargeback report (Front-End Backup Size column). BET is smaller than FET because it reflects post-dedup storage. Basing your environment size classification on the correct metric ensures you look up the right IOPS recommendation from Commvault's sizing documentation.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">During Media Agent recovery, what happens if you configure the new MA with the same hostname but a different IP address than the original?</div>
+    <div class="qa-a">Commvault creates a duplicate/new client entry rather than recognizing it as the existing MA. The CommServe identifies clients by the combination of hostname and IP. If the IP is different, Commvault treats it as a new and separate client, creating a conflict or orphan entry. The original MA entry remains in the database with "offline" status, and the new installation creates its own registration. To avoid this: always configure the new MA with the exact same hostname AND IP address as the failed MA before installing Commvault packages. If the same IP cannot be reused (e.g., subnet change), engage Commvault Technical Support for the appropriate migration procedure.</div>
+  </div>
+</section>
+
+</div><!-- end main-content -->
+
+<!-- ============================= AUTHOR SECTION ============================= -->
+<div class="author-section">
+  <div class="author-title">About the Author</div>
+
+  <div class="author-card">
+    <div class="author-avatar">👨‍💻</div>
+    <div class="author-info">
+      <div class="author-name">Mohammed Abdul</div>
+      <div class="author-role">Data Protection Architect · 15+ Years Experience</div>
+      <div class="author-bio">
+        Mohammed Abdul is a Data Protection Architect with more than 15 years of experience in Hybrid Cloud and has worked with global clients across various industries. With extensive expertise in enterprise backup and recovery solutions, Mohammed specializes in Commvault, Veeam, NetBackup, and NetApp technologies, helping organizations design and implement robust data protection strategies.
+      </div>
+      <div class="badge-row">
+        <span class="badge cv">Commvault</span>
+        <span class="badge veeam">Veeam</span>
+        <span class="badge nb">NetBackup</span>
+        <span class="badge netapp">NetApp</span>
+        <span class="badge">Hybrid Cloud</span>
+        <span class="badge">15+ Years</span>
+      </div>
+      <a class="contact-card" href="/cdn-cgi/l/email-protection#6504070110094b08014b5755555555545557250208040c094b060a08">
+        ✉ <span class="__cf_email__" data-cfemail="51303335243d7f3c357f636161616160616311363c30383d7f323e3c">[email&#160;protected]</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <p>⚠ <strong>Disclaimer:</strong> This content is for educational purposes and tutorial material only. All IP addresses, hostnames, and environment-specific parameters used in this tutorial are illustrative examples and must be replaced with your actual environment values. Always refer to official Commvault documentation and follow your organization's procedures for production implementations. Commvault features and CLI syntax may vary by product version — always verify against your installed version's documentation before executing in a production environment.</p>
+  </div>
+</div>
+
+<footer>
+  <p>Commvault Software Administration · Tutorial 7 · Storage Performance, Media Agent Operations &amp; Kubernetes</p>
+  <p style="margin-top:6px; color:var(--text-dim);">© Mohammed Abdul · Data Protection Architect · For educational use only</p>
+</footer>
+</body>
+</html>
