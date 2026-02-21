@@ -1832,7 +1832,7 @@
       <li><strong>Secrets &amp; ConfigMaps</strong> — application configuration and sensitive data</li>
       <li><strong>Storage Classes</strong> — cluster-level storage definitions</li>
       <li><strong>Persistent Volume Claims (PVC)</strong> — storage claimed by pods</li>
-      <li><strong>Persistent Volumes (PV)</strong> — storage actively bound to running pods</li>
+      <li><strong>Persistent Volumes (PV)</strong> — cluster-scoped storage resources provisioned by an admin or dynamically by a StorageClass</li>
       <li><strong>Helm chart-deployed applications</strong> — pods deployed via Helm automation</li>
       <li><strong>kubectl-deployed resources</strong> — pods deployed via CLI YAML manifests</li>
       <li><strong>etcd database</strong> — on-premises/vanilla clusters only</li>
@@ -1855,19 +1855,19 @@
       <div class="cmp-box cmp-a">
         <h5>📋 Persistent Volume Claim (PVC)</h5>
         <ul>
-          <li>Storage requested via YAML manifest</li>
-          <li>Not yet bound to any running pod</li>
-          <li>"Claimed" but not yet "consumed"</li>
-          <li>Equivalent: Reserved parking spot, no car yet</li>
+          <li>A request for storage by a user or pod (namespace-scoped)</li>
+          <li>Specifies size, access mode, and optional StorageClass</li>
+          <li>Binds to a matching PV — pods reference the PVC, not the PV directly</li>
+          <li>Equivalent: A hotel reservation — you request a room but don't manage the room itself</li>
         </ul>
       </div>
       <div class="cmp-box cmp-b">
         <h5>💽 Persistent Volume (PV)</h5>
         <ul>
-          <li>Storage actively bound to a running pod</li>
-          <li>Pod is writing/reading from this volume</li>
-          <li>Snapshot required during backup</li>
-          <li>Equivalent: Reserved spot with a car parked in it</li>
+          <li>The actual storage resource provisioned in the cluster (cluster-scoped)</li>
+          <li>Created by an admin or dynamically via a StorageClass</li>
+          <li>Exists independently of any pod; one PV can only bind to one PVC at a time</li>
+          <li>Equivalent: The hotel room itself — exists and is managed independently of guests</li>
         </ul>
       </div>
     </div>
