@@ -384,8 +384,8 @@
 <!-- HERO -->
 <div class="hero">
   <div class="hero-badge">🌩 Tutorial 8 · Cloud Backup &amp; Restore</div>
-  <h1>Commvault Cloud Backup Mastery:<br><span>AirGap Protect, AWS EC2 &amp; S3</span></h1>
-  <p class="hero-desc">A comprehensive hands-on guide covering Commvault AirGap Protect Storage configuration, AWS EC2 agentless VM backup and restore, and Amazon S3 object storage protection using the Cloud Apps agent — including IAM role setup, access node deployment, storage accelerator architecture, and end-to-end restore procedures.</p>
+  <h1>Commvault Software Backup Mastery:<br><span>AirGap Protect, AWS EC2 &amp; S3</span></h1>
+  <p class="hero-desc">A comprehensive hands-on guide covering Commvault AirGap Protect Storage configuration, AWS EC2 agentless VM backup and restore, and Amazon S3 object storage protection using the CloudApps agent — including IAM role setup, access node deployment, storage accelerator architecture, and end-to-end restore procedures.</p>
   <div class="hero-tags">
     <span class="tag purple">☁ AirGap Protect Storage</span>
     <span class="tag blue">🖥 AWS EC2 Backup</span>
@@ -1231,39 +1231,39 @@
     <div class="section-icon icon-blue">🪣</div>
     <div>
       <div class="section-title">Amazon S3 Backup — Overview &amp; Architecture</div>
-      <div class="section-subtitle">Object storage protection using the Commvault Cloud Apps agent</div>
+      <div class="section-subtitle">Object storage protection using the Commvault Software CloudApps agent</div>
     </div>
   </div>
 
   <div class="card">
     <h3>What is Amazon S3?</h3>
     <p>Amazon S3 (Simple Storage Service) is AWS's <strong>object storage</strong> platform. It is used for storing files, videos, audio, images, and unstructured data — not databases or applications. You cannot install databases or applications on S3; it is pure object/file storage.</p>
-    <p>Commvault protects S3 (and other object storage types like Azure Blob, Google Cloud Storage, Amazon EFS, FSx) using a common agent called <strong>Cloud Apps</strong>. This is a different agent from the Virtual Server Agent (VSA) used for EC2 VM backups — though they can be installed on the same proxy server.</p>
+    <p>Commvault protects S3 (and other object storage types like Azure Blob, Google Cloud Storage, Amazon EFS, FSx) using a common agent called <strong>CloudApps</strong>. This is a different agent from the Virtual Server Agent (VSA) used for EC2 VM backups — though they can be installed on the same proxy server.</p>
 
     <div class="strip-row">
       <span class="strip-label">Amazon EFS</span>
-      <span class="strip-val">Elastic File System — NFS-based shared file storage. Protected by Cloud Apps agent.</span>
-      <span class="strip-badge sb-info">Cloud Apps</span>
+      <span class="strip-val">Elastic File System — NFS-based shared file storage. Protected by CloudApps agent.</span>
+      <span class="strip-badge sb-info">CloudApps</span>
     </div>
     <div class="strip-row">
       <span class="strip-label">Amazon FSx</span>
-      <span class="strip-val">Managed file storage (Windows or Lustre-based). Protected by Cloud Apps agent.</span>
-      <span class="strip-badge sb-info">Cloud Apps</span>
+      <span class="strip-val">Managed file storage (Windows or Lustre-based). Protected by CloudApps agent.</span>
+      <span class="strip-badge sb-info">CloudApps</span>
     </div>
     <div class="strip-row">
       <span class="strip-label">Amazon S3</span>
-      <span class="strip-val">Object storage for files, media, and unstructured data. Protected by Cloud Apps agent.</span>
-      <span class="strip-badge sb-info">Cloud Apps</span>
+      <span class="strip-val">Object storage for files, media, and unstructured data. Protected by CloudApps agent.</span>
+      <span class="strip-badge sb-info">CloudApps</span>
     </div>
     <div class="strip-row">
       <span class="strip-label">Azure Blob Storage</span>
-      <span class="strip-val">Microsoft Azure's object storage equivalent to S3. Also protected by Cloud Apps.</span>
-      <span class="strip-badge sb-info">Cloud Apps</span>
+      <span class="strip-val">Microsoft Azure's object storage equivalent to S3. Also protected by CloudApps.</span>
+      <span class="strip-badge sb-info">CloudApps</span>
     </div>
     <div class="strip-row">
       <span class="strip-label">Google Cloud Storage</span>
-      <span class="strip-val">GCP's object storage. Also protected by Cloud Apps agent.</span>
-      <span class="strip-badge sb-info">Cloud Apps</span>
+      <span class="strip-val">GCP's object storage. Also protected by CloudApps agent.</span>
+      <span class="strip-badge sb-info">CloudApps</span>
     </div>
   </div>
 
@@ -1272,7 +1272,7 @@
     <div class="arch-row">
       <div class="arch-box abox-blue">Amazon S3 Bucket<small>Source data to protect</small></div>
       <div class="arch-connector">→</div>
-      <div class="arch-box abox-purple">Proxy Client (EC2)<small>Cloud Apps package installed<br>Reads S3 bucket data</small></div>
+      <div class="arch-box abox-purple">Proxy Client (EC2)<small>CloudApps package installed<br>Reads S3 bucket data</small></div>
       <div class="arch-connector">→</div>
       <div class="arch-box abox-gold">Cloud Library<small>Backup destination<br>(e.g., another S3 bucket)</small></div>
     </div>
@@ -1292,7 +1292,7 @@
     <div class="hflow">
       <div class="hflow-box active">Step 1<small>Review system requirements for proxy client</small></div>
       <div class="hflow-arrow">→</div>
-      <div class="hflow-box active">Step 2<small>Deploy proxy client + install Cloud Apps package</small></div>
+      <div class="hflow-box active">Step 2<small>Deploy proxy client + install CloudApps package</small></div>
       <div class="hflow-arrow">→</div>
       <div class="hflow-box active">Step 3<small>Create S3 Virtual Client in Commvault</small></div>
       <div class="hflow-arrow">→</div>
@@ -1362,7 +1362,7 @@
             <div class="status-row">
               <span class="status-pill sp-green">✓ File System</span>
               <span class="status-pill sp-green">✓ File System Core</span>
-              <span class="status-pill sp-green">✓ Cloud Apps (under Applications section)</span>
+              <span class="status-pill sp-green">✓ CloudApps (under Applications section)</span>
               <span class="status-pill sp-green">✓ Storage Accelerator</span>
             </div>
           </div>
@@ -1467,8 +1467,8 @@ Credential Name: (user-defined name for this credential entry)</div>
         <div class="flow-step">
           <div class="flow-num">1</div>
           <div class="flow-content">
-            <strong>Navigate to S3 Virtual Client → Cloud Apps → Default Subclient → Properties</strong>
-            <p>In the CommCell Console client tree, expand the S3 Virtual Client, then <strong>Cloud Apps</strong>, right-click <strong>Default Subclient → Properties</strong>.</p>
+            <strong>Navigate to S3 Virtual Client → CloudApps → Default Subclient → Properties</strong>
+            <p>In the CommCell Console client tree, expand the S3 Virtual Client, then <strong>CloudApps</strong>, right-click <strong>Default Subclient → Properties</strong>.</p>
           </div>
         </div>
         <div class="flow-step">
@@ -1517,7 +1517,7 @@ Credential Name: (user-defined name for this credential entry)</div>
     </div>
     <div class="strip-row">
       <span class="strip-label">Data Flow</span>
-      <span class="strip-val">S3 Bucket → Proxy Client (Cloud Apps) → Storage Accelerator → Cloud Library (direct). Media Agent only receives metadata.</span>
+      <span class="strip-val">S3 Bucket → Proxy Client (CloudApps) → Storage Accelerator → Cloud Library (direct). Media Agent only receives metadata.</span>
       <span class="strip-badge sb-ok">With Storage Accelerator</span>
     </div>
     <div class="strip-row">
@@ -1610,7 +1610,7 @@ Credential Name: (user-defined name for this credential entry)</div>
 
   <div class="qa-block">
     <div class="qa-q">What Commvault agent is used to back up Amazon S3 buckets, and how does it differ from the EC2 backup agent?</div>
-    <div class="qa-a">Amazon S3 (and other cloud object storage types — Azure Blob, Google Cloud Storage, Amazon EFS, FSx) are protected using the <strong>Cloud Apps agent</strong>, not the Virtual Server Agent (VSA). While both agents can be installed on the same proxy EC2 instance, they serve distinct purposes. The VSA performs agentless EC2 virtual machine backups (snapshot-based). The Cloud Apps agent performs object-level backups of storage buckets — treating S3 bucket contents as files to be backed up and restored. For S3 backup, you create an <strong>S3 Virtual Client</strong> in the CommCell Console, configure authentication (Access Key + Secret Key is common), and select specific buckets as subclient content. The File System and File System Core packages are also required on the proxy alongside the Cloud Apps package.</div>
+    <div class="qa-a">Amazon S3 (and other cloud object storage types — Azure Blob, Google Cloud Storage, Amazon EFS, FSx) are protected using the <strong>CloudApps agent</strong>, not the Virtual Server Agent (VSA). While both agents can be installed on the same proxy EC2 instance, they serve distinct purposes. The VSA performs agentless EC2 virtual machine backups (snapshot-based). The CloudApps agent performs object-level backups of storage buckets — treating S3 bucket contents as files to be backed up and restored. For S3 backup, you create an <strong>S3 Virtual Client</strong> in the CommCell Console, configure authentication (Access Key + Secret Key is common), and select specific buckets as subclient content. The File System and File System Core packages are also required on the proxy alongside the CloudApps package.</div>
   </div>
 
   <div class="qa-block">
@@ -1641,8 +1641,8 @@ Credential Name: (user-defined name for this credential entry)</div>
         <span class="badge nb">NetBackup</span>
         <span class="badge netapp">NetApp</span>
       </div>
-      <a class="contact-card" href="/cdn-cgi/l/email-protection#7d1c1f190811531019534f4d4d4d4d4c4d4f3d1a101c1411531e1210">
-        ✉ <span class="__cf_email__" data-cfemail="20414244554c0e4d440e121010101011101260474d41494c0e434f4d">[email&#160;protected]</span>
+      <a class="contact-card" href="mailto:abdul.md.20000102@gmail.com">
+        ✉ abdul.md.20000102@gmail.com
       </a>
     </div>
   </div>
