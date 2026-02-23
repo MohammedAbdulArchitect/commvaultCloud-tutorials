@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Cloud Tutorials — Mohammed Abdul | Data Protection Architect</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #0f2040;
+    --navy-light: #162b52;
+    --accent: #00c8ff;
+    --accent2: #00e5a0;
+    --accent3: #ff6b35;
+    --accent4: #a78bfa;
+    --gold: #f5c842;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --card: #0d1f3c;
+    --card-border: rgba(0,200,255,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', 'Segoe UI', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .bg-glow-1 {
+    position: fixed; top: -200px; right: -200px; width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(0,200,255,0.07) 0%, transparent 65%);
+    pointer-events: none; z-index: 0;
+  }
+  .bg-glow-2 {
+    position: fixed; bottom: -200px; left: -100px; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,229,160,0.05) 0%, transparent 65%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,22,40,0.95);
+    border-bottom: 1px solid var(--card-border);
+    backdrop-filter: blur(16px);
+    padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 58px;
+  }
+  .nav-brand {
+    font-family: 'DM Serif Display', Georgia, serif;
+    color: var(--accent); font-size: 16px; letter-spacing: 0.3px;
+  }
+  .nav-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--text-dim);
+    background: rgba(0,200,255,0.06);
+    border: 1px solid var(--card-border);
+    border-radius: 20px; padding: 4px 14px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    padding: 100px 48px 80px;
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+  }
+  @media (max-width: 800px) { .hero { grid-template-columns: 1fr; padding: 60px 24px 48px; gap: 40px; } }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.25);
+    border-radius: 30px; padding: 6px 18px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--accent2); letter-spacing: 1.2px; text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.5; transform:scale(0.8); } }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(36px, 5vw, 58px);
+    line-height: 1.1; color: #fff; margin-bottom: 24px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent2); }
+  .hero-desc {
+    color: var(--text-muted); font-size: 16px; font-weight: 300;
+    max-width: 480px; margin-bottom: 36px; line-height: 1.8;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+  .hero-stats {
+    display: flex; gap: 32px; flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .stat { text-align: left; }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px; color: var(--accent); line-height: 1;
+  }
+  .stat-label { font-size: 12px; color: var(--text-dim); margin-top: 4px; letter-spacing: 0.5px; }
+
+  /* Hero Right — Author Card */
+  .author-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px; padding: 32px;
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+  .author-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent4));
+  }
+  .author-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; margin-bottom: 16px;
+    box-shadow: 0 0 30px rgba(0,200,255,0.2);
+  }
+  .author-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; color: #fff; margin-bottom: 4px;
+  }
+  .author-title { font-size: 13px; color: var(--accent); margin-bottom: 16px; }
+  .author-bio { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; font-weight: 300; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .badge {
+    font-size: 11px; padding: 3px 12px; border-radius: 4px;
+    border: 1px solid; font-family: 'DM Mono', monospace;
+  }
+  .b-cv { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.07); }
+  .b-veeam { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.07); }
+  .b-nb { border-color: var(--accent3); color: var(--accent3); background: rgba(255,107,53,0.07); }
+  .b-netapp { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.07); }
+  .author-email {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--text-muted); font-size: 13px; text-decoration: none;
+    background: rgba(0,200,255,0.05); border: 1px solid var(--card-border);
+    border-radius: 8px; padding: 8px 14px;
+    transition: all 0.2s;
+  }
+  .author-email:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto; padding: 0 48px;
+  }
+  .section-divider hr { border: none; border-top: 1px solid var(--card-border); }
+
+  /* ── TUTORIALS SECTION ── */
+  .tutorials-section {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto;
+    padding: 64px 48px;
+  }
+  @media (max-width: 800px) { .tutorials-section { padding: 40px 24px; } }
+
+  .section-header { margin-bottom: 40px; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--accent2); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .section-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(24px, 3vw, 36px); color: #fff;
+  }
+
+  /* ── TUTORIAL GRID ── */
+  .tutorial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .tutorial-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px; overflow: hidden;
+    text-decoration: none;
+    display: flex; flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    animation: fadeUp 0.6s ease both;
+  }
+  .tutorial-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(0,200,255,0.35);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(0,200,255,0.06);
+  }
+  .tutorial-card::after {
+    content: ''; position: absolute; inset: 0; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(0,200,255,0.04), transparent 60%);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .tutorial-card:hover::after { opacity: 1; }
+
+  .card-top {
+    padding: 24px 24px 0;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 12px;
+  }
+  .part-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; font-weight: 500;
+    color: var(--accent2); background: rgba(0,229,160,0.1);
+    border: 1px solid rgba(0,229,160,0.25);
+    border-radius: 4px; padding: 3px 10px;
+    letter-spacing: 1px; white-space: nowrap;
+  }
+  .card-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .card-body { padding: 16px 24px 24px; flex: 1; display: flex; flex-direction: column; }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px; color: #fff; line-height: 1.3; margin-bottom: 10px;
+  }
+  .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; flex: 1; font-weight: 300; }
+
+  .card-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--card-border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ctag {
+    font-size: 10px; padding: 2px 8px; border-radius: 3px;
+    border: 1px solid; font-family: 'DM Mono', monospace;
+  }
+  .ct-blue { border-color: rgba(0,200,255,0.3); color: var(--accent); }
+  .ct-green { border-color: rgba(0,229,160,0.3); color: var(--accent2); }
+  .ct-orange { border-color: rgba(255,107,53,0.3); color: var(--accent3); }
+  .ct-purple { border-color: rgba(167,139,250,0.3); color: var(--accent4); }
+  .ct-gold { border-color: rgba(245,200,66,0.3); color: var(--gold); }
+
+  .read-arrow {
+    color: var(--text-dim); font-size: 18px; transition: all 0.2s;
+  }
+  .tutorial-card:hover .read-arrow { color: var(--accent2); transform: translateX(4px); }
+
+  /* card accent top border colors */
+  .acc-blue::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: var(--accent); }
+  .acc-green::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: var(--accent2); }
+  .acc-orange::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: var(--accent3); }
+  .acc-purple::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: var(--accent4); }
+  .acc-gold::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: var(--gold); }
+
+  /* staggered animation */
+  .tutorial-card:nth-child(1) { animation-delay: 0.05s; }
+  .tutorial-card:nth-child(2) { animation-delay: 0.1s; }
+  .tutorial-card:nth-child(3) { animation-delay: 0.15s; }
+  .tutorial-card:nth-child(4) { animation-delay: 0.2s; }
+  .tutorial-card:nth-child(5) { animation-delay: 0.25s; }
+  .tutorial-card:nth-child(6) { animation-delay: 0.3s; }
+  .tutorial-card:nth-child(7) { animation-delay: 0.35s; }
+  .tutorial-card:nth-child(8) { animation-delay: 0.4s; }
+  .tutorial-card:nth-child(9) { animation-delay: 0.45s; }
+
+  /* ── COMMUNITY BANNER ── */
+  .community-banner {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto;
+    padding: 0 48px 64px;
+  }
+  @media (max-width: 800px) { .community-banner { padding: 0 24px 48px; } }
+
+  .banner-inner {
+    background: linear-gradient(135deg, rgba(0,229,160,0.07), rgba(0,200,255,0.05));
+    border: 1px solid rgba(0,229,160,0.2);
+    border-radius: 16px; padding: 40px 48px;
+    display: flex; align-items: center; gap: 40px; flex-wrap: wrap;
+  }
+  .banner-icon { font-size: 48px; flex-shrink: 0; }
+  .banner-text { flex: 1; min-width: 240px; }
+  .banner-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px; color: #fff; margin-bottom: 8px;
+  }
+  .banner-desc { font-size: 14px; color: var(--text-muted); font-weight: 300; }
+  .banner-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .chip {
+    font-size: 11px; font-family: 'DM Mono', monospace;
+    padding: 4px 14px; border-radius: 20px; border: 1px solid;
+  }
+  .chip-green { border-color: var(--accent2); color: var(--accent2); }
+  .chip-blue { border-color: var(--accent); color: var(--accent); }
+  .chip-gold { border-color: var(--gold); color: var(--gold); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--card-border);
+    padding: 32px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    font-size: 13px; color: var(--text-dim);
+  }
+  footer span { font-family: 'DM Mono', monospace; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">Commvault Cloud Tutorials</div>
+  <div class="nav-tag">Free · Community · Open Access</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      Free Tutorial Series
+    </div>
+    <h1>Master <em>Commvault</em> — from Zero to Architect</h1>
+    <p class="hero-desc">
+      9 in-depth tutorials covering everything from CommServe setup to Azure cloud backup, VMware application-aware protection, and enterprise-grade restore operations. No paywall. No sign-up. Just knowledge — shared freely.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">9</div>
+        <div class="stat-label">Tutorials</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">15+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Free</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="author-card">
+    <div class="author-avatar">👨‍💻</div>
+    <div class="author-name">Mohammed Abdul</div>
+    <div class="author-title">Data Protection Architect · 15+ Years Experience</div>
+    <div class="author-bio">
+      Seasoned architect specialising in enterprise backup & recovery — Commvault, VMware, Azure, AWS, Kubernetes, and hybrid cloud protection strategies.
+    </div>
+    <div class="badge-row">
+      <span class="badge b-cv">Commvault Certified</span>
+      <span class="badge b-veeam">Veeam VMCE</span>
+      <span class="badge b-nb">NetBackup</span>
+      <span class="badge b-netapp">NetApp</span>
+    </div>
+    <a class="author-email" href="mailto:abdul.md.20000102@gmail.com">
+      ✉ &nbsp;abdul.md.20000102@gmail.com
+    </a>
+  </div>
+</div>
+
+<!-- TUTORIALS -->
+<div class="tutorials-section">
+  <div class="section-header">
+    <div class="section-label">// Tutorial Series</div>
+    <div class="section-heading">All 9 Parts — Pick Where You Left Off</div>
+  </div>
+
+  <div class="tutorial-grid">
+
+    <!-- Part 1 -->
+    <a class="tutorial-card acc-blue" href="commvaultcloud-tutorial-part1.html">
+      <div class="card-top">
+        <span class="part-badge">PART 01</span>
+        <div class="card-icon" style="background:rgba(0,200,255,0.1)">🏗</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">CommServe Architecture & Initial Setup</div>
+        <div class="card-desc">Introduction to Commvault architecture, CommServe roles, installation prerequisites, and setting up your first CommCell environment.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-blue">CommServe</span>
+          <span class="ctag ct-blue">Architecture</span>
+          <span class="ctag ct-blue">Setup</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Part 2 -->
+    <a class="tutorial-card acc-green" href="commvaultcloud-tutorial-part2.html">
+      <div class="card-top">
+        <span class="part-badge">PART 02</span>
+        <div class="card-icon" style="background:rgba(0,229,160,0.1)">💾</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Storage Configuration & Libraries</div>
+        <div class="card-desc">Disk libraries, cloud libraries, deduplication storage pools, storage policies, and backup copy configuration in Commvault.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-green">Storage</span>
+          <span class="ctag ct-green">Libraries</span>
+          <span class="ctag ct-green">Dedup</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Part 3 -->
+    <a class="tutorial-card acc-orange" href="commvaultcloud-tutorial-part3.html">
+      <div class="card-top">
+        <span class="part-badge">PART 03</span>
+        <div class="card-icon" style="background:rgba(255,107,53,0.1)">🖥</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">File System Backup & Restore</div>
+        <div class="card-desc">Windows and Linux file system agents, subclient configuration, backup schedules, in-place and out-of-place restore operations.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-orange">Windows</span>
+          <span class="ctag ct-orange">Linux</span>
+          <span class="ctag ct-orange">File System</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Part 4 -->
+    <a class="tutorial-card acc-purple" href="commvaultcloud-tutorial-part4.html">
+      <div class="card-top">
+        <span class="part-badge">PART 04</span>
+        <div class="card-icon" style="background:rgba(167,139,250,0.1)">🗄</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">SQL Server Backup & Granular Restore</div>
+        <div class="card-desc">Agent-based SQL Server backup, transaction log backups, RPO strategies, table-level granular restore, and database recovery scenarios.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-purple">SQL Server</span>
+          <span class="ctag ct-purple">Log Backup</span>
+          <span class="ctag ct-purple">Granular</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Part 5 -->
+    <a class="tutorial-card acc-gold" href="commvaultcloud-tutorial-part5.html">
+      <div class="card-top">
+        <span class="part-badge">PART 05</span>
+        <div class="card-icon" style="background:rgba(245,200,66,0.1)">⚡</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">VMware vSphere Backup — Agentless</div>
+        <div class="card-desc">VSA proxy setup, VMware hypervisor configuration, agentless snapshot-based VM backup, and full VM restore operations.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-gold">VMware</span>
+          <span class="ctag ct-gold">VSA</span>
+          <span class="ctag ct-gold">Agentless</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Part 6 -->
+    <a class="tutorial-card acc-blue" href="commvaultcloud-tutorial-part6.html">
+      <div class="card-top">
+        <span class="part-badge">PART 06</span>
+        <div class="card-icon" style="background:rgba(0,200,255,0.1)">📸</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">IntelliSnap — Snapshot-Based Backup</div>
+        <div class="card-desc">IntelliSnap architecture, hardware vs. software snap engines, snap backup and mount operations, and snap-to-tape workflows.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-blue">IntelliSnap</span>
+          <span class="ctag ct-blue">Snapshots</span>
+          <span class="ctag ct-blue">NetApp</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Part 7 -->
+    <a class="tutorial-card acc-green" href="commvaultcloud-tutorial-part7.html">
+      <div class="card-top">
+        <span class="part-badge">PART 07</span>
+        <div class="card-icon" style="background:rgba(0,229,160,0.1)">☁</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">AWS Cloud Backup — S3 & EC2</div>
+        <div class="card-desc">AWS S3 object storage backup, EC2 instance protection, IAM role configuration, cross-region restore, and cloud access node setup.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-green">AWS</span>
+          <span class="ctag ct-green">S3</span>
+          <span class="ctag ct-green">EC2</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Part 8 -->
+    <a class="tutorial-card acc-orange" href="commvaultcloud-tutorial-part8.html">
+      <div class="card-top">
+        <span class="part-badge">PART 08</span>
+        <div class="card-icon" style="background:rgba(255,107,53,0.1)">🔁</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Disaster Recovery & SLA Planning</div>
+        <div class="card-desc">DR architecture, RPO/RTO planning, replication configuration, CommServe DR backup, and business continuity strategies.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-orange">Disaster Recovery</span>
+          <span class="ctag ct-orange">RPO/RTO</span>
+          <span class="ctag ct-orange">SLA</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Part 9 -->
+    <a class="tutorial-card acc-purple" href="commvaultcloud-tutorial-part9.html" style="border-color: rgba(167,139,250,0.3);">
+      <div class="card-top">
+        <span class="part-badge" style="color:var(--accent4); background:rgba(167,139,250,0.1); border-color:rgba(167,139,250,0.3);">PART 09 · NEW</span>
+        <div class="card-icon" style="background:rgba(167,139,250,0.1)">🔵</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">VMware App-Aware & Azure Cloud Backup</div>
+        <div class="card-desc">Application-consistent backups for SQL Server VMs, Azure Blob Storage backup, Azure VM protection with Managed Identity, and in-place restores.</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="ctag ct-purple">App-Aware</span>
+          <span class="ctag ct-purple">Azure</span>
+          <span class="ctag ct-purple">Managed Identity</span>
+        </div>
+        <span class="read-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- COMMUNITY BANNER -->
+<div class="community-banner">
+  <div class="banner-inner">
+    <div class="banner-icon">🤝</div>
+    <div class="banner-text">
+      <div class="banner-title">Built for the Community — Free Forever</div>
+      <div class="banner-desc">
+        These tutorials are the product of 15+ years in enterprise data protection. No course fee, no subscription, no paywall — just a practitioner's knowledge shared openly. If this helped you, share it with someone who needs it.
+      </div>
+      <div class="banner-chips">
+        <span class="chip chip-green">✓ No Sign-Up Required</span>
+        <span class="chip chip-blue">✓ No Paywall</span>
+        <span class="chip chip-gold">✓ Real-World Scenarios</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>© Mohammed Abdul · Data Protection Architect · For educational use only</div>
+  <span>mohammedabdularchitect.github.io/commvaultCloud-tutorials</span>
+</footer>
+
+</body>
+</html>
