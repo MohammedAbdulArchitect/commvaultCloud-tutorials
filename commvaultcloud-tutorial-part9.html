@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Software Administration – Tutorial 9 | VMware App-Aware &amp; Azure Cloud Backup</title>
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #0f2040;
+    --navy-light: #162b52;
+    --accent: #00c8ff;
+    --accent2: #00e5a0;
+    --accent3: #ff6b35;
+    --accent4: #a78bfa;
+    --gold: #f5c842;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --card: #0d1f3c;
+    --card-border: rgba(0,200,255,0.12);
+    --warn-bg: rgba(255,107,53,0.08);
+    --warn-border: #ff6b35;
+    --tip-bg: rgba(0,229,160,0.08);
+    --tip-border: #00e5a0;
+    --note-bg: rgba(0,200,255,0.08);
+    --note-border: #00c8ff;
+    --exam-bg: rgba(167,139,250,0.08);
+    --exam-border: #a78bfa;
+    --best-bg: rgba(245,200,66,0.08);
+    --best-border: #f5c842;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', Calibri, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 999;
+    background: rgba(10,22,40,0.97);
+    border-bottom: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; min-height: 54px;
+  }
+  .nav-brand {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent); font-size: 15px; font-weight: bold;
+    letter-spacing: 0.5px; margin-right: 16px; white-space: nowrap;
+  }
+  nav a {
+    color: var(--text-muted); text-decoration: none; font-size: 12px;
+    padding: 6px 10px; border-radius: 4px; transition: all 0.2s; white-space: nowrap;
+  }
+  nav a:hover { color: var(--accent); background: rgba(0,200,255,0.08); }
+
+  .hero {
+    background: linear-gradient(135deg, #0a1628 0%, #0d1a38 40%, #0a2a20 100%);
+    padding: 80px 48px 64px;
+    border-bottom: 1px solid var(--card-border);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,200,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -80px; left: 30%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,229,160,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,200,255,0.1);
+    border: 1px solid rgba(0,200,255,0.3);
+    border-radius: 20px; padding: 6px 16px;
+    font-size: 12px; color: var(--accent);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1.2; color: #fff; max-width: 860px; margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--accent2); }
+  .hero-desc {
+    color: var(--text-muted); max-width: 720px;
+    font-size: 16px; margin-bottom: 36px;
+  }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tag {
+    background: var(--navy-light);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px; padding: 4px 12px;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .tag.hot { border-color: var(--accent3); color: var(--accent3); }
+  .tag.blue { border-color: var(--accent); color: var(--accent); }
+  .tag.green { border-color: var(--accent2); color: var(--accent2); }
+  .tag.purple { border-color: var(--accent4); color: var(--accent4); }
+  .tag.gold { border-color: var(--gold); color: var(--gold); }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px; padding: 40px 48px;
+    background: var(--navy-mid);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .toc-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 8px; padding: 14px 16px;
+    text-decoration: none; color: var(--text-muted);
+    font-size: 13px; transition: all 0.2s;
+  }
+  .toc-item:hover { border-color: var(--accent2); color: var(--accent2); transform: translateY(-2px); }
+  .toc-num {
+    background: rgba(0,229,160,0.1); color: var(--accent2);
+    border-radius: 4px; padding: 2px 8px; font-size: 11px;
+    font-family: 'Courier New', Courier, monospace; font-weight: bold; flex-shrink: 0;
+  }
+
+  .main-content { max-width: 1100px; margin: 0 auto; padding: 48px 32px; }
+
+  .section { margin-bottom: 64px; }
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .section-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .icon-blue { background: rgba(0,200,255,0.12); }
+  .icon-green { background: rgba(0,229,160,0.12); }
+  .icon-orange { background: rgba(255,107,53,0.12); }
+  .icon-purple { background: rgba(167,139,250,0.12); }
+  .icon-gold { background: rgba(245,200,66,0.12); }
+  .section-title {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(20px, 2.5vw, 28px); color: #fff;
+  }
+  .section-subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 12px; padding: 28px; margin-bottom: 20px;
+  }
+  .card h3 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent); font-size: 17px; margin-bottom: 12px;
+  }
+  .card h4 {
+    color: var(--accent2); font-size: 14px; margin: 18px 0 10px;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .card p { color: var(--text-muted); margin-bottom: 12px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { padding-left: 20px; }
+  .card li { color: var(--text-muted); margin-bottom: 8px; }
+  .card li strong { color: var(--text); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .callout { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 18px 22px; margin: 20px 0; }
+  .callout-title { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .callout p { font-size: 14px; margin-bottom: 0; }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.warn .callout-title { color: var(--warn-border); }
+  .callout.warn p { color: #fca97a; }
+  .callout.tip { background: var(--tip-bg); border-color: var(--tip-border); }
+  .callout.tip .callout-title { color: var(--tip-border); }
+  .callout.tip p { color: #6ee7b7; }
+  .callout.note { background: var(--note-bg); border-color: var(--note-border); }
+  .callout.note .callout-title { color: var(--note-border); }
+  .callout.note p { color: #7dd3f0; }
+  .callout.exam { background: var(--exam-bg); border-color: var(--exam-border); }
+  .callout.exam .callout-title { color: var(--exam-border); }
+  .callout.exam p, .callout.exam li { color: #c4b5fd; }
+  .callout.best { background: var(--best-bg); border-color: var(--best-border); }
+  .callout.best .callout-title { color: var(--best-border); }
+  .callout.best p, .callout.best li { color: #fde68a; }
+  .callout ul { padding-left: 20px; margin-top: 8px; }
+  .callout li { margin-bottom: 6px; font-size: 14px; }
+
+  .code-block {
+    background: #060e1c; border: 1px solid rgba(0,200,255,0.15);
+    border-radius: 8px; overflow: hidden; margin: 16px 0;
+  }
+  .code-header {
+    background: rgba(0,200,255,0.06); padding: 8px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(0,200,255,0.1);
+  }
+  .code-lang {
+    font-size: 11px; color: var(--accent); text-transform: uppercase;
+    letter-spacing: 1px; font-family: 'Courier New', Courier, monospace;
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; } .dot-y { background: #ffbd2e; } .dot-g { background: #28c840; }
+  .code-body {
+    padding: 18px 20px;
+    font-family: 'Courier New', Courier, 'Lucida Console', monospace;
+    font-size: 13px; line-height: 1.7; color: #c9e7ff;
+    overflow-x: auto; white-space: pre;
+  }
+  .code-body .cmd { color: #00e5a0; }
+  .code-body .comment { color: #4a6580; font-style: italic; }
+  .code-body .param { color: #f5c842; }
+  .code-body .val { color: #ff9f7e; }
+  .code-body .path { color: #a78bfa; }
+
+  .flow {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 12px; padding: 28px; margin: 20px 0;
+  }
+  .flow-title {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent); font-size: 15px; margin-bottom: 24px; text-align: center;
+  }
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step { display: flex; align-items: flex-start; gap: 16px; position: relative; }
+  .flow-step:not(:last-child)::after {
+    content: ''; position: absolute; left: 20px; top: 44px; bottom: -2px;
+    width: 2px; background: linear-gradient(to bottom, var(--accent2), transparent);
+  }
+  .flow-num {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(0,229,160,0.12); border: 2px solid var(--accent2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: bold; color: var(--accent2); flex-shrink: 0;
+    font-family: 'Courier New', monospace; margin-bottom: 28px;
+  }
+  .flow-content { padding-top: 8px; padding-bottom: 16px; flex: 1; }
+  .flow-content strong { color: var(--text); display: block; margin-bottom: 6px; font-size: 15px; }
+  .flow-content p { color: var(--text-muted); font-size: 14px; margin-bottom: 0; }
+
+  .hflow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 20px 0; }
+  .hflow-box {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 8px; padding: 10px 16px; font-size: 13px; color: var(--text-muted);
+    text-align: center; flex: 1; min-width: 110px;
+  }
+  .hflow-box small { display: block; font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+  .hflow-box.active { border-color: rgba(0,229,160,0.4); color: var(--accent2); }
+  .hflow-arrow { color: var(--text-dim); font-size: 18px; flex-shrink: 0; }
+
+  .arch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .arch-box {
+    border-radius: 8px; padding: 12px 20px;
+    text-align: center; font-size: 13px; font-weight: 500;
+  }
+  .arch-box small { display: block; font-size: 10px; opacity: 0.7; margin-top: 3px; font-weight: 400; }
+  .abox-blue { background: rgba(0,200,255,0.12); border: 1px solid rgba(0,200,255,0.3); color: #7ee8fa; }
+  .abox-green { background: rgba(0,229,160,0.12); border: 1px solid rgba(0,229,160,0.3); color: #6ee7b7; }
+  .abox-orange { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.3); color: #fca97a; }
+  .abox-purple { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); color: #c4b5fd; }
+  .abox-gold { background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.3); color: #fde68a; }
+  .arch-connector { text-align: center; color: var(--text-dim); font-size: 22px; line-height: 1; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .cmp-box { border-radius: 8px; padding: 18px; }
+  .cmp-box h5 { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .cmp-box ul { padding-left: 18px; } .cmp-box li { font-size: 13px; margin-bottom: 6px; }
+  .cmp-a { background: rgba(0,200,255,0.06); border: 1px solid rgba(0,200,255,0.2); }
+  .cmp-a h5 { color: var(--accent); } .cmp-a li { color: #7ee8fa; }
+  .cmp-b { background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.2); }
+  .cmp-b h5 { color: var(--accent2); } .cmp-b li { color: #6ee7b7; }
+
+  .strip-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 6px; padding: 12px 18px; margin-bottom: 8px;
+  }
+  .strip-label { font-size: 12px; color: var(--text-dim); min-width: 180px; flex-shrink: 0; }
+  .strip-val { font-size: 13px; color: var(--text); flex: 1; }
+  .strip-badge { font-size: 11px; padding: 2px 10px; border-radius: 10px; border: 1px solid; flex-shrink: 0; }
+  .sb-ok { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.07); }
+  .sb-warn { border-color: var(--accent3); color: var(--accent3); background: rgba(255,107,53,0.07); }
+  .sb-info { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.07); }
+  .sb-purple { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.07); }
+
+  .status-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 16px; font-size: 12px; border: 1px solid; }
+  .sp-green { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.08); }
+  .sp-red { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
+  .sp-yellow { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.08); }
+  .sp-blue { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.08); }
+  .sp-purple { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.08); }
+
+  .qa-block { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .qa-q {
+    background: rgba(167,139,250,0.08); border-bottom: 1px solid rgba(167,139,250,0.15);
+    padding: 14px 18px; font-size: 14px; color: #c4b5fd; font-weight: 500;
+  }
+  .qa-q::before { content: 'Q  '; opacity: 0.5; font-family: monospace; }
+  .qa-a { padding: 14px 18px; font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+  .qa-a::before { content: 'A  '; color: var(--accent2); font-weight: bold; font-family: monospace; }
+
+  .divider { border: none; border-top: 1px solid var(--card-border); margin: 40px 0; }
+
+  code {
+    font-family: 'Courier New', Courier, 'Lucida Console', monospace;
+    background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.15);
+    color: var(--accent); padding: 1px 6px; border-radius: 3px; font-size: 12.5px;
+  }
+
+  .hl { color: var(--accent); font-weight: 500; }
+  .hl-green { color: var(--accent2); font-weight: 500; }
+  .hl-orange { color: var(--accent3); }
+  .hl-gold { color: var(--gold); }
+
+  .job-timeline {
+    position: relative; padding-left: 24px; margin: 16px 0;
+  }
+  .job-timeline::before {
+    content: ''; position: absolute; left: 8px; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(to bottom, var(--accent2), transparent);
+  }
+  .job-item { position: relative; margin-bottom: 20px; }
+  .job-item::before {
+    content: ''; position: absolute; left: -20px; top: 6px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent2); border: 2px solid var(--navy);
+  }
+  .job-title { font-size: 14px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+  .job-desc { font-size: 13px; color: var(--text-muted); }
+  .job-badge {
+    display: inline-block; font-size: 10px; padding: 2px 8px;
+    border-radius: 8px; border: 1px solid; margin-top: 4px;
+  }
+  .jb-vm { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.07); }
+  .jb-app { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.07); }
+  .jb-install { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.07); }
+  .jb-snap { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.07); }
+
+  .author-section { background: linear-gradient(135deg, #0a1628, #0d2040); border-top: 1px solid var(--card-border); padding: 60px 48px; }
+  .author-title { font-family: Georgia, serif; font-size: 22px; color: var(--accent); margin-bottom: 28px; text-align: center; }
+  .author-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; padding: 36px;
+    max-width: 800px; margin: 0 auto 28px; display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;
+  }
+  .author-avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center; font-size: 36px; flex-shrink: 0;
+  }
+  .author-info { flex: 1; min-width: 240px; }
+  .author-name { font-family: Georgia, serif; font-size: 22px; color: #fff; margin-bottom: 4px; }
+  .author-role { color: var(--accent); font-size: 14px; margin-bottom: 14px; }
+  .author-bio { color: var(--text-muted); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .badge { background: var(--navy-light); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 12px; font-size: 11px; color: var(--text-muted); }
+  .badge.cv { border-color: var(--accent); color: var(--accent); }
+  .badge.veeam { border-color: var(--accent2); color: var(--accent2); }
+  .badge.nb { border-color: var(--accent3); color: var(--accent3); }
+  .badge.netapp { border-color: var(--accent4); color: var(--accent4); }
+  .contact-card {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.25);
+    border-radius: 8px; padding: 10px 18px; text-decoration: none; color: var(--accent); font-size: 14px; transition: all 0.2s;
+  }
+  .contact-card:hover { background: rgba(0,200,255,0.15); }
+  .disclaimer { background: var(--warn-bg); border: 1px solid rgba(255,107,53,0.25); border-radius: 8px; padding: 18px 24px; max-width: 800px; margin: 0 auto; }
+  .disclaimer p { font-size: 13px; color: #fca97a; line-height: 1.6; }
+  footer { background: #060e1c; border-top: 1px solid var(--card-border); padding: 24px 48px; text-align: center; color: var(--text-dim); font-size: 12px; }
+
+  /* ── SIDEBAR TOC LAYOUT ── */
+  .page-body {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .sidebar-toc {
+    width: 264px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 54px;
+    height: calc(100vh - 54px);
+    overflow-y: auto;
+    background: var(--navy-mid);
+    border-right: 1px solid var(--card-border);
+    padding: 20px 0 48px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,200,255,0.25) transparent;
+    z-index: 100;
+  }
+  .sidebar-toc::-webkit-scrollbar { width: 4px; }
+  .sidebar-toc::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-toc::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.25); border-radius: 4px; }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--text-dim);
+    padding: 0 18px 10px;
+    border-bottom: 1px solid var(--card-border);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    line-height: 1.45;
+    border-left: 2px solid transparent;
+    transition: color 0.18s, background 0.18s, border-color 0.18s;
+  }
+  .sidebar-link:hover {
+    color: var(--accent2);
+    background: rgba(0,229,160,0.06);
+    border-left-color: var(--accent2);
+  }
+  .sidebar-link.active {
+    color: var(--accent2);
+    background: rgba(0,229,160,0.09);
+    border-left-color: var(--accent2);
+    font-weight: 600;
+  }
+  .sidebar-num {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    background: rgba(0,229,160,0.1);
+    color: var(--accent2);
+    opacity: 0.75;
+  }
+  .sidebar-link.active .sidebar-num { opacity: 1; }
+
+  .sidebar-divider {
+    margin: 10px 18px;
+    border: none;
+    border-top: 1px solid var(--card-border);
+  }
+
+  /* override main-content to fill remaining space */
+  .main-content {
+    flex: 1;
+    min-width: 0;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 48px 40px !important;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar-toc { display: none; }
+    .main-content { padding: 32px 20px !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">📦 Commvault Tutorial 9</div>
+  <a href="#appaware-intro">App-Aware Intro</a>
+  <a href="#appaware-prereqs">Prerequisites</a>
+  <a href="#appaware-jobs">Job Workflow</a>
+  <a href="#appaware-restore">Restore</a>
+  <a href="#azure-overview">Azure Overview</a>
+  <a href="#azure-blob">Blob Storage Backup</a>
+  <a href="#azure-blob-auth">Blob Auth Methods</a>
+  <a href="#azure-vm">Azure VM Backup</a>
+  <a href="#azure-managed-identity">Managed Identity</a>
+  <a href="#azure-restore">Azure Restore</a>
+  <a href="#interview">Interview Q&amp;A</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🖥 Tutorial 9 · VMware App-Aware &amp; Azure Cloud</div>
+  <h1>VMware Application-Aware Backups<br>&amp; <span>Azure Cloud Backup &amp; Restore</span></h1>
+  <p class="hero-desc">A comprehensive hands-on guide covering VMware application-consistent agentless backups using SQL Server as an example, plus complete Azure cloud protection — including Azure Blob Storage backup with IAM VM role assignment, and Azure Virtual Machine agentless backup using Managed Identity with Custom Role authentication.</p>
+  <div class="hero-tags">
+    <span class="tag blue">🗄 VMware App-Aware Backup</span>
+    <span class="tag green">📸 IntelliSnap + VSS</span>
+    <span class="tag hot">🤖 Agent vs Agentless</span>
+    <span class="tag purple">☁ Azure Blob Storage</span>
+    <span class="tag blue">🖥 Azure VM Backup</span>
+    <span class="tag gold">🔐 Managed Identity &amp; Custom Roles</span>
+    <span class="tag green">🔄 Decoupled Installation</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc-grid">
+  <a class="toc-item" href="#appaware-intro"><span class="toc-num">01</span> App-Aware Backup — What &amp; Why</a>
+  <a class="toc-item" href="#appaware-prereqs"><span class="toc-num">02</span> Prerequisites &amp; Requirements</a>
+  <a class="toc-item" href="#appaware-jobs"><span class="toc-num">03</span> Job Workflow — Multi-Phase</a>
+  <a class="toc-item" href="#appaware-restore"><span class="toc-num">04</span> Restore — VM + App</a>
+  <a class="toc-item" href="#azure-overview"><span class="toc-num">05</span> Azure Cloud — Overview</a>
+  <a class="toc-item" href="#azure-blob"><span class="toc-num">06</span> Azure Blob Storage Backup</a>
+  <a class="toc-item" href="#azure-blob-auth"><span class="toc-num">07</span> Blob Auth — IAM VM Role</a>
+  <a class="toc-item" href="#azure-vm"><span class="toc-num">08</span> Azure VM Backup — Setup</a>
+  <a class="toc-item" href="#azure-managed-identity"><span class="toc-num">09</span> Managed Identity + Custom Role</a>
+  <a class="toc-item" href="#azure-restore"><span class="toc-num">10</span> Azure VM In-Place Restore</a>
+  <a class="toc-item" href="#interview"><span class="toc-num">11</span> Interview Q&amp;A</a>
+</div>
+
+<div class="page-body">
+
+<!-- SIDEBAR TOC -->
+<aside class="sidebar-toc" id="sidebar-toc">
+  <div class="sidebar-label">📋 Contents</div>
+  <a class="sidebar-link" href="#appaware-intro"><span class="sidebar-num">01</span>App-Aware Backup — What &amp; Why</a>
+  <a class="sidebar-link" href="#appaware-prereqs"><span class="sidebar-num">02</span>Prerequisites &amp; Requirements</a>
+  <a class="sidebar-link" href="#appaware-jobs"><span class="sidebar-num">03</span>Job Workflow — Multi-Phase</a>
+  <a class="sidebar-link" href="#appaware-restore"><span class="sidebar-num">04</span>Restore — VM + App</a>
+  <hr class="sidebar-divider">
+  <a class="sidebar-link" href="#azure-overview"><span class="sidebar-num">05</span>Azure Cloud — Overview</a>
+  <a class="sidebar-link" href="#azure-blob"><span class="sidebar-num">06</span>Azure Blob Storage Backup</a>
+  <a class="sidebar-link" href="#azure-blob-auth"><span class="sidebar-num">07</span>Blob Auth — IAM VM Role</a>
+  <a class="sidebar-link" href="#azure-vm"><span class="sidebar-num">08</span>Azure VM Backup — Setup</a>
+  <a class="sidebar-link" href="#azure-managed-identity"><span class="sidebar-num">09</span>Managed Identity + Custom Role</a>
+  <a class="sidebar-link" href="#azure-restore"><span class="sidebar-num">10</span>Azure VM In-Place Restore</a>
+  <hr class="sidebar-divider">
+  <a class="sidebar-link" href="#interview"><span class="sidebar-num">11</span>Interview Q&amp;A</a>
+</aside>
+
+<div class="main-content">
+
+<!-- ============================= PART 1: VMWARE APPLICATION-AWARE ============================= -->
+
+<!-- SECTION 1: INTRO -->
+<section id="appaware-intro" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🗄</div>
+    <div>
+      <div class="section-title">VMware Application-Aware Backup — What &amp; Why</div>
+      <div class="section-subtitle">Application-consistent agentless backups for VMs running databases and critical applications</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The Problem: Agentless VM Backup ≠ Application Consistency</h3>
+    <p>When you take a standard agentless (snapshot-level) backup of a VMware VM that is running a database like SQL Server, the backup captures the VM's disk state at a point in time. However, a database engine keeps data in memory and has pending transactions that may not have been flushed to disk at the exact moment of the snapshot. When you restore this VM and try to start the database:</p>
+    <ul>
+      <li>The database may fail to start, or start with errors</li>
+      <li>Transaction logs may be inconsistent</li>
+      <li>Data written to memory but not yet committed to disk is lost</li>
+      <li>The database may require recovery procedures before it becomes usable</li>
+    </ul>
+    <p>This is called a <strong>crash-consistent</strong> backup — the VM is captured as if the power was suddenly cut. It works for the OS but is unreliable for running applications.</p>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Application-Aware Backup — The Solution</div>
+      <p>Application-Aware Backup captures the VM <strong>AND</strong> the current state of running applications at the same instant — including data in memory and pending transactions. When restored, the application starts cleanly in a consistent, known-good state. This is called an <strong>application-consistent</strong> backup. It does not require installing a dedicated database agent inside the VM.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Agent-Based vs. Application-Aware — Critical Comparison</h3>
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🔌 Agent-Based Backup (e.g., SQL Agent)</h5>
+        <ul>
+          <li>Install SQL Server agent directly inside each VM</li>
+          <li>Schedule separate SQL backup jobs per VM</li>
+          <li>Full application integration — table-level granular restore</li>
+          <li>Transaction log backups supported (RPO of minutes)</li>
+          <li>Consumes an agent license for every VM</li>
+          <li>High management overhead for 100s of VMs</li>
+          <li>Use when: critical DBs needing log backups or granular restore</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>🛡 Application-Aware Backup (Agentless)</h5>
+        <ul>
+          <li>No agent installed inside the VM — enable one option in VM group</li>
+          <li>One schedule covers both VM and application backup</li>
+          <li>Application-consistent — DB starts clean after restore</li>
+          <li>No transaction log backups (only full/incremental VM backups)</li>
+          <li>No additional agent license consumed — only VM license</li>
+          <li>Scales easily to hundreds of VMs</li>
+          <li>Use when: scalable environments, ease of management is priority</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Licensing Advantage</div>
+      <p>With Application-Aware Backup, Commvault does <strong>not</strong> consume an agent-based license for the SQL database — only the VM-level license applies. In large environments with hundreds of VMs running SQL Server, this can represent a significant licensing cost saving compared to deploying individual SQL agents in every VM.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Supported Hypervisors for Application-Aware Backup</h3>
+    <p>Application-Aware Backup is not limited to VMware. Commvault supports this feature across multiple virtualization platforms. The underlying procedure is essentially the same — only the hypervisor-specific details differ.</p>
+    <div class="status-row">
+      <span class="status-pill sp-green">✓ VMware vSphere</span>
+      <span class="status-pill sp-green">✓ Amazon EC2 (AWS)</span>
+      <span class="status-pill sp-green">✓ Microsoft Azure</span>
+      <span class="status-pill sp-green">✓ Microsoft Hyper-V</span>
+      <span class="status-pill sp-green">✓ Nutanix AHV</span>
+      <span class="status-pill sp-green">✓ OpenStack</span>
+      <span class="status-pill sp-green">✓ Oracle VM</span>
+      <span class="status-pill sp-green">✓ Red Hat Virtualization</span>
+      <span class="status-pill sp-green">✓ VMware Cloud</span>
+    </div>
+    <div class="callout note">
+      <div class="callout-title">📘 Steps Remain the Same Across Hypervisors</div>
+      <p>Whether you are configuring Application-Aware Backup on VMware, AWS EC2, or Azure, the Commvault configuration steps are essentially the same. What differs is how each hypervisor platform is connected as a Commvault hypervisor. Once connected, the Application-Aware option is enabled in the VM Group properties — the rest is identical.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 2: PREREQUISITES -->
+<section id="appaware-prereqs" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">✅</div>
+    <div>
+      <div class="section-title">Application-Aware Backup — Prerequisites</div>
+      <div class="section-subtitle">VSA proxy requirements, guest VM requirements, and first-run automatic installations</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>VSA Proxy Requirements</h3>
+    <p>Application-Aware Backup requires a VSA (Virtual Server Agent) proxy, just like standard agentless VM backup. The proxy handles the backup operations and is separate from the VMs being protected.</p>
+    <div class="strip-row">
+      <span class="strip-label">Packages Required</span>
+      <span class="strip-val"><strong>Media Agent</strong> package + <strong>Virtual Server Agent (VSA)</strong> package — both must be installed on the proxy</span>
+      <span class="strip-badge sb-info">Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">VMware Proxy Location</span>
+      <span class="strip-val">Can be a physical server or a VMware virtual machine — <em>not</em> installed on the ESX host or vCenter directly</span>
+      <span class="strip-badge sb-ok">Separate VM/Server</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Hyper-V Proxy Location</span>
+      <span class="strip-val">VSA agent is installed directly on the Hyper-V cluster node itself — different from VMware approach</span>
+      <span class="strip-badge sb-info">On Cluster Node</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Lab Shortcut</span>
+      <span class="strip-val">In resource-constrained lab environments, the CommServe itself can act as the VSA proxy (not recommended for production)</span>
+      <span class="strip-badge sb-warn">Lab Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Backup Type for VM</span>
+      <span class="strip-val">The VM-level backup is a <strong>streaming backup</strong> (data transferred over network). The <em>application</em> backup uses IntelliSnap (snapshot-based).</span>
+      <span class="strip-badge sb-info">Two Different Methods</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Guest VM Requirements (VMware)</h3>
+    <p>The virtual machine being protected must meet the following requirements. These are configured on the guest OS side — not by the backup admin directly, but in coordination with the Windows/Linux teams.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">VMware Tools</span>
+      <span class="strip-val">Must be installed and running inside the guest VM. For Hyper-V, the equivalent is <strong>Hyper-V Integration Services</strong>.</span>
+      <span class="strip-badge sb-warn">Mandatory</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">VSS Shadow Storage (Windows)</span>
+      <span class="strip-val">Volume Shadow Copy Service must be configured inside the Windows VM. Configure shadow storage to at least <strong>900 MB</strong>. Ask the Windows team to verify this.</span>
+      <span class="strip-badge sb-warn">Windows VMs</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">PowerShell Version (Windows)</span>
+      <span class="strip-val">PowerShell version <strong>5 or above</strong> must be present on Windows guest VMs</span>
+      <span class="strip-badge sb-warn">Windows VMs</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">File System Core (Linux)</span>
+      <span class="strip-val">For Linux VMs, the Commvault File System Core package must be <strong>manually installed</strong> in the guest VM beforehand. Unlike Windows, it is not auto-pushed.</span>
+      <span class="strip-badge sb-warn">Linux VMs — Manual</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">SQL Admin Rights</span>
+      <span class="strip-val">If backing up SQL Server, the credential provided must have SQL Server <strong>sysadmin</strong> rights. This is needed for backup and restore operations.</span>
+      <span class="strip-badge sb-warn">SQL VMs</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Network Connectivity</span>
+      <span class="strip-val">CommServe, Media Agent, and VSA proxy must all have network connectivity to the guest VMs being protected</span>
+      <span class="strip-badge sb-info">All Components</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Credentials per VM Group</span>
+      <span class="strip-val">You must provide guest OS credentials in the VM Group configuration. Group Windows VMs separately from Linux VMs — you cannot use a single credential set for mixed OS groups.</span>
+      <span class="strip-badge sb-warn">Separate OS Groups</span>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 First-Time Backup — Automatic Package Push</div>
+      <p>You do NOT manually install packages inside the guest VM for Windows. When you run the Application-Aware backup for the <strong>first time</strong>, Commvault automatically pushes the required packages into the guest VM: File System Core, Media Agent binaries, and application plugins (e.g., MSSQL plugin for SQL Server). This automatic installation only happens once — subsequent backups skip this step since packages are already present.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Enabling Application-Aware in the VM Group</h3>
+    <p>From the backup admin's perspective, enabling Application-Aware Backup requires only one configuration change — everything else happens automatically.</p>
+    <div class="hflow">
+      <div class="hflow-box active">VM Group Created<small>Standard agentless VM backup already configured</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Open VM Group Properties<small>Command Center: Edit → Properties tab</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Enable "Application Aware"<small>Toggle the Application Aware option on</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Provide Guest Credentials<small>OS credentials for the guest VMs (e.g., Windows admin account)</small></div>
+      <div class="hflow-arrow">→</div>
+      <div class="hflow-box active">Run Backup<small>First run auto-installs plugins; application becomes consistent</small></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 3: JOB WORKFLOW -->
+<section id="appaware-jobs" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">⚙</div>
+    <div>
+      <div class="section-title">Application-Aware Backup — Job Workflow</div>
+      <div class="section-subtitle">How Commvault spawns multiple child jobs and what each one does</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What You See in the Job Controller</h3>
+    <p>When you trigger an Application-Aware Backup, a single job spawns multiple child jobs. Understanding this job hierarchy is important for troubleshooting and for explaining to customers what is happening.</p>
+
+    <div class="job-timeline">
+      <div class="job-item">
+        <div class="job-title">Parent Job — VM Backup (e.g., Job 9212)</div>
+        <div class="job-desc">The main job triggered by your schedule or manual run. This is the only job you initiated. It orchestrates all other jobs. Note: the actual orchestrator job (e.g., 9213) is hidden by Commvault — you won't see it in the Job Controller. Only the visible parent and its children appear.</div>
+        <span class="job-badge jb-vm">VM Admin Job</span>
+      </div>
+      <div class="job-item">
+        <div class="job-title">Child Job — Install Software (First Run Only)</div>
+        <div class="job-desc">Automatically triggered only on the <strong>first ever</strong> Application-Aware backup run for a given VM group. Commvault pushes File System Core, Media Agent binaries, MSSQL plugin, Storage Accelerator, and VSA-related packages into the guest virtual machine. On all subsequent backups, this job does NOT appear — the packages are already installed.</div>
+        <span class="job-badge jb-install">Install Software — First Run Only</span>
+      </div>
+      <div class="job-item">
+        <div class="job-title">Child Job — VSA App-Aware Workflow</div>
+        <div class="job-desc">The workflow job that manages the application-aware process. It goes through phases: pre-checks (verifying packages are installed and the application is discovered), application quiesce, VSS snapshot creation, and application backup coordination. You can see the detailed phases listed in the workflow job's status.</div>
+        <span class="job-badge jb-app">VSA App-Aware Workflow</span>
+      </div>
+      <div class="job-item">
+        <div class="job-title">Child Job — Snap Backup (IntelliSnap)</div>
+        <div class="job-desc">A snapshot backup of the application data (e.g., the SQL Server databases and their drives). Unlike the VM-level streaming backup, the application backup uses <strong>IntelliSnap</strong> — a snapshot-based technology. The snap engine used is "Virtual Server Application Snap" by default, though hardware snap engines (NetApp, Hitachi, IBM, HP, etc.) can also be configured.</div>
+        <span class="job-badge jb-snap">IntelliSnap — Application Snap</span>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Two Parallel Things Happening</div>
+      <p>Application-Aware Backup does two things simultaneously: (1) a <strong>streaming VM backup</strong> of the entire virtual machine (OS disk, data disks) — this is the agentless VM-level backup you already know. (2) An <strong>IntelliSnap application backup</strong> specifically targeting the running application (e.g., SQL Server databases). After restore, you have both — a full VM restore option and a granular application restore option.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Automatic Package Discovery — What Gets Installed</h3>
+    <p>Commvault automatically identifies the application type running in the guest VM during the first backup run. Based on what it discovers, it installs the correct plugins. You never have to specify "this VM has SQL Server" manually — Commvault detects it.</p>
+    <div class="strip-row">
+      <span class="strip-label">Discovered: SQL Server</span>
+      <span class="strip-val">Commvault installs: Media Agent, MSSQL Plugin, File System, Storage Accelerator, VSA packages — all automatically</span>
+      <span class="strip-badge sb-ok">Auto-Detected</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Result in Client Tree</span>
+      <span class="strip-val">After the first run, a new SQL Server client appears in the CommCell Console under the guest VM — created automatically by Commvault, no manual setup required</span>
+      <span class="strip-badge sb-ok">Auto-Created</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">SQL Client Properties</span>
+      <span class="strip-val">The auto-created SQL client uses <strong>IntelliSnap</strong> with snap engine "Virtual Server Application Snap" by default</span>
+      <span class="strip-badge sb-info">IntelliSnap Default</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Storage Accelerator</span>
+      <span class="strip-val">Also installed automatically — allows the guest VM (now a Commvault client) to send application backup data directly to cloud library, bypassing Media Agent</span>
+      <span class="strip-badge sb-info">Auto-Installed</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Viewing Backups in the Storage Policy</h3>
+    <p>After an Application-Aware backup completes, you can verify what was captured by checking the storage policy copies:</p>
+    <div class="strip-row">
+      <span class="strip-label">Primary Snap Copy</span>
+      <span class="strip-val">Shows snapshot backups only. Right-click → List Snapshots to see VSS snapshots taken (e.g., C: drive snapshot for SQL Server hosted on C:)</span>
+      <span class="strip-badge sb-info">Snap Backups</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Primary Copy</span>
+      <span class="strip-val">Shows both the <strong>VM backup</strong> (streaming) and the <strong>SQL Server backup</strong> (IntelliSnap) as separate entries — two backups from one triggered job</span>
+      <span class="strip-badge sb-ok">Both Captured</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 4: RESTORE -->
+<section id="appaware-restore" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🔄</div>
+    <div>
+      <div class="section-title">Application-Aware Restore — VM and Database</div>
+      <div class="section-subtitle">Two restore paths: full VM restore and granular application (database) restore</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Restore Scenarios and Paths</h3>
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🔴 Scenario A: VM Crashed Completely</h5>
+        <ul>
+          <li>First restore the full virtual machine (VM-level restore)</li>
+          <li>Once VM is up and running, verify application state</li>
+          <li>If application (SQL) is also corrupted, perform application restore next</li>
+          <li>Order: VM restore first, then application restore if needed</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>🟢 Scenario B: Only Application/Database Corrupted</h5>
+        <ul>
+          <li>VM is running fine, only the SQL database has an issue</li>
+          <li>Go directly to database restore — skip VM restore entirely</li>
+          <li>Navigate: Protect → Databases → Select instance → Browse and Restore</li>
+          <li>Select database(s) → In-place restore → overwrite existing</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Database-Only Restore — Step-by-Step (SQL Server Example)</h3>
+    <div class="flow">
+      <div class="flow-title">Restoring an Accidentally Deleted SQL Database</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Confirm Scenario: Database Deleted, VM Still Running</strong>
+            <p>In SQL Server Management Studio, verify that the target database (e.g., AdventureWorks) is missing. The VM is functional but the database is gone. A restore request comes to you.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Navigate to Commvault: Protect → Databases</strong>
+            <p>In the Command Center or CommCell Console, go to <strong>Protect → Databases</strong>. Find the SQL Server instance that was auto-created by the Application-Aware backup. Select the specific database to restore.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Browse and Select Recovery Point</strong>
+            <p>Click <strong>Browse and Restore</strong>. Select the latest available backup point (or a specific point in time). Choose the database(s) to restore — for example, the AdventureWorks database only.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Select In-Place Restore and Submit</strong>
+            <p>Choose <strong>In-Place Restore</strong> — this restores to the same SQL instance and same database name, overwriting whatever is there. Submit the job. The restore will recreate the MDF (data file) and LDF (log file) from backup.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Handle Storage Accelerator Connectivity Issues (if any)</strong>
+            <p>If the restore job pends or fails initially with a connectivity error, it may be because the Storage Accelerator is trying to connect the client directly to the library — and the guest VM does not have direct connectivity to the cloud library. In this case, disable the Storage Accelerator on the SQL client: go to Client Properties → Additional Settings and disable the Storage Accelerator. Re-run the restore.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Verify in SQL Management Studio</strong>
+            <p>After the restore job completes, open SQL Server Management Studio, expand Databases → you should see the AdventureWorks database reappear. Run a query to confirm data integrity (e.g., <code>SELECT TOP 10 * FROM HumanResources.Employee</code>).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Storage Accelerator and Guest VM Connectivity</div>
+      <p>When Commvault installs packages in the guest VM during Application-Aware backup, it also installs the Storage Accelerator. By default, the Storage Accelerator will attempt to have the guest VM send restore data directly to the backup library — bypassing the Media Agent. If the guest VM does not have direct connectivity to the cloud library, the restore will fail or pend. In such cases, disable the Storage Accelerator on the SQL client's additional settings and let the Media Agent handle the data flow instead.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================= PART 2: AZURE CLOUD ============================= -->
+
+<!-- SECTION 5: AZURE OVERVIEW -->
+<section id="azure-overview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">☁</div>
+    <div>
+      <div class="section-title">Azure Cloud Backup — Overview &amp; Terminology</div>
+      <div class="section-subtitle">Azure storage concepts, lab architecture, and what Commvault protects in Azure</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What Commvault Protects in Azure</h3>
+    <p>This tutorial covers two Azure protection workloads, both requiring an access node deployed in the Azure cloud:</p>
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🗂 Azure Blob Storage (Object Storage)</h5>
+        <ul>
+          <li>Azure's object storage service — equivalent to AWS S3</li>
+          <li>Stores files, videos, images, unstructured data</li>
+          <li>Protected using the <strong>Cloud Apps agent</strong></li>
+          <li>Commvault Virtual Client type: Azure Blob</li>
+          <li>Three authentication methods: Access Key, IAM AD, IAM VM Role</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>🖥 Azure Virtual Machines</h5>
+        <ul>
+          <li>Azure IaaS virtual machines (equivalent to AWS EC2)</li>
+          <li>Agentless backup using snapshot technology</li>
+          <li>Protected using <strong>Virtual Server Agent (VSA)</strong></li>
+          <li>Commvault hypervisor type: Microsoft Azure</li>
+          <li>Three auth methods: Managed Identity, Azure App, Roles/Permissions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Azure Terminology — Key Concepts for Backup Admins</h3>
+    <div class="strip-row">
+      <span class="strip-label">Subscription</span>
+      <span class="strip-val">An Azure account with a billing boundary. Contains all Azure resources. Azure provides a free trial with $200 credit. Each subscription has a unique <strong>Subscription ID</strong> (UUID format — used in Commvault hypervisor config).</span>
+      <span class="strip-badge sb-info">Account Boundary</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Resource Group</span>
+      <span class="strip-val">A logical container for grouping related Azure resources (VMs, storage accounts, network interfaces). All resources in a group share the same lifecycle.</span>
+      <span class="strip-badge sb-info">Logical Container</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Storage Account</span>
+      <span class="strip-val">Azure's object storage service. The name must be globally unique. Contains Containers (≈ folders) and Blobs (≈ files). Two storage accounts are needed in a lab: one for customer data, one for backup library.</span>
+      <span class="strip-badge sb-info">Object Storage</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Container</span>
+      <span class="strip-val">A logical grouping within a Storage Account — equivalent to a folder or directory. Names must be lowercase, alphanumeric, hyphens allowed. No other special characters.</span>
+      <span class="strip-badge sb-info">≈ Folder</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Blob</span>
+      <span class="strip-val">An individual object (file) stored inside a Container. "Blob" is the Azure term for a stored object — equivalent to a file in S3.</span>
+      <span class="strip-badge sb-info">≈ File/Object</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Access Tier</span>
+      <span class="strip-val"><strong>Hot</strong>: frequent access, higher cost. <strong>Cool</strong>: infrequent access (recommended for backup repositories). <strong>Cold/Archive</strong>: rarely accessed, lowest cost.</span>
+      <span class="strip-badge sb-info">Cost Optimization</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Access Keys</span>
+      <span class="strip-val">Storage account authentication credentials. Two keys exist (Key1, Key2) — either can be used. The key provides full access to the storage account. Unlike AWS, there is no separate secret key — the key itself is the credential.</span>
+      <span class="strip-badge sb-warn">Full Access</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Network Security Group (NSG)</span>
+      <span class="strip-val">Azure's firewall equivalent. Controls inbound and outbound traffic to/from VMs. By default, all inbound ports are blocked. Outbound traffic is allowed by default.</span>
+      <span class="strip-badge sb-warn">Ports Blocked by Default</span>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Azure Cost Management for Labs</div>
+      <p>Azure charges per hour of VM runtime. Even if you stop (not delete) a VM, the OS disk cost still accrues. Always <strong>delete</strong> VMs and storage accounts after completing your lab. A standard access node VM costs ~$0.13/hour; running for a full month costs ~$107. For lab VMs, select the smallest eligible size (B1S: 1 vCPU, 1 GB RAM = ~$15/month). Enable "Delete public IP when VM is deleted" to avoid orphaned public IP charges.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Lab Architecture — What to Create in Azure</h3>
+    <div class="arch-row">
+      <div class="arch-box abox-blue">Storage Account 1<small>Customer Data<br>(source to backup)<br>Access tier: Hot</small></div>
+      <div class="arch-connector">+</div>
+      <div class="arch-box abox-purple">Storage Account 2<small>Backup Library<br>(destination for backups)<br>Access tier: Cool</small></div>
+      <div class="arch-connector">+</div>
+      <div class="arch-box abox-green">Access Node VM<small>Oracle Linux / RHEL<br>Cloud Apps + File System<br>+ Storage Accelerator</small></div>
+      <div class="arch-connector">+</div>
+      <div class="arch-box abox-orange">Production VM<small>Ubuntu / Any OS<br>Workload to protect<br>No Commvault agent</small></div>
+    </div>
+    <div class="callout note">
+      <div class="callout-title">📘 Why Oracle Linux for the Access Node?</div>
+      <p>For Azure Blob Storage backup, Commvault has certified only specific operating systems as access nodes: <strong>Oracle Linux, Red Hat Enterprise Linux</strong>, and Windows Server. Ubuntu is <strong>not supported</strong> as an access node for Azure Blob Storage backup — even though it works for the production VM (which is agentless). This is why Oracle Linux was selected despite Azure offering other distributions. Always verify the supported OS list in Commvault documentation before deploying an access node.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 6: AZURE BLOB STORAGE BACKUP -->
+<section id="azure-blob" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">🗂</div>
+    <div>
+      <div class="section-title">Azure Blob Storage Backup — Configuration</div>
+      <div class="section-subtitle">Cloud library setup, access node deployment, and virtual client creation for Azure Blob</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 1: Create the Azure Cloud Library (Backup Destination)</h3>
+    <p>Before backing up anything, you need a destination for the backup data. Create an Azure-based cloud library in Commvault using the backup Storage Account's access keys.</p>
+
+    <h4>Getting the Storage Account Access Keys</h4>
+    <p>In the Azure Portal: <strong>Storage Account → Security + Networking → Access Keys → Show Keys</strong>. Copy both the <strong>Storage Account Name</strong> and <strong>Key1</strong> (or Key2). These are the credentials Commvault needs to write to the library.</p>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Access Key Security</div>
+      <p>Azure Storage Access Keys provide <strong>full control</strong> over the storage account — read, write, delete all data. Treat them like a root password. Never share them in emails, tickets, or chat messages. If compromised, rotate (regenerate) them immediately in the Azure Portal.</p>
+    </div>
+
+    <h4>Creating the Cloud Library in Commvault Command Center</h4>
+    <div class="flow">
+      <div class="flow-title">Azure Cloud Library Configuration</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Storage → Cloud → Add</strong>
+            <p>In Command Center, navigate to <strong>Storage → Cloud → Add</strong>. By default, Azure Storage is listed — select it.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Provide Library Name, Media Agent, and Region</strong>
+            <p>Give the library a descriptive name (e.g., <code>Azure-Cloud-Lib</code>). Select the CommServe or Media Agent. Choose the region matching where you created the backup Storage Account (e.g., South India).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Select Authentication: Access Key</strong>
+            <p>Choose <strong>Account Name + Access Key</strong> as the authentication method. Create a new credential: give it a name, paste the Storage Account name, and paste the Access Key. Service Host defaults to <code>blob.core.windows.net</code> — leave as default.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Create and Specify a Container</strong>
+            <p>A Container must exist inside the Storage Account before saving. Create one in the Azure Portal (e.g., <code>cv-container</code>, lowercase, no special characters). Paste the container name in Commvault. Save — the library should appear as <strong>Ready/Online</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 2: Deploy Access Node and Install Packages</h3>
+    <p>The access node must be deployed as a VM in the Azure cloud. Packages are pushed from the CommServe to the access node using its Public IP (since CommServe is on-premises).</p>
+
+    <h4>Required Ports — Azure NSG Inbound Rules</h4>
+    <div class="status-row">
+      <span class="status-pill sp-blue">Port 22 — SSH (permanent)</span>
+      <span class="status-pill sp-blue">Port 8400 — Commvault (permanent)</span>
+      <span class="status-pill sp-blue">Port 8403 — Commvault (permanent)</span>
+    </div>
+    <p style="margin-top:12px; color:var(--text-muted); font-size:14px">In Azure, all inbound ports are blocked by default in the Network Security Group. You must explicitly add rules for ports 8400 and 8403. Port 22 (SSH) is typically opened at VM creation time.</p>
+
+    <h4>Required Packages on Oracle Linux Access Node</h4>
+    <div class="status-row">
+      <span class="status-pill sp-green">✓ File System</span>
+      <span class="status-pill sp-green">✓ File System Core</span>
+      <span class="status-pill sp-green">✓ Cloud Apps</span>
+      <span class="status-pill sp-green">✓ Storage Accelerator</span>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Decoupled Installation — When CommServe Has No Direct Route to Access Node</div>
+      <p>In many setups, the CommServe (on-premises, private IP) cannot directly receive a callback from the Azure access node (cloud, public IP) because the CommServe has no public-facing IP or port. This is called a <strong>decoupled mode</strong> scenario. Symptoms: package installation fails during the <em>registration</em> phase — packages are installed but the access node cannot register with CommServe. Fix: in CommCell Console, right-click Client Computers → New Client → Unix File System → enter the access node's public IP and enable <strong>"Fetch the configuration information from the client already installed in decoupled mode"</strong>. This pulls the configuration from the already-installed (but unregistered) client, completing the registration.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — verify Commvault installation on access node</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Connect to Azure access node via SSH (PuTTY using public IP)</span>
+<span class="cmd">ssh</span> <span class="val">username@public-ip-of-access-node</span>
+
+<span class="comment"># Verify Commvault services are running</span>
+<span class="cmd">commvault list</span>
+<span class="comment"># Expected: shows commserv name and services — confirms registration complete</span>
+<span class="comment"># If "command not found" — Commvault not installed</span>
+<span class="comment"># If "commserv name missing" — installed but not registered (decoupled mode fix needed)</span>
+
+<span class="comment"># If package install was partial, cleanly uninstall before retrying</span>
+<span class="cmd">cvpkgrm</span>  <span class="comment"># uninstall command for Linux (Oracle Linux / RHEL)</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 7: BLOB AUTH METHODS -->
+<section id="azure-blob-auth" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">🔐</div>
+    <div>
+      <div class="section-title">Azure Blob Virtual Client — Authentication Methods</div>
+      <div class="section-subtitle">Three ways to authenticate Commvault to Azure Blob Storage — Access Key, IAM AD, IAM VM Role</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three Authentication Methods for Azure Blob Virtual Client</h3>
+    <div class="strip-row">
+      <span class="strip-label">Method 1 — Access Key</span>
+      <span class="strip-val">Use the Storage Account name + Access Key. Simplest method. Keys provide full storage account access. Must be manually rotated when expired or compromised.</span>
+      <span class="strip-badge sb-warn">Simplest but Less Secure</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Method 2 — IAM AD (Azure AD Application)</span>
+      <span class="strip-val">Register an Azure AD application, assign permissions, and use its Application ID, Tenant ID, and Client Secret in Commvault. Supports fine-grained RBAC.</span>
+      <span class="strip-badge sb-info">Enterprise/AAD</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Method 3 — IAM VM Role Assignment</span>
+      <span class="strip-val">Assign the <strong>Storage Blob Data Owner</strong> role to the access node VM using Managed Identity. No credentials to manage — authentication is identity-based. Recommended.</span>
+      <span class="strip-badge sb-ok">Recommended</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>IAM VM Role Assignment — Configuring Access Node Identity for Blob Backup</h3>
+    <p>Think of this method like delegating authority: you are telling Azure "this specific VM (the access node) has permission to read and write data in this specific Storage Account — without needing any username or password." It is analogous to assigning a role rather than sharing a key.</p>
+
+    <div class="flow">
+      <div class="flow-title">IAM VM Role Assignment — Step-by-Step Azure Portal Configuration</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Enable System-Assigned Managed Identity on the Access Node VM</strong>
+            <p>In the Azure Portal: <strong>Virtual Machines → Access Node VM → Identity → System Assigned → Status: On → Save</strong>. This creates a unique Azure identity for this VM, tied to its lifecycle. When the VM is deleted, the identity is automatically deleted too.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Assign "Storage Blob Data Owner" Role to the Access Node VM</strong>
+            <p>Navigate to the <strong>Customer Data Storage Account</strong> (the one being backed up): <strong>Storage Account → Access Control (IAM) → Add Role Assignment</strong>. Search for and select <strong>Storage Blob Data Owner</strong>. In "Assign access to", choose <strong>Managed Identity</strong>. Select the access node VM from the list. Review and assign.</p>
+            <div class="callout note">
+              <div class="callout-title">📘 What "Storage Blob Data Owner" Means</div>
+              <p>This role grants full read/write/delete access to the blob containers and data in the storage account. It is the minimum role needed for Commvault to back up and restore blob data. Without this, the access node cannot read the blobs to back them up.</p>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Create the Blob Virtual Client in CommCell Console</strong>
+            <p>In CommCell Console: <strong>Client Computers → New Client → Cloud Storage → Azure Blob</strong>. Set the client name (user-defined), select the access node, choose a storage plan, and go to the <strong>Connection Details</strong> tab. Leave the host URL as default (<code>blob.core.windows.net</code>). Set authentication to <strong>IAM VM Role Assignment</strong>. Enter the Storage Account name. Click OK.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Configure Subclient Content and Run Backup</strong>
+            <p>Navigate to the new virtual client → Cloud Apps → Default Subclient → Properties → Content. Browse the storage account — all containers are listed. Select the specific container to back up (e.g., <code>data</code>). If no container is specified, everything in the storage account is backed up. Run an ad hoc backup.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Azure Blob Storage — In-Place Restore</h3>
+    <div class="flow">
+      <div class="flow-title">Restoring a Deleted Container/Blob — In-Place</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Simulate Data Loss</strong>
+            <p>In the Azure Portal, delete the target container from the customer data Storage Account to simulate an accidental deletion scenario.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Browse and Restore from Backup</strong>
+            <p>In CommCell Console: right-click the default subclient → <strong>Browse and Restore</strong>. Select the full backup point. Browse the backed-up containers and blobs. Select the deleted container/blob(s).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>In-Place Restore — Default Options</strong>
+            <p>Select <strong>In-Place Restore</strong> with <strong>Restore to same folder</strong> and <strong>Overwrite existing files</strong> as defaults. Submit the job.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Verify in Azure Portal</strong>
+            <p>Refresh the Storage Account in the Azure Portal. The deleted container (and its blobs) reappears — confirming successful restore directly back to the original location in Azure Blob Storage.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 8: AZURE VM BACKUP SETUP -->
+<section id="azure-vm" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🖥</div>
+    <div>
+      <div class="section-title">Azure VM Backup — Setup and Access Node Upgrade</div>
+      <div class="section-subtitle">Adding VSA package to the existing access node and understanding hypervisor authentication methods</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Reusing the Blob Access Node for VM Backup</h3>
+    <p>The same access node VM used for Blob Storage backup can also be used for Azure VM backup, provided you install the additional VSA (Virtual Server Agent) package. In smaller environments, this single access node approach is practical and cost-effective.</p>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Large vs. Small Environments</div>
+      <p><strong>Large environments</strong>: Use separate dedicated access nodes — one for Azure Blob Storage backup and one for Azure VM backup. This provides isolation, better performance, and easier troubleshooting. <strong>Small environments</strong>: A single access node can serve both roles. Install both Cloud Apps and VSA packages on the same VM.</p>
+    </div>
+
+    <div class="strip-row">
+      <span class="strip-label">Already Installed</span>
+      <span class="strip-val">File System, File System Core, Cloud Apps, Storage Accelerator (from Blob Storage setup)</span>
+      <span class="strip-badge sb-ok">From Blob Setup</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Additional Package Needed</span>
+      <span class="strip-val"><strong>Virtual Server Agent (VSA)</strong> — required for Azure VM agentless backup. Install via CommCell Console: right-click access node → Add/Remove Software → add Virtual Server</span>
+      <span class="strip-badge sb-warn">Must Add</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Azure VM Backup — Three Authentication Methods</h3>
+    <p>Like Blob Storage backup, Azure VM backup supports three methods of authenticating Commvault to the Azure subscription. The authentication method for VM backup is independent of the one used for Blob Storage.</p>
+    <div class="strip-row">
+      <span class="strip-label">Method 1 — Managed Identity</span>
+      <span class="strip-val">System-assigned managed identity + Custom Role with VM management permissions. No credentials stored — recommended by Microsoft and Commvault. Used in this lab demo.</span>
+      <span class="strip-badge sb-ok">Recommended</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Method 2 — Azure App</span>
+      <span class="strip-val">Register an Azure AD Application with required permissions. Provide Application ID, Tenant ID, and Client Secret in Commvault.</span>
+      <span class="strip-badge sb-info">AD App Registration</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Method 3 — Roles and Permissions</span>
+      <span class="strip-val">Assign built-in Azure roles (e.g., Virtual Machine Contributor) directly to the access node's managed identity at subscription scope.</span>
+      <span class="strip-badge sb-info">Built-in Roles</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 9: MANAGED IDENTITY + CUSTOM ROLE -->
+<section id="azure-managed-identity" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">🔒</div>
+    <div>
+      <div class="section-title">Managed Identity + Custom Role — Azure VM Backup Auth</div>
+      <div class="section-subtitle">Creating a Commvault custom role in Azure and configuring Managed Identity for VM-level authentication</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Custom Role vs. Built-In Roles?</h3>
+    <p>Azure has built-in roles like <em>Virtual Machine Contributor</em> that grant broad permissions. A <strong>Custom Role</strong> allows you to define exactly the minimum permissions Commvault needs — no more, no less. This is important for:</p>
+    <ul style="padding-left:20px; margin-top:8px">
+      <li style="color:var(--text-muted); margin-bottom:8px"><strong>Security audits</strong>: Your security team may question why a backup tool has Virtual Machine Contributor rights (which include things Commvault does not need). A custom role with only backup-required permissions passes audit scrutiny.</li>
+      <li style="color:var(--text-muted); margin-bottom:8px"><strong>Principle of least privilege</strong>: Best practice in cloud security — grant only what is required.</li>
+      <li style="color:var(--text-muted)"><strong>Clarity</strong>: A role named "CV Backup" makes it immediately obvious what this role is for and who created it.</li>
+    </ul>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Always Use Commvault-Provided JSON for Custom Role</div>
+      <p>Commvault publishes a JSON permissions file in its documentation that defines the exact permissions required for Azure VM backup. Use this JSON as the basis for your custom role — do not use a generic AI-generated JSON, as it may include insufficient or overly broad permissions. The Commvault JSON has been tested and validated against all backup and restore operations.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step-by-Step: Custom Role + Managed Identity Configuration</h3>
+    <div class="flow">
+      <div class="flow-title">Azure VM Backup — Managed Identity + Custom Role Setup</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Obtain the Subscription ID</strong>
+            <p>In the Azure Portal, search for <strong>Subscriptions</strong>. Copy the <strong>Subscription ID</strong> (UUID format, e.g., <code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>). This is different from the Subscription Name — do not confuse them. The Subscription ID is required in the Commvault JSON and for hypervisor configuration.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Create a Custom Role from Commvault's JSON</strong>
+            <p>In the Azure Portal: <strong>Subscriptions → Select Subscription → Access Control (IAM) → Add → Add Custom Role → Start from scratch</strong>. Click <strong>Edit</strong>, delete the default template, and paste the Commvault-provided JSON. Replace <code>"subscriptionId"</code> placeholder with your actual Subscription ID. Save, then click <strong>Review + Create → Create</strong>.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">JSON — Commvault Custom Role structure (abbreviated)</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+              <div class="code-body">{
+  "Name": "CV Backup",
+  "Description": "Lets you manage virtual machines, not access to them,
+                  and not the virtual network or storage account.",
+  "AssignableScopes": [
+    "/subscriptions/<span class="val">YOUR-SUBSCRIPTION-ID</span>"
+  ],
+  "permissions": [
+    {
+      "actions": [ <span class="comment">/* VM management actions required by Commvault */</span> ],
+      "notActions": [],
+      "dataActions": [],
+      "notDataActions": []
+    }
+  ]
+}</div>
+            </div>
+            <div class="callout warn">
+              <div class="callout-title">⚠ Subscription ID vs. Subscription Name</div>
+              <p>A common mistake: pasting the Subscription <em>Name</em> (human-readable text) instead of the Subscription <em>ID</em> (UUID format). This causes the role creation to fail with "subscription identifier is invalid." Always verify you are copying the ID column, not the Name column, from the Subscriptions page.</p>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Assign the Custom Role to the Access Node's Managed Identity</strong>
+            <p>In the Azure Portal: <strong>Subscriptions → Access Control (IAM) → Add Role Assignment → Select "CV Backup" role → Assign access to: Managed Identity → Select the Access Node VM</strong>. Assign at <strong>subscription scope</strong> — this means the role automatically applies to all VMs in the subscription, including any new VMs created later. You do NOT need to assign the role to each VM individually.</p>
+            <div class="callout note">
+              <div class="callout-title">📘 Scope Inheritance in Azure</div>
+              <p>When you assign a role at the <strong>subscription level</strong>, all resources within that subscription automatically inherit the role assignment. This is why the CV Backup role appears on the Production VM even though you assigned it only to the Access Node at subscription scope — the Production VM is inside the same subscription and inherits the permission.</p>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Configure Azure Hypervisor in Commvault Command Center</strong>
+            <p>In Command Center: <strong>Protect → Virtualization → Add Hypervisor → Microsoft Azure → Next</strong>. Provide the Subscription ID. In credentials: select <strong>Connect using Managed Identity for Azure resources</strong> (do not enter any keys or tenant IDs). Select the Access Node VM. Click Next — Commvault will validate the connection.</p>
+            <div class="callout tip">
+              <div class="callout-title">💡 Guided Setup is Simpler</div>
+              <p>You can also use Command Center's <strong>Guided Setup → Configure → Microsoft Azure</strong> workflow instead of manually navigating to Protect → Virtualization. Both reach the same configuration screen — Guided Setup may be easier for first-time configuration.</p>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Add VM Group — Select VMs to Protect</strong>
+            <p>After successful hypervisor connection, Commvault prompts to add a VM Group. Click <strong>Browse</strong> — all VMs in the connected subscription are listed. Select only the production VM (not the access node — it is the proxy, not the workload). Assign a plan (e.g., "Azure VM Backup" plan pointing to the Azure cloud library). Give the VM Group a name and finish.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 10: AZURE RESTORE -->
+<section id="azure-restore" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🔄</div>
+    <div>
+      <div class="section-title">Azure VM — Backup and In-Place Restore</div>
+      <div class="section-subtitle">Running backups, validating agentless operation, and full VM in-place restore</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running the Azure VM Backup</h3>
+    <p>With the VM Group configured, trigger a manual backup. The agentless nature can be confirmed before and after the backup.</p>
+    <div class="strip-row">
+      <span class="strip-label">Confirm Agentless</span>
+      <span class="strip-val">SSH into the production VM and run <code>commvault list</code> — "command not found" confirms no Commvault agent is installed. Backup is truly agentless.</span>
+      <span class="strip-badge sb-ok">Agentless Confirmed</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Create Test Data Before Backup</span>
+      <span class="strip-val">Create test files/directories in the VM before running backup (e.g., <code>mkdir /usr/customer-data && touch /usr/customer-data/testfile</code>). These will be used to verify restore.</span>
+      <span class="strip-badge sb-info">For Verification</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Trigger Backup</span>
+      <span class="strip-val">In Command Center: VM Group → Back Up Now. Monitor from Job Controller. The backup runs through the Access Node using the Managed Identity authentication.</span>
+      <span class="strip-badge sb-ok">Standard Process</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">View Backup Details</span>
+      <span class="strip-val">After completion, check VM Group → Virtual Machines to see backup size, access node used, instance size, last backup time — all visible per-VM.</span>
+      <span class="strip-badge sb-info">Monitoring</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>In-Place VM Restore — Full Virtual Machine</h3>
+    <div class="flow">
+      <div class="flow-title">Azure VM In-Place Restore Procedure</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Simulate Data Loss (Root Partition Deletion)</strong>
+            <p>SSH into the production VM and delete root partition files to simulate corruption: <code>cd / && rm -rf *</code> (with appropriate warnings — <em>this is destructive, lab only!</em>). After deletion, <code>sudo</code> commands return "no such file or directory" — the VM is corrupted and unusable. A full VM restore is the only option.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Navigate to Restore: Virtualization → Select Hypervisor → VM → Restore</strong>
+            <p>In Command Center: <strong>Protect → Virtualization → Select Azure hypervisor → Select the production VM → Restore</strong>. Select <strong>Full Instance</strong> restore type.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Select Restore Point and In-Place Options</strong>
+            <p>Select the latest backup point. Choose <strong>In-Place</strong> restore. Enable <strong>Power On after Restore</strong> and <strong>Unconditionally Overwrite</strong>. Optionally specify the Access Node. The storage account field shown in the restore dialog refers to the staging storage — leave as the associated cloud library storage account.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>What In-Place Restore Does in Azure</strong>
+            <p>An Azure VM in-place restore <strong>deletes the existing VM</strong> and <strong>recreates it</strong> from the backup. This means the Public IP address will change after restore — always retrieve the new Public IP from the Azure Portal after an in-place restore before trying to SSH back in.</p>
+            <div class="callout warn">
+              <div class="callout-title">⚠ Public IP Changes After In-Place Restore</div>
+              <p>Because the VM is deleted and recreated during in-place restore, Azure assigns a new public IP address to the restored VM. Do not use the old IP to reconnect. After restore completion, go to the Azure Portal → Virtual Machines → Select the restored VM → copy the new Public IP from the Overview page.</p>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Verify Successful Restore</strong>
+            <p>SSH into the restored VM using the new Public IP. Run <code>sudo ls</code> — you should have sudo access again. Navigate to <code>/usr/customer-data/</code> — the test files created before backup should be present. The VM is fully restored and operational.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Lab Cost Reminder</div>
+      <p>After completing Azure lab exercises, always <strong>stop or delete</strong> Azure VMs. Stop the VM if you plan to return; delete it if you are done. Even a stopped VM incurs OS disk charges. Storage accounts also incur charges based on stored data volume. For lab environments, delete all resources when done to avoid unexpected billing.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 11: INTERVIEW Q&A -->
+<section id="interview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🎓</div>
+    <div>
+      <div class="section-title">Interview &amp; Exam — Scenario-Based Q&amp;A</div>
+      <div class="section-subtitle">Real-world questions covering Application-Aware Backup, Azure Blob, and Azure VM protection</div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A customer has 200 VMware virtual machines, all running SQL Server. They want application-consistent backups but don't want to install SQL agents in every VM. What do you recommend, and what are the trade-offs?</div>
+    <div class="qa-a">Recommend <strong>Application-Aware Backup</strong>. By enabling this option in the VM Group properties (with guest OS credentials provided), Commvault automatically pushes the required plugins to each guest VM on the first backup run — no manual agent installation required. The backup captures both the VM snapshot (streaming) and the SQL Server in an application-consistent state using IntelliSnap. Trade-offs: (1) No transaction log backups — only full/incremental VM-level recovery is possible, so RPO is limited by your VM backup schedule. (2) No table-level granular restore — only full database or full VM restore. (3) No additional SQL agent license is consumed — only the VM license applies, which is a significant cost saving for 200 VMs. If the customer needs log-level backups or granular table-level recovery, then agent-based SQL Server backup would be the correct choice instead.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">When an Application-Aware backup runs for the first time, you notice three jobs appearing in the Job Controller instead of one. What are they, and is this expected?</div>
+    <div class="qa-a">Yes, this is fully expected and by design. The three jobs are: (1) <strong>Parent VM backup job</strong> — the main orchestrator job you triggered. (2) <strong>Install Software child job</strong> — automatically pushes required packages (File System Core, Media Agent binaries, application plugins like MSSQL, Storage Accelerator) into the guest VM. This job appears <em>only on the first run</em> — never again after initial installation. (3) <strong>VSA App-Aware Workflow child job + Snap backup</strong> — handles the application-consistent snapshot using IntelliSnap. On all subsequent backup runs, only 2 jobs appear (parent VM backup and the snap/workflow job) since the Install Software step is skipped.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is the difference between Agent-Based SQL backup and Application-Aware backup in terms of license consumption?</div>
+    <div class="qa-a">With <strong>Agent-Based backup</strong>, you install a Commvault SQL Server agent inside each VM. Each installed agent consumes an agent-based license. In a 200-VM environment, this means 200 SQL agent licenses on top of the VM licenses — significant additional cost. With <strong>Application-Aware backup</strong>, Commvault does not install a licensed SQL agent — it uses a lightweight plugin pushed automatically. Only the <strong>VM-level license</strong> is consumed. No additional agent license is deducted, even though SQL Server is being backed up in an application-consistent manner. This is one of the primary reasons customers with large VMware deployments prefer Application-Aware backup — it protects applications without consuming per-application agent licenses.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">You are configuring Azure Blob Storage backup. The package installation on the Oracle Linux access node fails during the registration phase, even though the packages are installed successfully. What is the cause and how do you fix it?</div>
+    <div class="qa-a">This is a <strong>decoupled installation</strong> scenario. The CommServe (on-premises, private IP 192.168.x.x) cannot receive a direct callback from the Azure access node (cloud, public IP) because CommServe does not have a public-facing IP. The packages install fine on the access node, but the registration — where the access node registers with CommServe — fails because CommServe is unreachable from the public internet. Fix: after the failed installation, go to CommCell Console → right-click Client Computers → <strong>New Client → Unix File System</strong> → enter the access node's <strong>public IP</strong> as the hostname → enable <strong>"Fetch the configuration information from the client already installed in decoupled mode"</strong> → Finish. This tells CommServe to pull the registration details from the already-installed (but unregistered) access node, completing the connection. After this, push any missing packages (Cloud Apps, Storage Accelerator) via Add/Remove Software.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">Why can't you use Ubuntu as an access node for Azure Blob Storage backup, and what OS should you use instead?</div>
+    <div class="qa-a">Ubuntu is not on Commvault's certified operating system list for Azure Blob Storage access nodes. Commvault has certified only <strong>Oracle Linux, Red Hat Enterprise Linux (RHEL)</strong>, and <strong>Windows Server</strong> as supported access node operating systems for Azure storage account backup. This is a Commvault product certification decision — even though Ubuntu runs fine as a general Linux VM in Azure, Commvault's Cloud Apps agent for Azure Blob has only been tested and validated on these specific distributions. Always consult the Commvault documentation's system requirements before deploying an access node. The production VM being backed up has no such restriction — it can be any OS since the backup is agentless.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is a Managed Identity in Azure, and why is it the recommended authentication method for Commvault Azure VM backup?</div>
+    <div class="qa-a">A <strong>Managed Identity</strong> is an automatically managed identity in Azure Active Directory assigned to an Azure resource (in this case, the access node VM). It allows the resource to authenticate to other Azure services without storing any credentials — no keys, no passwords, no client secrets that can expire or be compromised. For Commvault Azure VM backup, the access node VM's Managed Identity is assigned the custom "CV Backup" role at the subscription level. When Commvault connects using this method, the access node presents its managed identity token to Azure — Azure verifies the identity and grants access. It is recommended because: (1) No credentials to rotate or manage, (2) Tied to the VM lifecycle — deleted when the VM is deleted, (3) Satisfies enterprise security audits, (4) Supported by both Microsoft and Commvault as the preferred approach. In Commvault Command Center, this is configured by simply enabling "Connect using Managed Identity for Azure resources" — no tenant ID, application ID, or secrets need to be entered.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">After an Azure VM in-place restore completes, a junior engineer tries to SSH into the restored VM using the same IP address as before and cannot connect. What is the likely cause?</div>
+    <div class="qa-a">During an Azure VM in-place restore, Commvault <strong>deletes the original VM and recreates it</strong> from the backup. When the VM is recreated, Azure assigns a <strong>new public IP address</strong> — the old IP no longer exists or points to the restored VM. The fix is to go to the Azure Portal → Virtual Machines → select the restored VM → copy the new Public IP from the Overview page → use this new IP to SSH. This is expected behavior and should be communicated to the team before initiating any in-place restore. If IP address stability is a requirement, consider using a Static public IP or Azure DNS instead of relying on a dynamic public IP.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A customer's Azure Blob Storage backup completes but when they browse and restore, they can see the container in the backup but the blob files inside appear empty. What might have happened?</div>
+    <div class="qa-a">This is a timing issue: the backup job ran before any files were uploaded to the container. Commvault backs up whatever is present in the container <em>at the time the backup job runs</em>. If the backup ran first and the files were uploaded afterward, the backup captures an empty container. The fix is: (1) Ensure files are uploaded to the container <strong>before</strong> initiating backup, or (2) Run a new full backup after the files are present, then restore from that backup. Going forward, this highlights the importance of backup scheduling — the backup window should be after expected data upload windows, not before. In production, incremental backups after an initial full backup would capture newly added blobs as they are created.</div>
+  </div>
+</section>
+
+</div><!-- end main-content -->
+
+</div><!-- end page-body -->
+
+<!-- AUTHOR SECTION -->
+<div class="author-section">
+  <div class="author-title">About the Author</div>
+  <div class="author-card">
+    <div class="author-avatar">👨‍💻</div>
+    <div class="author-info">
+      <div class="author-name">Mohammed Abdul</div>
+      <div class="author-role">Data Protection Architect · 15+ Years Experience</div>
+      <div class="author-bio">Seasoned Data Protection Architect with over 15 years of hands-on experience designing, implementing, and troubleshooting enterprise backup and recovery solutions. Deep expertise in Commvault administration spanning VMware application-aware backups, Azure cloud protection, AWS cloud workloads, Kubernetes backup, and large-scale infrastructure management. Specialist in hybrid cloud backup architectures and agentless application protection strategies.</div>
+      <div class="badge-row">
+        <span class="badge cv">Commvault Certified</span>
+        <span class="badge veeam">Veeam VMCE</span>
+        <span class="badge nb">NetBackup</span>
+        <span class="badge netapp">NetApp</span>
+      </div>
+      <a class="contact-card" href="mailto:abdul.md.20000102@gmail.com">
+        ✉ abdul.md.20000102@gmail.com
+      </a>
+    </div>
+  </div>
+  <div class="disclaimer">
+    <p><strong>Disclaimer:</strong> This tutorial is created for educational and training purposes only. All technical procedures, commands, and configurations are based on real-world Commvault implementation experience. Always refer to the official Commvault documentation for your specific software version before applying any changes in a production environment. Azure Portal UI, IAM, and NSG configurations may vary across Azure regions and subscription types — consult Microsoft Azure official documentation for the latest guidance.</p>
+  </div>
+</div>
+
+<footer>
+  Commvault Software Administration — Tutorial 9: VMware Application-Aware &amp; Azure Cloud Backup
+  <p style="margin-top:6px; color:var(--text-dim);">© Mohammed Abdul · Data Protection Architect · For educational use only</p>
+</footer>
+<script>
+(function () {
+  const sectionIds = [
+    "appaware-intro","appaware-prereqs","appaware-jobs","appaware-restore",
+    "azure-overview","azure-blob","azure-blob-auth","azure-vm",
+    "azure-managed-identity","azure-restore","interview"
+  ];
+  const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+  const links    = document.querySelectorAll(".sidebar-link");
+
+  function activate() {
+    const scrollY = window.scrollY + 80;
+    let current = sections[0];
+    for (const sec of sections) {
+      if (sec.offsetTop <= scrollY) current = sec;
+    }
+    links.forEach(link => {
+      const match = link.getAttribute("href") === "#" + current.id;
+      link.classList.toggle("active", match);
+      if (match) {
+        // keep active link visible in sidebar
+        link.scrollIntoView({ block: "nearest" });
+      }
+    });
+  }
+
+  window.addEventListener("scroll", activate, { passive: true });
+  activate();
+})();
+</script>
+</body>
+</html>
