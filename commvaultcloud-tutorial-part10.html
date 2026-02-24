@@ -1648,27 +1648,11 @@
   </div>
 
   <div class="card">
-    <h3>The Real Cost of Skipping Maintenance Releases — A Real-World Example</h3>
-    <p>A critical lesson from production experience that every backup admin must internalize:</p>
-    <div class="upgrade-box">
-      <h4>⚠ Real Incident: Backups Completing Successfully — But VMs Won't Restore</h4>
-      <ul>
-        <li>Customer was on Commvault 11.32 — a supported version — but had not installed any maintenance releases (running on a very low MR number)</li>
-        <li>VMware backup jobs ran and showed "Completed" status in the Job Controller every day for months</li>
-        <li>When a restore was needed, every restored VM showed a <strong>Blue Screen of Death</strong> — the VM would not start</li>
-        <li>VMware team and OS team both tried to troubleshoot — no success</li>
-        <li>Commvault support was engaged — Commvault acknowledged a <strong>known bug</strong> in that old MR version where restore completes but VM boots to blue screen</li>
-        <li>Resolution: upgrade to a newer MR — but existing backups taken on the old version were <strong>NOT restorable</strong></li>
-        <li>Customer had to wait until new backups were taken after the MR upgrade to have restorable backups</li>
-        <li>Business impact: complete data protection gap for all existing backup jobs</li>
-      </ul>
-    </div>
-
     <div class="callout best">
       <div class="callout-title">⭐ The N-1 Rule for Commvault Versions</div>
       <ul>
         <li><strong>Platform/Feature Release</strong> (e.g., 11.32, 11.36, 11.40): These are major releases. Do NOT upgrade to the latest platform release immediately — it may be unstable. Follow the <strong>N-1 rule</strong>: use one version behind the latest. For example, if 11.40 just released, stay on 11.36 until 11.40 is proven stable.</li>
-        <li><strong>Maintenance Release (MR)</strong> (e.g., 11.32.100, 11.32.150): These are hotfixes/patches. <strong>Always keep MRs current.</strong> There is very little risk in applying the latest MR for your platform release — they contain critical bug fixes like the restore failure described above. An outdated MR can silently cause data loss.</li>
+        <li><strong>Maintenance Release (MR)</strong> (e.g., 11.32.100, 11.32.150): These are hotfixes/patches. <strong>Always keep MRs current.</strong> They contain critical bug fixes and stability improvements — an outdated MR can silently cause data loss or restore failures. Apply the latest available MR for your platform release on a regular cadence.</li>
         <li><strong>OS Compatibility Check</strong>: Before any platform upgrade (e.g., 11.32 → 11.36), verify all OS versions in your environment (CommServe OS, Media Agent OS, client OS) are compatible with the new version — check the System Requirements Guide in Commvault documentation.</li>
       </ul>
     </div>
@@ -1756,10 +1740,7 @@
     <div class="qa-a">This error occurs when the Azure SQL Database is on the <strong>free tier</strong>. Commvault's backup process internally creates a copy/export of the database (similar to a BACPAC export). The Azure SQL free tier explicitly restricts database copy operations to prevent abuse of the free service. This limitation is not a Commvault bug — it is an Azure platform restriction. The fix: in Azure Portal → SQL Database → Compute + Storage → disable the "Apply free database offer" checkbox → switch to paid compute (basic tier, approximately $6/month). After disabling the free tier, kill the failed job and resubmit a new full backup. The export operation will now complete successfully.</div>
   </div>
 
-  <div class="qa-block">
-    <div class="qa-q">A customer reports that their Commvault backup jobs have been showing "Completed" for 6 months, but when they tried to restore a VM last week, it booted to a Blue Screen of Death every time. What happened and what should they have done to prevent this?</div>
-    <div class="qa-a">This is a known real-world scenario caused by an unpatched Commvault bug in an outdated <strong>Maintenance Release (MR)</strong>. The customer was on a supported platform version (e.g., 11.32) but had not applied MR updates for an extended period. A bug existed in that MR version where VM restore completes successfully in Commvault but the restored VM is non-bootable. The bug was fixed in a later MR. Because they never applied the MR fix, all backups taken during that period are unrestorable from those jobs. Prevention: (1) Always keep Maintenance Releases current — apply new MRs as soon as they are released and tested. MRs are hotfixes that specifically address bugs like this. (2) Perform periodic restore tests — quarterly test restores of representative VMs would have immediately caught this issue. (3) Monitor Commvault's known issue list and release notes for the MR versions you are running.</div>
-  </div>
+
 </section>
 
 </div><!-- end main-content -->
