@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Software Administration – Tutorial 10 | IntelliSnap &amp; Azure SQL Backup</title>
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #0f2040;
+    --navy-light: #162b52;
+    --accent: #00c8ff;
+    --accent2: #00e5a0;
+    --accent3: #ff6b35;
+    --accent4: #a78bfa;
+    --gold: #f5c842;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --card: #0d1f3c;
+    --card-border: rgba(0,200,255,0.12);
+    --warn-bg: rgba(255,107,53,0.08);
+    --warn-border: #ff6b35;
+    --tip-bg: rgba(0,229,160,0.08);
+    --tip-border: #00e5a0;
+    --note-bg: rgba(0,200,255,0.08);
+    --note-border: #00c8ff;
+    --exam-bg: rgba(167,139,250,0.08);
+    --exam-border: #a78bfa;
+    --best-bg: rgba(245,200,66,0.08);
+    --best-border: #f5c842;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', Calibri, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 999;
+    background: rgba(10,22,40,0.97);
+    border-bottom: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; min-height: 54px;
+  }
+  .nav-brand {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent); font-size: 15px; font-weight: bold;
+    letter-spacing: 0.5px; margin-right: 16px; white-space: nowrap;
+  }
+  nav a {
+    color: var(--text-muted); text-decoration: none; font-size: 12px;
+    padding: 6px 10px; border-radius: 4px; transition: all 0.2s; white-space: nowrap;
+  }
+  nav a:hover { color: var(--accent); background: rgba(0,200,255,0.08); }
+
+  .hero {
+    background: linear-gradient(135deg, #0a1628 0%, #151030 40%, #0a1e28 100%);
+    padding: 80px 48px 64px;
+    border-bottom: 1px solid var(--card-border);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(167,139,250,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -80px; left: 30%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,200,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(167,139,250,0.1);
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 20px; padding: 6px 16px;
+    font-size: 12px; color: var(--accent4);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1.2; color: #fff; max-width: 860px; margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--accent4); }
+  .hero-desc {
+    color: var(--text-muted); max-width: 720px;
+    font-size: 16px; margin-bottom: 36px;
+  }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tag {
+    background: var(--navy-light); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px; padding: 4px 12px; font-size: 12px; color: var(--text-muted);
+  }
+  .tag.purple { border-color: var(--accent4); color: var(--accent4); }
+  .tag.blue { border-color: var(--accent); color: var(--accent); }
+  .tag.green { border-color: var(--accent2); color: var(--accent2); }
+  .tag.gold { border-color: var(--gold); color: var(--gold); }
+  .tag.orange { border-color: var(--accent3); color: var(--accent3); }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px; padding: 40px 48px;
+    background: var(--navy-mid);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .toc-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 8px; padding: 14px 16px;
+    text-decoration: none; color: var(--text-muted);
+    font-size: 13px; transition: all 0.2s;
+  }
+  .toc-item:hover { border-color: var(--accent4); color: var(--accent4); transform: translateY(-2px); }
+  .toc-num {
+    background: rgba(167,139,250,0.1); color: var(--accent4);
+    border-radius: 4px; padding: 2px 8px; font-size: 11px;
+    font-family: 'Courier New', monospace; font-weight: bold; flex-shrink: 0;
+  }
+
+  .main-content { max-width: 1100px; margin: 0 auto; padding: 48px 32px; }
+
+  .section { margin-bottom: 64px; }
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .section-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .icon-blue { background: rgba(0,200,255,0.12); }
+  .icon-green { background: rgba(0,229,160,0.12); }
+  .icon-orange { background: rgba(255,107,53,0.12); }
+  .icon-purple { background: rgba(167,139,250,0.12); }
+  .icon-gold { background: rgba(245,200,66,0.12); }
+  .section-title {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(20px, 2.5vw, 28px); color: #fff;
+  }
+  .section-subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 12px; padding: 28px; margin-bottom: 20px;
+  }
+  .card h3 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent4); font-size: 17px; margin-bottom: 12px;
+  }
+  .card h4 {
+    color: var(--accent2); font-size: 14px; margin: 18px 0 10px;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .card p { color: var(--text-muted); margin-bottom: 12px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { padding-left: 20px; }
+  .card li { color: var(--text-muted); margin-bottom: 8px; }
+  .card li strong { color: var(--text); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .callout { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 18px 22px; margin: 20px 0; }
+  .callout-title { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .callout p, .callout li { font-size: 14px; margin-bottom: 0; }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.warn .callout-title { color: var(--warn-border); }
+  .callout.warn p, .callout.warn li { color: #fca97a; }
+  .callout.tip { background: var(--tip-bg); border-color: var(--tip-border); }
+  .callout.tip .callout-title { color: var(--tip-border); }
+  .callout.tip p, .callout.tip li { color: #6ee7b7; }
+  .callout.note { background: var(--note-bg); border-color: var(--note-border); }
+  .callout.note .callout-title { color: var(--note-border); }
+  .callout.note p, .callout.note li { color: #7dd3f0; }
+  .callout.exam { background: var(--exam-bg); border-color: var(--exam-border); }
+  .callout.exam .callout-title { color: var(--exam-border); }
+  .callout.exam p, .callout.exam li { color: #c4b5fd; }
+  .callout.best { background: var(--best-bg); border-color: var(--best-border); }
+  .callout.best .callout-title { color: var(--best-border); }
+  .callout.best p, .callout.best li { color: #fde68a; }
+  .callout ul { padding-left: 20px; margin-top: 8px; }
+  .callout li { margin-bottom: 6px; }
+
+  .code-block {
+    background: #060e1c; border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 8px; overflow: hidden; margin: 16px 0;
+  }
+  .code-header {
+    background: rgba(167,139,250,0.06); padding: 8px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(167,139,250,0.1);
+  }
+  .code-lang {
+    font-size: 11px; color: var(--accent4); text-transform: uppercase;
+    letter-spacing: 1px; font-family: 'Courier New', monospace;
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; } .dot-y { background: #ffbd2e; } .dot-g { background: #28c840; }
+  .code-body {
+    padding: 18px 20px;
+    font-family: 'Courier New', Courier, 'Lucida Console', monospace;
+    font-size: 13px; line-height: 1.7; color: #c9e7ff;
+    overflow-x: auto; white-space: pre;
+  }
+  .code-body .cmd { color: #00e5a0; }
+  .code-body .comment { color: #4a6580; font-style: italic; }
+  .code-body .param { color: #f5c842; }
+  .code-body .val { color: #ff9f7e; }
+  .code-body .path { color: #a78bfa; }
+
+  .flow {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 12px; padding: 28px; margin: 20px 0;
+  }
+  .flow-title {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent4); font-size: 15px; margin-bottom: 24px; text-align: center;
+  }
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step { display: flex; align-items: flex-start; gap: 16px; position: relative; }
+  .flow-step:not(:last-child)::after {
+    content: ''; position: absolute; left: 20px; top: 44px; bottom: -2px;
+    width: 2px; background: linear-gradient(to bottom, var(--accent4), transparent);
+  }
+  .flow-num {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(167,139,250,0.12); border: 2px solid var(--accent4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: bold; color: var(--accent4); flex-shrink: 0;
+    font-family: 'Courier New', monospace; margin-bottom: 28px;
+  }
+  .flow-content { padding-top: 8px; padding-bottom: 16px; flex: 1; }
+  .flow-content strong { color: var(--text); display: block; margin-bottom: 6px; font-size: 15px; }
+  .flow-content p { color: var(--text-muted); font-size: 14px; margin-bottom: 0; }
+
+  .hflow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 20px 0; }
+  .hflow-box {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 8px; padding: 10px 16px; font-size: 13px; color: var(--text-muted);
+    text-align: center; flex: 1; min-width: 110px;
+  }
+  .hflow-box small { display: block; font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+  .hflow-box.active { border-color: rgba(167,139,250,0.4); color: var(--accent4); }
+  .hflow-arrow { color: var(--text-dim); font-size: 18px; flex-shrink: 0; }
+
+  .arch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .arch-box {
+    border-radius: 8px; padding: 12px 20px;
+    text-align: center; font-size: 13px; font-weight: 500;
+  }
+  .arch-box small { display: block; font-size: 10px; opacity: 0.7; margin-top: 3px; font-weight: 400; }
+  .abox-blue { background: rgba(0,200,255,0.12); border: 1px solid rgba(0,200,255,0.3); color: #7ee8fa; }
+  .abox-green { background: rgba(0,229,160,0.12); border: 1px solid rgba(0,229,160,0.3); color: #6ee7b7; }
+  .abox-orange { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.3); color: #fca97a; }
+  .abox-purple { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); color: #c4b5fd; }
+  .abox-gold { background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.3); color: #fde68a; }
+  .arch-connector { text-align: center; color: var(--text-dim); font-size: 22px; line-height: 1; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .cmp-box { border-radius: 8px; padding: 18px; }
+  .cmp-box h5 { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .cmp-box ul { padding-left: 18px; } .cmp-box li { font-size: 13px; margin-bottom: 6px; }
+  .cmp-a { background: rgba(0,200,255,0.06); border: 1px solid rgba(0,200,255,0.2); }
+  .cmp-a h5 { color: var(--accent); } .cmp-a li { color: #7ee8fa; }
+  .cmp-b { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.2); }
+  .cmp-b h5 { color: var(--accent4); } .cmp-b li { color: #c4b5fd; }
+  .cmp-c { background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.2); }
+  .cmp-c h5 { color: var(--accent2); } .cmp-c li { color: #6ee7b7; }
+  .cmp-d { background: rgba(245,200,66,0.06); border: 1px solid rgba(245,200,66,0.2); }
+  .cmp-d h5 { color: var(--gold); } .cmp-d li { color: #fde68a; }
+
+  .strip-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 6px; padding: 12px 18px; margin-bottom: 8px;
+  }
+  .strip-label { font-size: 12px; color: var(--text-dim); min-width: 190px; flex-shrink: 0; }
+  .strip-val { font-size: 13px; color: var(--text); flex: 1; }
+  .strip-badge { font-size: 11px; padding: 2px 10px; border-radius: 10px; border: 1px solid; flex-shrink: 0; }
+  .sb-ok { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.07); }
+  .sb-warn { border-color: var(--accent3); color: var(--accent3); background: rgba(255,107,53,0.07); }
+  .sb-info { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.07); }
+  .sb-purple { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.07); }
+  .sb-gold { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.07); }
+  .sb-best { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.07); }
+
+  .status-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 16px; font-size: 12px; border: 1px solid; }
+  .sp-green { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.08); }
+  .sp-red { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
+  .sp-yellow { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.08); }
+  .sp-blue { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.08); }
+  .sp-purple { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.08); }
+
+  .snap-diagram {
+    background: #060e1c; border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 10px; padding: 24px; margin: 16px 0;
+  }
+  .snap-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .snap-box {
+    border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 500;
+    border: 1px solid; text-align: center; flex-shrink: 0;
+  }
+  .sbox-prod { border-color: rgba(255,107,53,0.5); color: #fca97a; background: rgba(255,107,53,0.08); }
+  .sbox-cv { border-color: rgba(167,139,250,0.5); color: #c4b5fd; background: rgba(167,139,250,0.08); }
+  .sbox-storage { border-color: rgba(0,229,160,0.5); color: #6ee7b7; background: rgba(0,229,160,0.08); }
+  .sbox-lib { border-color: rgba(0,200,255,0.5); color: #7ee8fa; background: rgba(0,200,255,0.08); }
+  .snap-arrow { color: var(--text-dim); font-size: 20px; }
+  .snap-label { font-size: 11px; color: var(--text-dim); text-align: center; display: block; margin-top: 4px; }
+  .snap-col { display: flex; flex-direction: column; align-items: center; }
+
+  .job-line {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 6px; padding: 10px 16px; margin-bottom: 8px;
+  }
+  .job-id { font-family: monospace; font-size: 12px; color: var(--accent4); min-width: 60px; }
+  .job-name { font-size: 13px; color: var(--text); flex: 1; }
+  .job-type { font-size: 11px; padding: 2px 10px; border-radius: 10px; border: 1px solid; }
+  .jt-snap { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.07); }
+  .jt-copy { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.07); }
+  .jt-stream { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.07); }
+
+  .qa-block { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .qa-q {
+    background: rgba(167,139,250,0.08); border-bottom: 1px solid rgba(167,139,250,0.15);
+    padding: 14px 18px; font-size: 14px; color: #c4b5fd; font-weight: 500;
+  }
+  .qa-q::before { content: 'Q  '; opacity: 0.5; font-family: monospace; }
+  .qa-a { padding: 14px 18px; font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+  .qa-a::before { content: 'A  '; color: var(--accent2); font-weight: bold; font-family: monospace; }
+
+  .divider { border: none; border-top: 1px solid var(--card-border); margin: 40px 0; }
+  code {
+    font-family: 'Courier New', Courier, monospace;
+    background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.15);
+    color: var(--accent4); padding: 1px 6px; border-radius: 3px; font-size: 12.5px;
+  }
+
+  .highlight-box {
+    border: 1px solid rgba(167,139,250,0.3); border-radius: 10px;
+    padding: 20px 24px; margin: 16px 0;
+    background: rgba(167,139,250,0.05);
+  }
+  .highlight-box h4 { color: var(--accent4); margin-bottom: 10px; font-size: 15px; }
+  .highlight-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 0; }
+
+  .two-copy-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .two-copy-table th {
+    background: rgba(167,139,250,0.1); color: var(--accent4);
+    padding: 10px 16px; text-align: left; font-size: 13px;
+    border-bottom: 1px solid rgba(167,139,250,0.2);
+  }
+  .two-copy-table td {
+    padding: 10px 16px; font-size: 13px; color: var(--text-muted);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .two-copy-table tr:hover td { background: rgba(167,139,250,0.03); }
+
+  .author-section { background: linear-gradient(135deg, #0a1628, #0d2040); border-top: 1px solid var(--card-border); padding: 60px 48px; }
+  .author-title { font-family: Georgia, serif; font-size: 22px; color: var(--accent4); margin-bottom: 28px; text-align: center; }
+  .author-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; padding: 36px;
+    max-width: 800px; margin: 0 auto 28px; display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;
+  }
+  .author-avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent4), var(--accent));
+    display: flex; align-items: center; justify-content: center; font-size: 36px; flex-shrink: 0;
+  }
+  .author-info { flex: 1; min-width: 240px; }
+  .author-name { font-family: Georgia, serif; font-size: 22px; color: #fff; margin-bottom: 4px; }
+  .author-role { color: var(--accent4); font-size: 14px; margin-bottom: 14px; }
+  .author-bio { color: var(--text-muted); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .badge { background: var(--navy-light); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 12px; font-size: 11px; color: var(--text-muted); }
+  .badge.cv { border-color: var(--accent4); color: var(--accent4); }
+  .badge.veeam { border-color: var(--accent2); color: var(--accent2); }
+  .badge.nb { border-color: var(--accent3); color: var(--accent3); }
+  .badge.netapp { border-color: var(--accent); color: var(--accent); }
+  .contact-card {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 8px; padding: 10px 18px; text-decoration: none;
+    color: var(--accent4); font-size: 14px; transition: all 0.2s;
+  }
+  .contact-card:hover { background: rgba(167,139,250,0.15); }
+  .disclaimer { background: var(--warn-bg); border: 1px solid rgba(255,107,53,0.25); border-radius: 8px; padding: 18px 24px; max-width: 800px; margin: 0 auto; }
+  .disclaimer p { font-size: 13px; color: #fca97a; line-height: 1.6; }
+  footer { background: #060e1c; border-top: 1px solid var(--card-border); padding: 24px 48px; text-align: center; color: var(--text-dim); font-size: 12px; }
+
+  .upgrade-box {
+    background: rgba(245,200,66,0.05); border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 10px; padding: 20px 24px; margin: 16px 0;
+  }
+  .upgrade-box h4 { color: var(--gold); margin-bottom: 10px; font-size: 14px; }
+  .upgrade-box p, .upgrade-box li { color: #fde68a; font-size: 13px; }
+  .upgrade-box ul { padding-left: 18px; margin-top: 8px; }
+  .upgrade-box li { margin-bottom: 6px; }
+
+  /* ── SIDEBAR LAYOUT ── */
+  .page-body {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .sidebar-toc {
+    width: 260px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 54px;
+    height: calc(100vh - 54px);
+    overflow-y: auto;
+    background: var(--navy-mid);
+    border-right: 1px solid var(--card-border);
+    padding: 24px 0 40px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(167,139,250,0.3) transparent;
+  }
+  .sidebar-toc::-webkit-scrollbar { width: 4px; }
+  .sidebar-toc::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-toc::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.3); border-radius: 4px; }
+
+  .sidebar-heading {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    padding: 0 20px 12px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--card-border);
+    margin-bottom: 8px;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    line-height: 1.4;
+    border-left: 2px solid transparent;
+    transition: all 0.18s;
+  }
+  .sidebar-link:hover {
+    color: var(--accent4);
+    background: rgba(167,139,250,0.07);
+    border-left-color: var(--accent4);
+  }
+  .sidebar-link.active {
+    color: var(--accent4);
+    background: rgba(167,139,250,0.1);
+    border-left-color: var(--accent4);
+    font-weight: 600;
+  }
+  .sidebar-num {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: var(--accent4);
+    background: rgba(167,139,250,0.1);
+    border-radius: 3px;
+    padding: 1px 6px;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+  .sidebar-link.active .sidebar-num { opacity: 1; }
+
+  .main-content {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    padding: 48px 40px;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar-toc { display: none; }
+    .main-content { padding: 32px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">📦 Commvault Tutorial 10</div>
+  <a href="#intellisnap-what">What is IntelliSnap</a>
+  <a href="#intellisnap-how">How It Works</a>
+  <a href="#intellisnap-prereqs">Prerequisites</a>
+  <a href="#intellisnap-azure-setup">Azure Lab Setup</a>
+  <a href="#intellisnap-config">Commvault Config</a>
+  <a href="#snap-vs-backup-copy">Snap vs Backup Copy</a>
+  <a href="#intellisnap-restore">Restore</a>
+  <a href="#spool-data-aging">Spool &amp; Data Aging</a>
+  <a href="#azuresql-overview">Azure SQL PaaS</a>
+  <a href="#azuresql-config">Azure SQL Config</a>
+  <a href="#azuresql-restore">Azure SQL Restore</a>
+  <a href="#best-practices">Best Practices</a>
+  <a href="#interview">Interview Q&amp;A</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">📸 Tutorial 10 · IntelliSnap &amp; Azure SQL PaaS Backup</div>
+  <h1>Commvault <span>IntelliSnap</span> Feature &amp;<br>Azure SQL Database Backup</h1>
+  <p class="hero-desc">A deep-dive into Commvault's snapshot technology — IntelliSnap — covering how it achieves application-consistent snapshots on SAN and cloud storage, the snap copy vs. backup copy architecture, spool copy and data aging, and complete hands-on coverage of Azure SQL (PaaS/Managed Service) backup and restore with custom role authentication.</p>
+  <div class="hero-tags">
+    <span class="tag purple">📸 IntelliSnap Technology</span>
+    <span class="tag blue">🔄 Snap Copy + Backup Copy</span>
+    <span class="tag green">⏱ Spool Copy &amp; Data Aging</span>
+    <span class="tag gold">🔐 Custom Role / Managed Identity</span>
+    <span class="tag orange">☁ Azure SQL PaaS Backup</span>
+    <span class="tag purple">🩺 ODBC &amp; Free Tier Troubleshooting</span>
+    <span class="tag blue">🚀 Upgrade Best Practices</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc-grid">
+  <a class="toc-item" href="#intellisnap-what"><span class="toc-num">01</span> What is IntelliSnap?</a>
+  <a class="toc-item" href="#intellisnap-how"><span class="toc-num">02</span> How IntelliSnap Works</a>
+  <a class="toc-item" href="#intellisnap-prereqs"><span class="toc-num">03</span> Prerequisites &amp; Supported Arrays</a>
+  <a class="toc-item" href="#intellisnap-azure-setup"><span class="toc-num">04</span> Azure Lab Setup</a>
+  <a class="toc-item" href="#intellisnap-config"><span class="toc-num">05</span> Commvault IntelliSnap Config</a>
+  <a class="toc-item" href="#snap-vs-backup-copy"><span class="toc-num">06</span> Snap Copy vs Backup Copy</a>
+  <a class="toc-item" href="#intellisnap-restore"><span class="toc-num">07</span> IntelliSnap Restore</a>
+  <a class="toc-item" href="#spool-data-aging"><span class="toc-num">08</span> Spool Copy &amp; Data Aging</a>
+  <a class="toc-item" href="#azuresql-overview"><span class="toc-num">09</span> Azure SQL PaaS — Overview</a>
+  <a class="toc-item" href="#azuresql-config"><span class="toc-num">10</span> Azure SQL — Configuration</a>
+  <a class="toc-item" href="#azuresql-restore"><span class="toc-num">11</span> Azure SQL — Backup &amp; Restore</a>
+  <a class="toc-item" href="#best-practices"><span class="toc-num">12</span> Upgrade &amp; Maintenance Best Practices</a>
+  <a class="toc-item" href="#interview"><span class="toc-num">13</span> Interview Q&amp;A</a>
+</div>
+
+<div class="page-body">
+
+<!-- SIDEBAR TOC -->
+<aside class="sidebar-toc">
+  <div class="sidebar-heading">📋 Table of Contents</div>
+  <a class="sidebar-link" href="#intellisnap-what"><span class="sidebar-num">01</span> What is IntelliSnap?</a>
+  <a class="sidebar-link" href="#intellisnap-how"><span class="sidebar-num">02</span> How IntelliSnap Works</a>
+  <a class="sidebar-link" href="#intellisnap-prereqs"><span class="sidebar-num">03</span> Prerequisites &amp; Arrays</a>
+  <a class="sidebar-link" href="#intellisnap-azure-setup"><span class="sidebar-num">04</span> Azure Lab Setup</a>
+  <a class="sidebar-link" href="#intellisnap-config"><span class="sidebar-num">05</span> Commvault IntelliSnap Config</a>
+  <a class="sidebar-link" href="#snap-vs-backup-copy"><span class="sidebar-num">06</span> Snap Copy vs Backup Copy</a>
+  <a class="sidebar-link" href="#intellisnap-restore"><span class="sidebar-num">07</span> IntelliSnap Restore</a>
+  <a class="sidebar-link" href="#spool-data-aging"><span class="sidebar-num">08</span> Spool Copy &amp; Data Aging</a>
+  <a class="sidebar-link" href="#azuresql-overview"><span class="sidebar-num">09</span> Azure SQL PaaS — Overview</a>
+  <a class="sidebar-link" href="#azuresql-config"><span class="sidebar-num">10</span> Azure SQL — Configuration</a>
+  <a class="sidebar-link" href="#azuresql-restore"><span class="sidebar-num">11</span> Azure SQL — Backup &amp; Restore</a>
+  <a class="sidebar-link" href="#best-practices"><span class="sidebar-num">12</span> Upgrade Best Practices</a>
+  <a class="sidebar-link" href="#interview"><span class="sidebar-num">13</span> Interview Q&amp;A</a>
+</aside>
+
+<div class="main-content">
+
+<!-- ===== PART 1: INTELLISNAP ===== -->
+
+<!-- SECTION 1: WHAT IS INTELLISNAP -->
+<section id="intellisnap-what" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">📸</div>
+    <div>
+      <div class="section-title">What is IntelliSnap?</div>
+      <div class="section-subtitle">Commvault's snapshot technology — automating application-consistent snapshots across SAN and cloud storage</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Definition and Purpose</h3>
+    <p>IntelliSnap is a Commvault feature that automates the creation of <strong>application-consistent snapshots</strong> on storage arrays and cloud storage. It bridges the gap between raw storage-level snapshots (which are crash-consistent) and true application-consistent backups by coordinating with the application before the snapshot is triggered.</p>
+
+    <div class="highlight-box">
+      <h4>🎯 The Core Problem IntelliSnap Solves</h4>
+      <p>When a storage team manually triggers a snapshot of a LUN (Logical Unit Number) hosting a running Oracle or SQL Server database, the snapshot is taken without notifying the application. The database may have data in memory, pending transactions not yet written to disk, and open I/O operations. The resulting snapshot is <strong>crash-consistent</strong> — as if the server lost power. The database may not start cleanly after restore. IntelliSnap solves this by <strong>quiescing</strong> (freezing) the application first, then triggering the snapshot — guaranteeing application consistency.</p>
+    </div>
+
+    <h4>Where IntelliSnap Is Used</h4>
+    <div class="status-row">
+      <span class="status-pill sp-green">✓ SAN Storage (NetApp, Hitachi, HP, IBM, Pure Storage...)</span>
+      <span class="status-pill sp-green">✓ Cloud Storage (Azure, AWS, GCP)</span>
+      <span class="status-pill sp-red">✗ Virtualized files (VMDK, VHD) — NOT supported</span>
+    </div>
+    <div class="callout note">
+      <div class="callout-title">📘 SAN or Cloud Only</div>
+      <p>IntelliSnap requires the underlying storage to support snapshot technology — either a physical SAN array (NetApp, Hitachi Vantara, Pure Storage, HP 3PAR, etc.) or a cloud platform (Azure Managed Disks, AWS EBS, GCP Persistent Disks). It cannot be used with virtualized file-based storage like VMware VMDK files on a datastore, or with NFS-backed storage that doesn't support hardware snapshots.</p>
+    </div>
+
+    <h4>Key Advantages of IntelliSnap</h4>
+    <ul>
+      <li><strong>Speed:</strong> A 100 TB LUN can be snapshotted in minutes — time is independent of data volume. The snapshot creation is near-instantaneous on modern arrays.</li>
+      <li><strong>Application Consistency:</strong> Commvault quiesces the application (via agent, VSS, or pre/post scripts) before triggering the snapshot, ensuring the database starts cleanly after restore.</li>
+      <li><strong>Zero Impact on Production:</strong> Once the snapshot is created, the backup copy reads from the snapshot — not the live production volume. The production server is completely unaffected during the data transfer phase.</li>
+      <li><strong>Automation:</strong> Storage admins previously had to manually create and manage snapshots. IntelliSnap automates the entire lifecycle — creation, catalog registration, retention, backup copy, and expiry.</li>
+      <li><strong>Granular Recovery:</strong> Snapshots support guest file restore and application-level recovery (database, mailbox, etc.).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>IntelliSnap vs. Streaming Backup — Key Differences</h3>
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🌊 Streaming Backup (Standard)</h5>
+        <ul>
+          <li>Data is read from the live production volume and sent over the network</li>
+          <li>Backup size = actual data volume written to cloud/disk library</li>
+          <li>Longer backup window for large datasets</li>
+          <li>Production server experiences I/O load during backup</li>
+          <li>Single copy in one location (library)</li>
+          <li>Job in Commvault: single backup job</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>📸 IntelliSnap (Snapshot-Based)</h5>
+        <ul>
+          <li>Snapshot created on storage array in seconds/minutes</li>
+          <li>Only metadata (~15 KB) written to library — actual data stays on array</li>
+          <li>Fast initial protection regardless of dataset size</li>
+          <li>Zero I/O impact on production after snapshot is taken</li>
+          <li>Two copies: snap copy (on array) + backup copy (on library)</li>
+          <li>Jobs: snap backup job + backup copy job spawned automatically</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 2: HOW INTELLISNAP WORKS -->
+<section id="intellisnap-how" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">⚙</div>
+    <div>
+      <div class="section-title">How IntelliSnap Works — Step by Step</div>
+      <div class="section-subtitle">The complete lifecycle: quiesce → snapshot → catalog → backup copy → restore</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Backup Phase — What Happens When You Trigger an IntelliSnap Backup</h3>
+
+    <div class="snap-diagram">
+      <div style="text-align:center; color:var(--accent4); font-size:13px; margin-bottom:16px; font-weight:bold;">IntelliSnap Backup Flow</div>
+      <div class="snap-row">
+        <div class="snap-col">
+          <div class="snap-box sbox-prod">Production Server<br><small>(Oracle / SQL / VM)</small></div>
+          <span class="snap-label">Application Running</span>
+        </div>
+        <div class="snap-arrow">←quiesce—</div>
+        <div class="snap-col">
+          <div class="snap-box sbox-cv">Commvault<br><small>(CommServe + Agent)</small></div>
+          <span class="snap-label">Orchestrates Backup</span>
+        </div>
+        <div class="snap-arrow">—API→</div>
+        <div class="snap-col">
+          <div class="snap-box sbox-storage">Storage Array<br><small>(NetApp / Azure Disk)</small></div>
+          <span class="snap-label">Snapshot Created Here</span>
+        </div>
+        <div class="snap-arrow">—metadata→</div>
+        <div class="snap-col">
+          <div class="snap-box sbox-lib">Cloud Library<br><small>(Catalog Only ~15KB)</small></div>
+          <span class="snap-label">Snap Copy = Metadata Only</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="flow-title">IntelliSnap Backup — Detailed Phase Breakdown</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Application Quiesce (Freeze)</strong>
+            <p>Commvault instructs the application to quiesce — freeze all I/O and flush in-memory data to disk. How quiesce happens depends on context: if a Commvault agent (SQL, Oracle, Exchange) is installed → agent quiesces the application directly. If no agent (agentless VM) → VSS (Windows) or pre/post scripts (Linux) are used. After quiesce, the application is in a known-good consistent state.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>API Request to Storage Array — Trigger Snapshot</strong>
+            <p>While the application is quiesced, Commvault sends an API request to the storage array (e.g., NetApp ONTAP API, Azure Disk Snapshot API) to create a snapshot of the target LUN or disk. The storage array creates the snapshot instantly — this is a metadata-level operation on most modern arrays, taking seconds regardless of volume size.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Application Un-quiesce (Resume)</strong>
+            <p>As soon as the snapshot is confirmed created, Commvault un-quiesces the application — I/O operations resume immediately. The quiesce window is typically only a few seconds. The production application experiences minimal freeze time.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Snapshot Catalog Registration (Metadata Only)</strong>
+            <p>Commvault records the snapshot in its catalog — the CommServe database stores metadata about the snapshot: which volume, on which array, at what time, with which job ID. The actual snapshot data remains on the storage array — it is NOT copied to the library at this stage. The library receives only ~15 KB of metadata. This is why snap copy jobs show a tiny media size (e.g., 15 KB) while primary copy jobs show the full data size (e.g., 1 GB).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Backup Copy (Optional but Recommended)</strong>
+            <p>A second child job — the backup copy job — is automatically spawned. It mounts the snapshot on the media agent and copies the actual data from the snapshot (not the live volume) to the cloud library or disk library. This creates a traditional streaming backup from the snapshot, enabling long-term retention beyond what the storage array can hold. Production I/O is unaffected since the backup reads from the snapshot, not the live volume.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What You See in the Job Controller — Two Jobs Per Backup</h3>
+    <p>When you trigger an IntelliSnap backup, you will always see (at minimum) two jobs:</p>
+
+    <div class="job-line">
+      <span class="job-id">Job 3012</span>
+      <span class="job-name"><strong>VM Admin Snap Backup</strong> — the parent job you triggered. Creates the snapshot on the storage array and writes metadata to the snap copy.</span>
+      <span class="job-type jt-snap">Snap Backup</span>
+    </div>
+    <div class="job-line">
+      <span class="job-id">Job 3015</span>
+      <span class="job-name"><strong>Backup Copy</strong> — automatically spawned child job. Reads from the snapshot, copies full data to the cloud library (primary copy).</span>
+      <span class="job-type jt-copy">Backup Copy</span>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Operation Type in Job Controller</div>
+      <p>When IntelliSnap is enabled, the job controller shows the operation type as <strong>"VM Admin Snap Backup"</strong> instead of the usual "VM Admin Backup." This confirms that IntelliSnap mode is active. If you see plain "VM Admin Backup," IntelliSnap is not enabled on that subclient.</p>
+    </div>
+
+    <h4>What Appears on the Azure Portal During an IntelliSnap Backup</h4>
+    <p>For Azure VM IntelliSnap backups, you can verify the snapshot was created in the Azure Portal. Navigate to <strong>Search → Snapshots</strong>. You will see a snapshot entry with the naming format:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Azure Snapshot Naming Convention</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Format: {JobID}_prodvm-os-disk_Commvault_snap</span>
+<span class="val">3013_prodvm-os-disk_Commvault_snap</span>
+
+<span class="comment"># 3013 = the VM-level job ID (child of 3012 parent)</span>
+<span class="comment"># prodvm-os-disk = OS disk name of the backed-up VM</span>
+<span class="comment"># Commvault_snap = Commvault naming suffix</span>
+<span class="comment"># Type shown: snap (distinguishes from backup copy)</span>
+
+<span class="comment"># One snapshot per disk — if VM has 2 disks, 2 snapshots appear</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 3: PREREQUISITES -->
+<section id="intellisnap-prereqs" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">✅</div>
+    <div>
+      <div class="section-title">IntelliSnap Prerequisites &amp; Supported Arrays</div>
+      <div class="section-subtitle">Licensing, package requirements, supported storage arrays, and application agents</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>High-Level Configuration Checklist</h3>
+    <div class="strip-row">
+      <span class="strip-label">Step 1 — Verify Support</span>
+      <span class="strip-val">Check Commvault documentation: confirm your <strong>storage array</strong> and <strong>application type</strong> are both listed in the IntelliSnap compatibility matrix</span>
+      <span class="strip-badge sb-warn">Do This First</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 2 — IntelliSnap License</span>
+      <span class="strip-val">IntelliSnap requires a dedicated Commvault license. Verify the license is enabled in the CommCell Console before configuring</span>
+      <span class="strip-badge sb-warn">License Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 3 — Proxy/Media Agent Access</span>
+      <span class="strip-val">The proxy node (media agent or access node) must have <strong>network access to the storage array</strong> management interface — not just the data plane</span>
+      <span class="strip-badge sb-info">Network Connectivity</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 4 — IntelliSnap Package</span>
+      <span class="strip-val">The <strong>IntelliSnap</strong> package must be installed on the media agent / access node alongside the standard Media Agent package. Both are mandatory.</span>
+      <span class="strip-badge sb-warn">Additional Package</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 5 — Storage Array Config</span>
+      <span class="strip-val">Add the storage array in Commvault Console → Storage Arrays. Provide control host, credentials, snap engine. For Azure/AWS cloud, this is auto-populated when you configure the hypervisor — no manual entry needed.</span>
+      <span class="strip-badge sb-info">Console Config</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 6 — Application Agent</span>
+      <span class="strip-val">For application-consistent snapshots (e.g., SQL, Oracle, Exchange), the relevant Commvault agent must be installed on the guest VM or server</span>
+      <span class="strip-badge sb-info">For App Consistency</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 7 — Enable IntelliSnap</span>
+      <span class="strip-val">At the subclient level: Subclient Properties → <strong>IntelliSnap Operations → Enable IntelliSnap</strong>. Also create a Snap Copy in the storage policy.</span>
+      <span class="strip-badge sb-ok">Final Step</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">LVM Metadata Daemon (Red Hat Only)</span>
+      <span class="strip-val">If the proxy/access node runs <strong>Red Hat Linux</strong>, disable the LVM metadata daemon before enabling IntelliSnap. This step is documented in Commvault's IntelliSnap + Azure prerequisites. <strong>Oracle Linux does NOT require this step.</strong></span>
+      <span class="strip-badge sb-warn">Red Hat Only</span>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Cloud Storage — No Manual Storage Array Entry Needed</div>
+      <p>For cloud-based IntelliSnap (Azure, AWS, GCP), you do <strong>not</strong> need to manually add a storage array in Commvault. The cloud credentials (Managed Identity, Azure hypervisor config, etc.) are automatically registered as a storage array entry when you first configure the cloud hypervisor. If you navigate to Storage → Storage Arrays after configuring Azure VM backup, you will already see the Azure subscription listed there automatically.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Supported Storage Arrays (Sample — Always Verify in Documentation)</h3>
+    <div class="status-row">
+      <span class="status-pill sp-green">✓ NetApp ONTAP (NAS/SAN)</span>
+      <span class="status-pill sp-green">✓ Hitachi Vantara</span>
+      <span class="status-pill sp-green">✓ Hitachi NAS</span>
+      <span class="status-pill sp-green">✓ IBM Storage</span>
+      <span class="status-pill sp-green">✓ HP 3PAR / StoreOnce</span>
+      <span class="status-pill sp-green">✓ Pure Storage</span>
+      <span class="status-pill sp-green">✓ EMC/Dell PowerStore</span>
+      <span class="status-pill sp-green">✓ Microsoft Azure (Managed Disks)</span>
+      <span class="status-pill sp-green">✓ AWS (EBS Snapshots)</span>
+      <span class="status-pill sp-green">✓ GCP (Persistent Disks)</span>
+    </div>
+    <p style="color:var(--text-muted);font-size:14px;margin-top:12px">Always verify your specific model and firmware version is listed in the Commvault IntelliSnap compatibility matrix before planning a deployment. The full list is extensive — consult the documentation for your Commvault version.</p>
+
+    <h4>Supported Applications (Agents) for Application-Consistent IntelliSnap</h4>
+    <div class="status-row">
+      <span class="status-pill sp-purple">MS SQL Server</span>
+      <span class="status-pill sp-purple">Oracle Database</span>
+      <span class="status-pill sp-purple">Microsoft Exchange</span>
+      <span class="status-pill sp-purple">SharePoint</span>
+      <span class="status-pill sp-purple">SAP HANA</span>
+      <span class="status-pill sp-blue">Azure VMs</span>
+      <span class="status-pill sp-blue">VMware VMs</span>
+      <span class="status-pill sp-blue">Hyper-V VMs</span>
+      <span class="status-pill sp-blue">Windows File System</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Required Packages on Access Node / Proxy for IntelliSnap</h3>
+    <div class="status-row">
+      <span class="status-pill sp-green">✓ Media Agent</span>
+      <span class="status-pill sp-purple">✓ IntelliSnap</span>
+      <span class="status-pill sp-blue">✓ Virtual Server Agent (for VM backups)</span>
+      <span class="status-pill sp-yellow">✓ Storage Accelerator (recommended)</span>
+    </div>
+    <div class="callout warn">
+      <div class="callout-title">⚠ IntelliSnap Package is Mandatory — Do Not Forget</div>
+      <p>A common mistake is installing only the Media Agent and Virtual Server packages but forgetting the <strong>IntelliSnap package</strong>. Without the IntelliSnap package on the access node, the snap engine cannot communicate with the storage array, and IntelliSnap backups will fail. Always explicitly select the IntelliSnap package when doing a push install to the access node.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 4: AZURE LAB SETUP -->
+<section id="intellisnap-azure-setup" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">☁</div>
+    <div>
+      <div class="section-title">Azure Lab Setup for IntelliSnap Demo</div>
+      <div class="section-subtitle">Creating access node, production VM with PostgreSQL, and cloud library</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Lab Architecture — What to Create</h3>
+    <div class="arch-row">
+      <div class="arch-box abox-purple">Access Node VM<small>Oracle Linux<br>2 vCPU / 4 GB RAM<br>Media Agent + IntelliSnap + VSA + Storage Accelerator</small></div>
+      <div class="arch-connector">+</div>
+      <div class="arch-box abox-orange">Production VM<small>Ubuntu 22.04<br>1 vCPU / 1 GB RAM<br>PostgreSQL installed<br>No Commvault agent</small></div>
+      <div class="arch-connector">+</div>
+      <div class="arch-box abox-blue">Azure Cloud Library<small>Storage Account (cool tier)<br>Container: cloud-mount-path<br>Authentication: Access Keys</small></div>
+    </div>
+
+    <div class="strip-row">
+      <span class="strip-label">Access Node OS</span>
+      <span class="strip-val">Oracle Linux (or Red Hat Linux). Ubuntu is not certified. Windows is supported but costs more due to Windows licensing overhead.</span>
+      <span class="strip-badge sb-warn">Oracle Linux Preferred</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Access Node Size</span>
+      <span class="strip-val">Minimum B2S (2 vCPU, 4 GB RAM) for IntelliSnap. 1 vCPU / 1 GB is too slow for production use. Check Commvault documentation for sizing guidance based on front-end TB.</span>
+      <span class="strip-badge sb-info">B2S Minimum</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Production VM OS</span>
+      <span class="strip-val">Any OS (Ubuntu, RHEL, Windows, etc.) — backup is agentless, so no OS restriction on the VM being protected</span>
+      <span class="strip-badge sb-ok">Any OS</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">IntelliSnap Disk Requirement</span>
+      <span class="strip-val">Azure IntelliSnap only supports <strong>Managed Disks</strong> (Standard or Premium). Unmanaged/legacy disks are NOT supported for IntelliSnap snapshots.</span>
+      <span class="strip-badge sb-warn">Managed Disks Only</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Production VM Setup — Installing PostgreSQL (Ubuntu 22.04)</h3>
+    <p>The production VM simulates a real-world database workload. PostgreSQL is installed to demonstrate application consistency after IntelliSnap restore.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — PostgreSQL Installation and Setup</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Update package repositories first</span>
+<span class="cmd">sudo apt-get update</span>
+<span class="cmd">sudo apt-get upgrade -y</span>
+
+<span class="comment"># Install PostgreSQL (version 14 on Ubuntu 22.04)</span>
+<span class="cmd">sudo apt-get install -y postgresql postgresql-contrib</span>
+
+<span class="comment"># Verify service is running</span>
+<span class="cmd">systemctl status postgresql</span>
+<span class="comment"># Expected: active (running)</span>
+
+<span class="comment"># Switch to postgres user and access psql shell</span>
+<span class="cmd">sudo -i -u postgres</span>
+<span class="cmd">psql</span>
+
+<span class="comment"># Create a test database and user inside psql</span>
+<span class="cmd">CREATE DATABASE</span> testdb;
+<span class="cmd">CREATE USER</span> backupuser <span class="param">WITH PASSWORD</span> <span class="val">'mypassword'</span>;
+<span class="cmd">GRANT ALL PRIVILEGES ON DATABASE</span> testdb <span class="param">TO</span> backupuser;
+<span class="cmd">\q</span>
+
+<span class="comment"># Allow remote connections — edit postgresql.conf</span>
+<span class="comment"># Find: #listen_addresses = 'localhost'</span>
+<span class="comment"># Change to: listen_addresses = '*'</span>
+<span class="cmd">sudo nano</span> <span class="path">/etc/postgresql/14/main/postgresql.conf</span>
+
+<span class="comment"># Allow remote connections — edit pg_hba.conf</span>
+<span class="comment"># Find IPv4 local connections line, change 127.0.0.1/32 to 0.0.0.0/0</span>
+<span class="cmd">sudo nano</span> <span class="path">/etc/postgresql/14/main/pg_hba.conf</span>
+
+<span class="comment"># Restart PostgreSQL after config changes</span>
+<span class="cmd">sudo systemctl restart postgresql</span>
+
+<span class="comment"># Allow PostgreSQL port in OS firewall</span>
+<span class="cmd">sudo ufw allow 5432/tcp</span>
+
+<span class="comment"># Test connection with backupuser</span>
+<span class="cmd">psql -h 127.0.0.1 -U backupuser -d testdb</span>
+<span class="comment"># Enter password when prompted</span></div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Why Set Up a Real Database?</div>
+      <p>The purpose is to simulate an actual production environment — a VM with a running database — so that after the IntelliSnap restore, we can verify that PostgreSQL starts cleanly, the service shows "active (running)", and we can connect to the database. This validates that the snapshot was application-consistent. A VM with no application running cannot demonstrate this advantage of IntelliSnap.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>NSG Ports Required on the Access Node VM</h3>
+    <div class="strip-row">
+      <span class="strip-label">Port 22 (SSH)</span>
+      <span class="strip-val">Required for package push installation. Can be removed after installation is complete.</span>
+      <span class="strip-badge sb-gold">Temporary</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Port 8400 (CVD)</span>
+      <span class="strip-val">Commvault Communication Daemon — permanent requirement for all Commvault operations</span>
+      <span class="strip-badge sb-ok">Permanent</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Port 8403 (CVFWD)</span>
+      <span class="strip-val">Commvault Firewall port — permanent requirement</span>
+      <span class="strip-badge sb-ok">Permanent</span>
+    </div>
+    <p style="color:var(--text-muted);font-size:14px;margin-top:12px">In Azure NSG, outbound traffic is open by default — you only need to add inbound rules. Add them under <strong>Networking → Network Security Group → Inbound Security Rules</strong> on the access node VM.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 5: COMMVAULT CONFIG -->
+<section id="intellisnap-config" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🔧</div>
+    <div>
+      <div class="section-title">Commvault IntelliSnap Configuration — Azure VM</div>
+      <div class="section-subtitle">Authentication options, hypervisor setup, snap copy creation, and enabling IntelliSnap on the subclient</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Authentication — Backup Contributor vs. Custom Role</h3>
+    <p>For IntelliSnap Azure VM backups, authentication follows the same Managed Identity approach as standard Azure VM backup. However, there is an important lesson from the lab:</p>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Azure Built-in "Backup Contributor" Role — Insufficient for VM Browsing</div>
+      <p>The Azure built-in <strong>Backup Contributor</strong> role was initially assigned to the access node's managed identity. While it appears to cover backup operations, it <strong>does not include sufficient permissions</strong> to list and browse virtual machines in the subscription from Commvault. When configuring the hypervisor VM Group content, the VM list shows "No items found." The fix: switch from the built-in Backup Contributor role to a <strong>Commvault Custom Role</strong> using the JSON file provided in Commvault's documentation. The custom role has exactly the right set of permissions — including VM discovery, disk snapshot creation, and backup operations.</p>
+    </div>
+
+    <h4>Two Managed Identity Methods — System Assigned vs. Custom Role</h4>
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🔵 System Assigned Managed Identity<br>+ Built-in Role (e.g., Backup Contributor)</h5>
+        <ul>
+          <li>Enable System Assigned Identity on the access node VM</li>
+          <li>Assign an Azure built-in role at subscription scope</li>
+          <li>Quick to configure — no JSON editing</li>
+          <li>Risk: built-in roles may lack some permissions (as seen in lab — VM browsing failed)</li>
+          <li>Use: exploratory/lab environments where permission gaps are acceptable</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>🟣 System Assigned Managed Identity<br>+ Commvault Custom Role (JSON)</h5>
+        <ul>
+          <li>Enable System Assigned Identity on the access node VM</li>
+          <li>Create custom role using Commvault's provided JSON file</li>
+          <li>Paste subscription ID into JSON before creating</li>
+          <li>Assign the custom role at subscription scope to the access node</li>
+          <li>Commvault-tested, includes all required permissions</li>
+          <li>Use: production environments — recommended approach</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Always Use Commvault's Custom Role JSON</div>
+      <p>Commvault's documentation publishes a specific JSON file for each protected workload type (Azure VMs, Azure SQL, etc.). These JSON files contain exactly the permissions tested and validated by Commvault engineering. Using Azure built-in roles or AI-generated JSON can result in missing permissions causing subtle failures — like VM browsing working but snapshot deletion failing, or backup succeeding but restore failing. Always download and use the JSON from the Commvault documentation article "Roles and Permissions Required for Protecting Azure Resources with Commvault."</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Commvault Configuration Steps — IntelliSnap for Azure VM</h3>
+    <div class="flow">
+      <div class="flow-title">Step-by-Step IntelliSnap Configuration in Commvault</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Install Packages on Access Node (Push Install)</strong>
+            <p>Tools → Add/Remove Software → Install. Select public IP of the access node (CommServe is on-prem, so use public IP). Select packages: <strong>Media Agent + IntelliSnap + Virtual Server Agent + Storage Accelerator</strong>. Without IntelliSnap package, snap backups will fail. Ensure ports 8400, 8403 are already open in NSG before attempting installation.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Configure Azure Hypervisor with Managed Identity</strong>
+            <p>Command Center: Protect → Virtualization → Add Hypervisor → Microsoft Azure. Enable <strong>"Connect using Managed Identity for Azure resources"</strong>. Enter Subscription ID. Select the access node. If VM browsing fails, verify the custom role (not just Backup Contributor) is assigned.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Create a Snapshot Copy in the Storage Policy / Plan</strong>
+            <p>In the storage policy (or plan), add a <strong>Primary Snap</strong> copy alongside the existing Primary copy. Set retention for the snap copy (e.g., 1–7 days for typical environments — snapshots consume array capacity, so keep retention short). The snap copy stores only metadata in the library; the actual snapshot lives on the storage array.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Run a Streaming Backup First (Verify Setup)</strong>
+            <p>Before enabling IntelliSnap, run a normal streaming backup to confirm the hypervisor configuration, VM browsing, plan, and access node are all working correctly. Once streaming backup succeeds, enable IntelliSnap.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Enable IntelliSnap on the Subclient</strong>
+            <p>Right-click the VM group / subclient → Properties → <strong>IntelliSnap Operations</strong> tab → enable IntelliSnap. The snap engine shown will be <strong>"Virtual Server Application Snap"</strong> for Azure. This is the built-in Azure disk snapshot engine. Hardware snap engines (NetApp, etc.) would show the vendor's snap engine here.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Verify Storage Array Auto-Registration</strong>
+            <p>After configuring the Azure hypervisor, navigate to CommCell Console → Storage → Storage Arrays. The Azure subscription credentials should appear there automatically — this confirms Commvault has registered the Azure storage as a snap-capable storage array. You do not need to manually add it for cloud environments.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 6: SNAP VS BACKUP COPY -->
+<section id="snap-vs-backup-copy" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🔄</div>
+    <div>
+      <div class="section-title">Snap Copy vs. Backup Copy — Understanding Both</div>
+      <div class="section-subtitle">What data each copy holds, where it lives, and how to view jobs from different perspectives</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The Two-Copy Architecture</h3>
+    <table class="two-copy-table">
+      <tr>
+        <th>Property</th>
+        <th>Primary Snap Copy</th>
+        <th>Primary Copy (Backup Copy)</th>
+      </tr>
+      <tr>
+        <td>What is stored</td>
+        <td>Metadata only (~15 KB) — snapshot catalog entry</td>
+        <td>Full VM/application data (~1 GB or more)</td>
+      </tr>
+      <tr>
+        <td>Where data lives</td>
+        <td>Snapshot remains on the storage array (Azure, NetApp, etc.)</td>
+        <td>Full data written to cloud library / disk library</td>
+      </tr>
+      <tr>
+        <td>Retention recommendation</td>
+        <td>Short: 1–7 days (snapshot occupies array capacity)</td>
+        <td>Longer: weeks/months (as per customer SLA)</td>
+      </tr>
+      <tr>
+        <td>Recovery speed</td>
+        <td>Very fast — restore directly from array snapshot</td>
+        <td>Slower — reads full data from library</td>
+      </tr>
+      <tr>
+        <td>Job type</td>
+        <td>Snap backup job (spawns automatically)</td>
+        <td>Backup copy job (spawns automatically from snap job)</td>
+      </tr>
+      <tr>
+        <td>View in List Snapshot</td>
+        <td>Right-click Primary Snap copy → List Snapshots: shows snapshot details</td>
+        <td>No snapshots to list — standard backup data</td>
+      </tr>
+      <tr>
+        <td>Browse and Restore from subclient</td>
+        <td>Shows snap backup jobs only (can browse and restore)</td>
+        <td>Must use Advanced option and select "Backup Copy" to see these jobs</td>
+      </tr>
+    </table>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Subclient-Level Browsing Limitation</div>
+      <p>When viewing backup history from the subclient level, only <strong>snap backup jobs</strong> are shown by default. To see <strong>backup copy jobs</strong>, go to Backup History → Advanced → select "Include Backup Copy jobs." At the storage policy copy level (right-click Primary Copy → View Jobs), backup copy jobs are visible by default without needing to select "advanced."</p>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Retention Planning for Snap Copy</div>
+      <p>Never set a long retention on the Snap Copy. Snapshots consume storage array capacity — a 100 TB volume snapshot that grows 5% per day will consume 5 TB after one week. Typical best practice: <strong>3–7 days</strong> for snap copy retention. For longer retention, rely on the Backup Copy (primary copy) which is written to the library and is more cost-efficient for long-term storage. The snap copy provides fast recovery for recent events; the backup copy provides long-term retention.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Viewing Jobs from Three Different Entry Points</h3>
+    <p>The same IntelliSnap backup job can be viewed from three perspectives in Commvault, each showing slightly different information:</p>
+    <div class="strip-row">
+      <span class="strip-label">From VM Group / Subclient</span>
+      <span class="strip-val">Shows snap backup jobs only by default. Access backup copy jobs via Backup History → Advanced → Include Backup Copy. Good for day-to-day job monitoring.</span>
+      <span class="strip-badge sb-purple">Default View</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">From Virtual Machine (Client)</span>
+      <span class="strip-val">Shows backup jobs for that specific VM. To see VMs in Client Computers view, enable: right-click Client Computers → Custom View → Show Virtual Machines (agentless VMs are hidden by default)</span>
+      <span class="strip-badge sb-purple">VM-Level View</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">From Storage Policy Copy</span>
+      <span class="strip-val">Right-click Primary Snap → View Jobs: shows snap jobs. Right-click Primary Copy → View Jobs: shows backup copy jobs directly — no "Advanced" selection needed. Also shows application size vs. media size comparison.</span>
+      <span class="strip-badge sb-purple">Most Detailed View</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 7: INTELLISNAP RESTORE -->
+<section id="intellisnap-restore" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">🔄</div>
+    <div>
+      <div class="section-title">IntelliSnap Restore — From Snap Copy and Backup Copy</div>
+      <div class="section-subtitle">Restoring from snapshots, staging storage account, and verifying application consistency</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Restore from Snap Copy (Fast Recovery)</h3>
+    <div class="flow">
+      <div class="flow-title">Azure VM IntelliSnap — In-Place Restore from Snap Copy</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Navigate to Restore: Storage Policy → Primary Snap → View Jobs</strong>
+            <p>From the Primary Snap copy → right-click → View Jobs to see the snap backup jobs. Select the job to restore from. Alternatively, navigate via VM Group → Backup History → select the snap backup job.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Browse and Restore → Full VM → In-Place</strong>
+            <p>Click Browse and Restore. Select the VM (e.g., ProdVM). Select "Recover All Selected." Choose <strong>In-Place restore</strong>. Select <strong>Power On after restore</strong> and <strong>Unconditionally Overwrite</strong>.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Select Staging Storage Account (Mandatory for Azure)</strong>
+            <p>Azure VM IntelliSnap restore requires a <strong>staging storage account</strong>. Commvault uses this to temporarily import the managed disk before recreating the VM. Select an existing Azure storage account from the dropdown. Without this, the restore job will fail with an error about staging path.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Monitor Restore — VM Deleted and Recreated</strong>
+            <p>In-place restore deletes the existing VM and recreates it from the snapshot. During this process, the VM in Azure Portal shows as "stopped" or "deallocated." After restore completion, refresh the portal — the VM appears as "Running." Note: the Public IP may remain the same for Azure IntelliSnap restores (unlike streaming restore where it changes).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Verify Application Consistency</strong>
+            <p>SSH into the restored VM. Run <code>systemctl status postgresql</code> — status should show <strong>active (running)</strong>. Connect to the database: <code>psql -h 127.0.0.1 -U backupuser -d testdb</code>. If the database connects and responds to queries, the IntelliSnap was application-consistent — the database is in a clean state without needing recovery mode.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Restoring from Backup Copy When Snap Has Expired</div>
+      <p>After the snap copy retention expires (e.g., 1 day), the snapshot is deleted from the Azure storage array. However, the <strong>backup copy</strong> in the primary copy is still available. You can restore from the backup copy exactly the same way — Browse and Restore from the Primary Copy. This proves that even when the snapshot is gone, data is still restorable from the library. This dual-copy architecture ensures you always have at least one recovery path available.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 8: SPOOL COPY & DATA AGING -->
+<section id="spool-data-aging" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">⏱</div>
+    <div>
+      <div class="section-title">Spool Copy &amp; Data Aging</div>
+      <div class="section-subtitle">How spool retention works, when snapshots get cleaned up, and how to manually trigger data aging</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Understanding Spool Copy Retention</h3>
+    <p>Retention for the Snap Copy can be set in two ways:</p>
+
+    <div class="compare">
+      <div class="cmp-c cmp-box">
+        <h5>📅 Fixed Day Retention (e.g., 1 Day)</h5>
+        <ul>
+          <li>The snapshot stays on the storage array for exactly 1 day (24 hours)</li>
+          <li>After 1 day, the next data aging job marks it for deletion</li>
+          <li>Data aging runs once every 24 hours by default</li>
+          <li>The snapshot remains visible in List Snapshots until data aging runs</li>
+          <li>Use when: you want a short but defined snap retention window</li>
+        </ul>
+      </div>
+      <div class="cmp-d cmp-box">
+        <h5>🔄 Spool Copy (No Fixed Retention)</h5>
+        <ul>
+          <li>The snapshot is retained on the storage array until the backup copy completes</li>
+          <li>Once the backup copy job finishes writing to the library, the snapshot is immediately marked for expiry</li>
+          <li>The next data aging job deletes it from the array</li>
+          <li>Purpose: keep snapshots only as long as needed for backup copy — then clean up</li>
+          <li>Use when: you only need the snapshot as an intermediate step, not for direct restores</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Why Snapshots Don't Disappear Immediately After Expiry</div>
+      <p>Even after setting the retention to "Spool Copy" and confirming the backup copy completed, the snapshot does not disappear immediately from the Azure Portal or from Commvault's List Snapshots view. This is because Commvault's <strong>data aging job</strong> only runs once every 24 hours by default. It is the data aging job that actually triggers the deletion of expired snapshots from the storage array. If you want immediate cleanup, you must <strong>manually run a data aging job</strong> from the CommCell Console (right-click CommServe → Data Aging). After the manual data aging run, the expired snapshots will be cleaned from both the storage array and the Commvault catalog.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running Data Aging Manually</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Commvault Console — Manual Data Aging</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># In CommCell Console (Java Console):</span>
+<span class="comment"># 1. Right-click the CommServe (top node)</span>
+<span class="comment"># 2. Select "Data Aging"</span>
+<span class="comment"># 3. This manually triggers the data aging job</span>
+
+<span class="comment"># What happens during data aging:</span>
+<span class="comment"># - Commvault checks all backup jobs in the database</span>
+<span class="comment"># - Identifies jobs whose retention period has expired</span>
+<span class="comment"># - For snap copies: sends delete request to the storage array API</span>
+<span class="comment"># - Removes the job records from the Commvault catalog</span>
+<span class="comment"># - Azure storage array snapshots are deleted from Azure Portal</span>
+
+<span class="comment"># After data aging runs successfully:</span>
+<span class="comment"># - Primary Snap copy → Right-click → View Jobs: shows no jobs</span>
+<span class="comment"># - Primary Snap copy → Right-click → List Snapshots: shows no snapshots</span>
+<span class="comment"># - Azure Portal → Snapshots: the Commvault_snap entry is gone</span>
+<span class="comment"># - But Primary Copy still has the backup copy job — restore still possible!</span></div>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Key Insight — Snap Gone, Restore Still Possible</div>
+      <p>After the snap copy is aged out (deleted), the primary snap copy shows no jobs and no snapshots. However, the <strong>backup copy job in the primary copy remains</strong>. You can still browse and restore from the backup copy — just do it from the Primary Copy view instead of the Primary Snap Copy view. This demonstrates the value of the dual-copy architecture: snap for fast short-term recovery, backup copy for long-term data protection.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ===== PART 2: AZURE SQL PAAS ===== -->
+
+<!-- SECTION 9: AZURE SQL OVERVIEW -->
+<section id="azuresql-overview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🗄</div>
+    <div>
+      <div class="section-title">Azure SQL Database (PaaS) — Overview</div>
+      <div class="section-subtitle">IaaS vs. PaaS SQL, what Azure manages vs. what you manage, and why you still need Commvault</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>IaaS SQL vs. PaaS SQL — The Critical Distinction</h3>
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🖥 IaaS — SQL on a Virtual Machine</h5>
+        <ul>
+          <li>You create a VM, install SQL Server on it</li>
+          <li>You have full OS access (RDP/SSH)</li>
+          <li>You manage the VM, OS patching, SQL patching</li>
+          <li>You can install Commvault SQL agent directly on the VM</li>
+          <li>Commvault connects directly to the SQL instance</li>
+          <li>Examples: Azure VM with SQL, AWS EC2 with SQL Server</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>☁ PaaS — Azure SQL Database (Managed Service)</h5>
+        <ul>
+          <li>You only create the SQL database/server — no VM to manage</li>
+          <li>No OS access — Azure manages the underlying VM completely</li>
+          <li>Azure handles OS patching, SQL patching, HA, backups internally</li>
+          <li>You <em>cannot</em> install any agent on the underlying VM</li>
+          <li>Commvault uses an external access node with special permissions</li>
+          <li>Also called: Managed SQL, Azure SQL Managed Instance</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Why Use Commvault When Azure Already Backs Up SQL?</div>
+      <p>Azure SQL provides its own native backup (point-in-time restore, geo-redundant backups). However, many customers also use Commvault for Azure SQL backup because: (1) Enterprise policy requires all data — regardless of platform — to be protected under a single backup tool for unified reporting and compliance. (2) Commvault gives granular control over retention periods, RPO, and recovery options. (3) It allows restoring Azure SQL backups to on-premise SQL servers or different regions. (4) Regulatory requirements may mandate third-party backup verification. The choice is up to the customer — they can use Azure native, Commvault, or both.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Azure SQL Database — Key Resources Created</h3>
+    <div class="strip-row">
+      <span class="strip-label">SQL Server (Logical)</span>
+      <span class="strip-val">The container/namespace for SQL databases. Has a globally unique hostname like <code>sqlserver0615.database.windows.net</code>. The underlying VM is completely hidden from users — you cannot see it in Azure Portal's VM section.</span>
+      <span class="strip-badge sb-info">Logical Container</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">SQL Database</span>
+      <span class="strip-val">The actual database within the SQL Server. One SQL Server can host multiple databases. Resource type appears in resource group as "SQL database." Can import a sample AdventureWorks database at creation time.</span>
+      <span class="strip-badge sb-info">Actual DB</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Authentication</span>
+      <span class="strip-val">SQL Authentication (username + password) — these credentials are for the SQL server, <strong>not</strong> for any VM. The VM where the DB is hosted does not accept these credentials.</span>
+      <span class="strip-badge sb-warn">SQL Credentials Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Free Tier Limitation</span>
+      <span class="strip-val">Azure SQL free tier (100K vCore seconds, 32 GB RAM) does NOT allow database copy/export operations, which Commvault uses internally during backup. The free tier causes "Pole operation status return failed" (also seen as "Poll operation") errors. Solution: disable the free tier and use the paid compute tier (~$6/month).</span>
+      <span class="strip-badge sb-warn">Free Tier Blocks Backup</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Networking / Firewall</span>
+      <span class="strip-val">By default, Azure SQL Server blocks all connections. You must add firewall rules: "Allow Azure services" and/or specific IP rules. At creation time, you can add your client IP automatically. The access node's IP must be whitelisted to allow Commvault to connect on port 1433.</span>
+      <span class="strip-badge sb-warn">Firewall Rules Required</span>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Command Center Only — No Console Console Option</div>
+      <p>Azure SQL PaaS backup configuration can <strong>only</strong> be done from the <strong>Command Center</strong> (web UI). The classic CommCell Console (Java console) does not have an option to configure Azure SQL backup. This is part of Commvault's strategic direction — all new cloud workloads (Kubernetes, Azure SQL, Azure VM, GCP) are being developed for Command Center only. The Java console is being maintained for legacy operations but new features are Command Center exclusive.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 10: AZURE SQL CONFIG -->
+<section id="azuresql-config" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">🔧</div>
+    <div>
+      <div class="section-title">Azure SQL Database — Configuration</div>
+      <div class="section-subtitle">Access node setup, custom role for SQL, Commvault virtual client creation, and troubleshooting ODBC</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Access Node for Azure SQL — Why a Separate Node?</h3>
+    <p>Since the underlying VM of Azure SQL PaaS is managed by Azure and not accessible to users, you cannot install a Commvault agent directly on it. Instead, you deploy a separate <strong>access node</strong> (proxy) that has permissions to access the SQL database via the network (port 1433). The access node uses its managed identity to authenticate to Azure and to the SQL database.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">Access Node OS</span>
+      <span class="strip-val">Windows Server 2019 is used in the lab (SQL agent runs well on Windows). Linux is also supported — check documentation.</span>
+      <span class="strip-badge sb-info">Windows / Linux</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Required Packages</span>
+      <span class="strip-val"><strong>SQL Agent (MSSQL)</strong> + <strong>Virtual Server Agent</strong> + <strong>Storage Accelerator</strong> + File System Core (auto-installed)</span>
+      <span class="strip-badge sb-warn">All Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">NSG Ports</span>
+      <span class="strip-val">8400, 8403 (permanent). For push install on Windows: 135, 139, 445 (temporary). Also must disable Windows Defender Firewall temporarily during push install.</span>
+      <span class="strip-badge sb-warn">Windows Firewall Off</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">ODBC Driver</span>
+      <span class="strip-val">Must be installed manually on the Windows access node. Commvault's documentation may not explicitly mention this. Without it, backup fails with "database not currently available" error. Install: Microsoft ODBC Driver for SQL Server + Visual C++ redistributable dependency.</span>
+      <span class="strip-badge sb-warn">Manual Install Required</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Custom Role for Azure SQL — Using Commvault's JSON</h3>
+    <p>Azure SQL PaaS backup requires its own custom role — different from the Azure VM backup custom role. The JSON file is available in Commvault documentation under "Roles and Permissions Required for Protecting Azure Resources with Commvault" → search for "Azure SQL database."</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON — Azure SQL Custom Role Structure (Commvault-Provided)</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body">{
+  "Name": "SQL DB Backup Role",
+  "Description": "Commvault custom role for Azure SQL Database backup and restore",
+  "AssignableScopes": [
+    "/subscriptions/<span class="val">YOUR-SUBSCRIPTION-ID</span>"
+  ],
+  "permissions": [
+    {
+      "actions": [
+        <span class="comment">/* SQL Server read/write: Microsoft.Sql/servers/read */</span>
+        <span class="comment">/* Database read/write/delete: Microsoft.Sql/servers/databases/* */</span>
+        <span class="comment">/* Document DB, Managed Instance permissions */</span>
+        <span class="comment">/* Import/Export operations */</span>
+      ],
+      "notActions": []
+    }
+  ]
+}
+
+<span class="comment"># IMPORTANT: Replace "YOUR-SUBSCRIPTION-ID" with actual UUID</span>
+<span class="comment"># Do NOT include the curly braces around the UUID</span>
+<span class="comment"># Common mistake: pasting "{subscription-id}" instead of the actual value</span>
+<span class="comment"># This causes "identifier is invalid" error in Azure Portal</span></div>
+    </div>
+
+    <div class="flow">
+      <div class="flow-title">Custom Role Creation and Assignment for Azure SQL</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Enable Managed Identity on the Windows Access Node VM</strong>
+            <p>Azure Portal → Virtual Machines → Windows Access Node → Identity → System Assigned → Status: On → Save. This gives the VM an identity that can be assigned roles.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Create Custom Role from Commvault's JSON</strong>
+            <p>Azure Portal → Subscriptions → IAM → Add → Create Custom Role → Start from JSON (Edit tab). Delete default template, paste Commvault's SQL JSON, replace Subscription ID (without braces). Review and Create. If error "role with same name exists," use a different name.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Assign Custom Role to the Windows Access Node VM</strong>
+            <p>Azure Portal → SQL Server resource → IAM → Add Role Assignment → select the custom SQL role → Assign to Managed Identity → select the Windows access node VM. Verify the role appears in the SQL Server's IAM → Role Assignments tab.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Configure Azure SQL Virtual Client in Command Center</strong>
+            <p>Command Center → Guided Setup → Database → Databases Running in Cloud → Microsoft Azure → Azure SQL Server and Managed SQL. Select plan, enable Managed Identity authentication, enter Subscription ID, select the Windows access node. The SQL Server instance name is auto-detected (e.g., <code>sqlserver0615</code>). Provide SQL authentication credentials (created at DB creation time). Submit.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Troubleshooting — Common Azure SQL Backup Errors</h3>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Error 1: "Database [name] on server is not currently available"</div>
+      <p><strong>Root Cause:</strong> The ODBC driver is not installed on the Windows access node. Commvault's SQL agent cannot connect to Azure SQL Database without the Microsoft ODBC Driver for SQL Server.<br><strong>Fix:</strong> Download and install: (1) Microsoft Visual C++ Redistributable (required dependency), then (2) Microsoft ODBC Driver for SQL Server. Both must be installed before resuming the backup job. After installation, resume the existing job — do not resubmit a new job to avoid cluttering logs.</p>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Error 2: "Pole operation status return failed"</div>
+      <p><strong>Root Cause:</strong> The Azure SQL Database is on the <strong>free tier</strong>. The free tier restricts database copy/export operations, which is exactly what Commvault triggers internally during backup (it creates a dump/copy of the database for export).<br><strong>Note:</strong> The exact error wording may appear as <em>"Pole operation"</em> or <em>"Poll operation"</em> depending on your Commvault version — both refer to the same issue.<br><strong>Fix:</strong> In Azure Portal → SQL Database → Compute + Storage → disable the "free database" option and switch to paid compute (approximately $6/month for basic tier). After disabling free tier, kill the failed job and resubmit a new backup job.</p>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Error 3: Push Install Fails on Windows Access Node</div>
+      <p><strong>Root Cause:</strong> Windows Defender Firewall is blocking remote installation ports (135, 139, 445). Even if NSG ports are open in Azure, the Windows OS-level firewall still blocks these connections.<br><strong>Fix:</strong> (1) Open NSG inbound rules for 135, 139, 445 (temporary). (2) Disable Windows Defender Firewall in Server Manager → Local Server → Defender Firewall → Off for Private, Public, and Domain profiles. After installation completes, re-enable firewall and remove temporary NSG rules. Port 8400 and 8403 must remain open permanently.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash/cmd — Troubleshooting Port Connectivity</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Test if port 1433 (SQL Server) is reachable from the access node</span>
+<span class="comment"># Run this from CommServe to verify connectivity to the SQL access node</span>
+<span class="cmd">Test-NetConnection</span> -ComputerName <span class="val">&lt;access-node-ip&gt;</span> -Port <span class="val">1433</span>
+
+<span class="comment"># Test if CommVault port is reachable</span>
+<span class="cmd">Test-NetConnection</span> -ComputerName <span class="val">&lt;access-node-ip&gt;</span> -Port <span class="val">8400</span>
+
+<span class="comment"># For push install — verify Windows RPC port reachable</span>
+<span class="cmd">Test-NetConnection</span> -ComputerName <span class="val">&lt;access-node-ip&gt;</span> -Port <span class="val">135</span>
+
+<span class="comment"># Check logs for backup failures</span>
+<span class="comment"># On the Windows access node:</span>
+<span class="path">C:\Program Files\Commvault\ContentStore\Log Files\SqlBackup.log</span>
+
+<span class="comment"># Look for lines containing:</span>
+<span class="comment"># "Starting to copy the DB" — backup initiated successfully</span>
+<span class="comment"># "failed with error" — look at the following line for root cause</span>
+<span class="comment"># "SQL pass is not currently available" — ODBC issue</span>
+<span class="comment"># "Pole operation status return failed" — free tier limitation</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 11: AZURE SQL RESTORE -->
+<section id="azuresql-restore" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🔄</div>
+    <div>
+      <div class="section-title">Azure SQL — Backup Verification &amp; Restore</div>
+      <div class="section-subtitle">Verifying data exists, running backup, in-place restore of deleted database, and staging path</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What Commvault Does During Azure SQL Backup</h3>
+    <p>Commvault's Azure SQL backup follows a specific internal process that differs from traditional SQL agent backup:</p>
+    <div class="strip-row">
+      <span class="strip-label">Step 1 — Connect</span>
+      <span class="strip-val">Access node connects to Azure SQL Server on port 1433 using the SQL authentication credentials provided</span>
+      <span class="strip-badge sb-ok">Via ODBC</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 2 — Export (Copy)</span>
+      <span class="strip-val">Commvault triggers a database copy/export operation internally — similar to a BACPAC export. This is why the free tier blocks it (copy operations are not permitted on free tier).</span>
+      <span class="strip-badge sb-info">DB Copy/Export</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 3 — tagfs Transfer</span>
+      <span class="strip-val">After export, Commvault uses its internal "tagfs" technology to transfer the exported database data to the cloud library. Log entry shows: "starting to export... using tagfs"</span>
+      <span class="strip-badge sb-info">Internal Transfer</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Staging Path (Restore)</span>
+      <span class="strip-val">During restore, a staging path (local folder on access node) is required. Commvault restores the database dump to this folder first, then imports it back to Azure SQL. Must provide a valid path on the access node (e.g., <code>C:\CVRestore\</code>)</span>
+      <span class="strip-badge sb-warn">Mandatory for Restore</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>In-Place Restore — Deleted Azure SQL Database</h3>
+    <div class="flow">
+      <div class="flow-title">Restoring an Accidentally Deleted Azure SQL Database</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Verify Data Exists Before Backup (Using Query Editor)</strong>
+            <p>In Azure Portal → SQL Database → Query Editor. Log in with SQL credentials. Expand Tables — verify sample AdventureWorks tables are present. Run a test query: <code>SELECT TOP 5 * FROM SalesLT.Customer</code> — confirm data is returned. This confirms there is meaningful data to back up and restore.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Run Backup — Full Backup of Azure SQL Database</strong>
+            <p>In CommCell Console or Command Center: navigate to the SQL virtual client → instance (SQL Server name) → database → right-click → Backup → Full. Monitor the job. Successful backup log shows: "Starting to copy the DB → Starting to export → Backup completed."</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Simulate Data Loss — Delete the Database</strong>
+            <p>In Azure Portal → SQL Databases → select the database → Delete. Confirm deletion. Verify: navigating to the SQL Server shows no databases. The Resource Group also confirms the database resource no longer exists. A restore request is now raised.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Browse and Restore — In-Place</strong>
+            <p>CommCell Console: SQL virtual client → instance → database → Backup History → select the backup job → Browse and Restore. The backed-up database (e.g., SQLPass) is shown. Select it, choose <strong>In-Place Restore</strong>, check <strong>Unconditionally Overwrite</strong>.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Provide Staging Path (Advanced Options)</strong>
+            <p>In the restore dialog, click <strong>Advanced</strong> → provide a staging path on the access node (e.g., <code>C:\CVRestore\</code>). This path is where Commvault temporarily writes the database file before importing it to Azure SQL. Without this, the restore job will fail.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Verify Restored Database</strong>
+            <p>After restore completes (~3 minutes for a small database), go to Azure Portal → SQL Databases → the database reappears. Click it — status shows Online. Open Query Editor, log in, run the same test query — data is intact, confirming successful restore. The restore brought the database back to Azure SQL from the Commvault library.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 12: BEST PRACTICES -->
+<section id="best-practices" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">⭐</div>
+    <div>
+      <div class="section-title">Upgrade &amp; Maintenance Best Practices</div>
+      <div class="section-subtitle">Critical guidance on Commvault version management, maintenance releases, and data integrity validation</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The Real Cost of Skipping Maintenance Releases — A Real-World Example</h3>
+    <p>A critical lesson from production experience that every backup admin must internalize:</p>
+    <div class="upgrade-box">
+      <h4>⚠ Real Incident: Backups Completing Successfully — But VMs Won't Restore</h4>
+      <ul>
+        <li>Customer was on Commvault 11.32 — a supported version — but had not installed any maintenance releases (running on a very low MR number)</li>
+        <li>VMware backup jobs ran and showed "Completed" status in the Job Controller every day for months</li>
+        <li>When a restore was needed, every restored VM showed a <strong>Blue Screen of Death</strong> — the VM would not start</li>
+        <li>VMware team and OS team both tried to troubleshoot — no success</li>
+        <li>Commvault support was engaged — Commvault acknowledged a <strong>known bug</strong> in that old MR version where restore completes but VM boots to blue screen</li>
+        <li>Resolution: upgrade to a newer MR — but existing backups taken on the old version were <strong>NOT restorable</strong></li>
+        <li>Customer had to wait until new backups were taken after the MR upgrade to have restorable backups</li>
+        <li>Business impact: complete data protection gap for all existing backup jobs</li>
+      </ul>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ The N-1 Rule for Commvault Versions</div>
+      <ul>
+        <li><strong>Platform/Feature Release</strong> (e.g., 11.32, 11.36, 11.40): These are major releases. Do NOT upgrade to the latest platform release immediately — it may be unstable. Follow the <strong>N-1 rule</strong>: use one version behind the latest. For example, if 11.40 just released, stay on 11.36 until 11.40 is proven stable.</li>
+        <li><strong>Maintenance Release (MR)</strong> (e.g., 11.32.100, 11.32.150): These are hotfixes/patches. <strong>Always keep MRs current.</strong> There is very little risk in applying the latest MR for your platform release — they contain critical bug fixes like the restore failure described above. An outdated MR can silently cause data loss.</li>
+        <li><strong>OS Compatibility Check</strong>: Before any platform upgrade (e.g., 11.32 → 11.36), verify all OS versions in your environment (CommServe OS, Media Agent OS, client OS) are compatible with the new version — check the System Requirements Guide in Commvault documentation.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Data Integrity Best Practices</h3>
+    <div class="strip-row">
+      <span class="strip-label">DDB Verification Jobs</span>
+      <span class="strip-val">If using Commvault software deduplication (DDB), enable and schedule DDB Verification Jobs. These verify the deduplication database is intact and backup data is recoverable. Without verification, silent corruption can go undetected.</span>
+      <span class="strip-badge sb-warn">Enable DDB Verify</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Data Verification Schedule</span>
+      <span class="strip-val">If using storage-level deduplication (e.g., HP StoreOnce — Commvault cannot use software dedup with it), enable a Data Verification schedule in Commvault to regularly verify backup data integrity.</span>
+      <span class="strip-badge sb-info">Alternative to DDB</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Media Agent in Same Region as Storage</span>
+      <span class="strip-val">If backing up to public cloud, deploy Media Agent in the <strong>same cloud region</strong> as your storage account/bucket. This prevents egress charges (data transfer fees for moving data out of a cloud region). Ask Commvault for recommendations on optimal Media Agent placement.</span>
+      <span class="strip-badge sb-best">Cost Saving</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Regular OS/Driver Patching</span>
+      <span class="strip-val">Keep CommServe OS, Media Agent OS, HBA drivers, and network drivers current. Outdated drivers on Media Agents (physical servers) can cause backup failures or data corruption that are difficult to diagnose.</span>
+      <span class="strip-badge sb-warn">Regular Patching</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Periodic Restore Testing</span>
+      <span class="strip-val">Schedule periodic restore tests (quarterly at minimum) to verify backups are actually restorable. The scenario described above — backups completing but restores failing — would have been caught immediately if the customer had tested restores periodically.</span>
+      <span class="strip-badge sb-warn">Critical Practice</span>
+    </div>
+
+    <div class="callout exam">
+      <div class="callout-title">🎓 Interview/Architect Question</div>
+      <p>An interviewer may ask: "How do you ensure backup data integrity in your environment?" The expected answer covers: DDB verification jobs, data verification schedules, periodic restore testing, maintaining current MR versions, and monitoring backup job completion with proactive alerts. Simply saying "backups complete every day" is not sufficient — the example above shows that completion does not guarantee restorability.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 13: INTERVIEW Q&A -->
+<section id="interview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🎓</div>
+    <div>
+      <div class="section-title">Interview &amp; Exam — Scenario-Based Q&amp;A</div>
+      <div class="section-subtitle">Real-world questions on IntelliSnap, Azure SQL PaaS backup, troubleshooting, and best practices</div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is the difference between a streaming backup and an IntelliSnap backup? When would you recommend IntelliSnap to a customer?</div>
+    <div class="qa-a">A <strong>streaming backup</strong> reads data directly from the live production volume over the network and writes it entirely to the backup library. A 100 TB database takes hours to stream. During the backup window, the production server experiences I/O load and must remain accessible. An <strong>IntelliSnap backup</strong> creates an application-consistent snapshot on the storage array in seconds or minutes — size-independent. The actual data stays on the storage array (only ~15 KB metadata goes to the library as the snap copy). A backup copy job then reads from the snapshot (not the live volume), so production is unaffected during data transfer. I would recommend IntelliSnap when: (1) the customer has a large dataset where streaming backup windows are too long, (2) the storage array is SAN-based or cloud-based and supports snapshots, (3) zero production I/O impact is required during backup, or (4) fast recovery from recent events is needed (restore directly from array snapshot in minutes).</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">After enabling IntelliSnap, you see two jobs in the Job Controller every time a backup runs. What are they and what does each one do?</div>
+    <div class="qa-a">The two jobs are: (1) <strong>Snap Backup Job</strong> (e.g., "VM Admin Snap Backup") — this is the job you initiated. It quiesces the application, sends an API request to the storage array to create a snapshot, then writes only the snapshot metadata (~15 KB) to the Snap Copy in the library. (2) <strong>Backup Copy Job</strong> — automatically spawned by the snap backup job. It mounts the snapshot on the media agent and copies the full VM/application data to the Primary Copy (cloud library). This is a traditional streaming backup, but reading from the snapshot instead of the live volume. Both jobs run automatically when IntelliSnap is enabled and a Snap Copy exists in the storage policy. The snap copy job is always fast; the backup copy job takes longer because it transfers the full data to the library.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">You set the snap copy retention to "Spool Copy." The backup copy job completes, but the snapshot is still visible in the Azure Portal. Why, and how do you remove it?</div>
+    <div class="qa-a">The snapshot is still visible because Commvault's <strong>Data Aging job</strong> has not run yet. Spool Copy retention means: delete the snapshot as soon as the backup copy completes. However, the actual deletion happens when the data aging job runs — which only executes automatically once every 24 hours. Even though the snap copy is logically expired (backup copy done), it is not physically deleted from Azure until data aging runs. To immediately remove it: in CommCell Console → right-click the CommServe → Data Aging → Run Now. After the manual data aging run, Commvault sends a delete API call to Azure, the snapshot disappears from the Azure Portal, and the Primary Snap copy shows no jobs in List Snapshots. The Primary Copy backup copy job remains unaffected and is still restorable.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">You assigned the Azure built-in "Backup Contributor" role to the access node's managed identity. The hypervisor was configured in Commvault, but when adding the VM Group content, the VM list shows "No items found." What is the issue and how do you resolve it?</div>
+    <div class="qa-a">The <strong>Backup Contributor</strong> built-in Azure role does not include the permissions needed for Commvault to <strong>list and browse virtual machines</strong> in the subscription. The role may cover some backup operations but lacks VM discovery permissions. Resolution: switch to a <strong>Commvault Custom Role</strong>. In Commvault documentation → "Roles and Permissions Required for Protecting Azure Resources with Commvault" → find the JSON template for Azure VM backup. In Azure Portal: Subscriptions → IAM → Add → Create Custom Role → paste the Commvault JSON (with your Subscription ID replacing the placeholder, without curly braces). Create the role, then assign it to the access node VM's managed identity at the subscription scope. After this, the VM Group content browse will show all VMs in the subscription.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is the difference between IaaS SQL Server backup and Azure SQL (PaaS) backup in Commvault? Why is an access node required for PaaS backup?</div>
+    <div class="qa-a">With <strong>IaaS SQL</strong> (SQL Server on a VM), you have full VM access — you can install the Commvault SQL agent directly on the VM, connect to the SQL instance locally, and back up via agent-based backup or agentless VM backup. With <strong>Azure SQL PaaS</strong>, the underlying VM is completely managed by Azure — you cannot log into it, cannot install any software on it. You only interact with the SQL database endpoint. Therefore, Commvault cannot install an agent on the host. Instead, you deploy a separate <strong>access node</strong> (a VM you create and control) with the MSSQL agent installed. The access node connects to the Azure SQL Database over port 1433 using SQL credentials and the managed identity, triggers a database export/copy, and transfers the data to the backup library. The access node acts as a proxy — it has agent capabilities and connectivity to both the Azure SQL service and the backup library.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">An Azure SQL backup job fails with "database is not currently available." You verify the database is online in the Azure Portal. What is the likely cause and fix?</div>
+    <div class="qa-a">Despite the database being online in Azure Portal, this error typically indicates that the <strong>ODBC driver is not installed</strong> on the Windows access node. Commvault's SQL agent uses ODBC to connect to Azure SQL Database. Without the Microsoft ODBC Driver for SQL Server on the access node, the agent cannot establish a connection even though the database is reachable at the network level (port 1433 connectivity may be fine). The fix is to install two components on the Windows access node: (1) Microsoft Visual C++ Redistributable (required dependency), then (2) Microsoft ODBC Driver for SQL Server (the version compatible with your SQL Server edition). Note that Commvault's documentation may not clearly list ODBC as a prerequisite — this is a known gap. After installing, resume the failed job (or resubmit a new one). The backup should proceed past the connection phase and export the database successfully.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A customer's Azure SQL backup fails with "Pole operation status return failed" (also seen as "Poll operation status return failed"). The database is online and ODBC is installed. What is the cause?</div>
+    <div class="qa-a">This error occurs when the Azure SQL Database is on the <strong>free tier</strong>. Commvault's backup process internally creates a copy/export of the database (similar to a BACPAC export). The Azure SQL free tier explicitly restricts database copy operations to prevent abuse of the free service. This limitation is not a Commvault bug — it is an Azure platform restriction. The fix: in Azure Portal → SQL Database → Compute + Storage → disable the "Apply free database offer" checkbox → switch to paid compute (basic tier, approximately $6/month). After disabling the free tier, kill the failed job and resubmit a new full backup. The export operation will now complete successfully.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A customer reports that their Commvault backup jobs have been showing "Completed" for 6 months, but when they tried to restore a VM last week, it booted to a Blue Screen of Death every time. What happened and what should they have done to prevent this?</div>
+    <div class="qa-a">This is a known real-world scenario caused by an unpatched Commvault bug in an outdated <strong>Maintenance Release (MR)</strong>. The customer was on a supported platform version (e.g., 11.32) but had not applied MR updates for an extended period. A bug existed in that MR version where VM restore completes successfully in Commvault but the restored VM is non-bootable. The bug was fixed in a later MR. Because they never applied the MR fix, all backups taken during that period are unrestorable from those jobs. Prevention: (1) Always keep Maintenance Releases current — apply new MRs as soon as they are released and tested. MRs are hotfixes that specifically address bugs like this. (2) Perform periodic restore tests — quarterly test restores of representative VMs would have immediately caught this issue. (3) Monitor Commvault's known issue list and release notes for the MR versions you are running.</div>
+  </div>
+</section>
+
+</div><!-- end main-content -->
+
+</div><!-- end page-body -->
+
+<!-- AUTHOR SECTION -->
+<div class="author-section">
+  <div class="author-title">About the Author</div>
+  <div class="author-card">
+    <div class="author-avatar">👨‍💻</div>
+    <div class="author-info">
+      <div class="author-name">Mohammed Abdul</div>
+      <div class="author-role">Data Protection Architect · 15+ Years Experience</div>
+      <div class="author-bio">Seasoned Data Protection Architect with over 15 years of hands-on experience designing, implementing, and troubleshooting enterprise backup and recovery solutions. Deep expertise in Commvault administration spanning IntelliSnap snapshot technology, Azure cloud PaaS protection, VMware application-aware backups, and large-scale SAN and cloud storage environments. Specialist in hybrid cloud backup architectures and snapshot-based recovery strategies.</div>
+      <div class="badge-row">
+        <span class="badge cv">Commvault Certified</span>
+        <span class="badge veeam">Veeam VMCE</span>
+        <span class="badge nb">NetBackup</span>
+        <span class="badge netapp">NetApp Data ONTAP</span>
+      </div>
+      <a class="contact-card" href="/cdn-cgi/l/email-protection#02636066776e2c6f662c303232323233323042656f636b6e2c616d6f">✉ <span class="__cf_email__" data-cfemail="d7b6b5b3a2bbf9bab3f9e5e7e7e7e7e6e7e597b0bab6bebbf9b4b8ba">[email&#160;protected]</span></a>
+    </div>
+  </div>
+  <div class="disclaimer">
+    <p><strong>Disclaimer:</strong> This tutorial is created for educational and training purposes only. All technical procedures, commands, configurations, and troubleshooting steps are based on real-world Commvault implementation experience. Always refer to official Commvault documentation for your specific software version. Azure Portal UI, IAM policies, and pricing may vary — consult Microsoft Azure documentation for the latest guidance. Free tier limitations and ODBC requirements may change across Commvault versions.</p>
+  </div>
+</div>
+
+<footer>
+  Commvault Software Administration — Tutorial 10: IntelliSna
+<script>
+// Sidebar active link on scroll
+(function() {
+  const links = document.querySelectorAll(".sidebar-link");
+  const sectionIds = ["intellisnap-what","intellisnap-how","intellisnap-prereqs","intellisnap-azure-setup","intellisnap-config","snap-vs-backup-copy","intellisnap-restore","spool-data-aging","azuresql-overview","azuresql-config","azuresql-restore","best-practices","interview"];
+  const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+  function setActive() {
+    let current = sections[0];
+    const scrollY = window.scrollY + 100;
+    for (const sec of sections) {
+      if (sec.offsetTop <= scrollY) current = sec;
+    }
+    links.forEach(l => {
+      const href = l.getAttribute("href").replace("#","");
+      l.classList.toggle("active", href === current.id);
+    });
+  }
+
+  window.addEventListener("scroll", setActive, { passive: true });
+  setActive();
+})();
+</script>
+</body>
+</html>
