@@ -60,9 +60,14 @@
     background: rgba(10,22,40,0.95);
     border-bottom: 1px solid var(--card-border);
     backdrop-filter: blur(16px);
-    padding: 0 48px;
+    padding: 12px 48px;
     display: flex; align-items: center; justify-content: space-between;
-    height: 58px;
+    flex-wrap: wrap;
+    gap: 24px;
+    min-height: auto;
+  }
+  .nav-left {
+    display: flex; align-items: center; gap: 40px; flex: 1;
   }
   .nav-brand {
     font-family: 'DM Serif Display', Georgia, serif;
@@ -75,6 +80,48 @@
     border: 1px solid var(--card-border);
     border-radius: 20px; padding: 4px 14px;
     letter-spacing: 0.5px;
+  }
+
+  /* ── ANALYTICS HEADER ── */
+  .nav-analytics {
+    display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
+  }
+  .analytics-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 15px; font-weight: 500;
+  }
+  .analytics-icon {
+    font-size: 20px;
+  }
+  .analytics-label {
+    color: var(--text-muted); font-size: 13px; font-weight: 400;
+  }
+  .analytics-value {
+    color: var(--accent2); font-family: 'DM Mono', monospace;
+    font-size: 18px; font-weight: 600;
+  }
+  .analytics-country {
+    color: var(--accent); font-family: 'DM Mono', monospace;
+    font-size: 16px; font-weight: 600;
+  }
+  .analytics-time {
+    color: var(--accent4); font-family: 'DM Mono', monospace;
+    font-size: 16px; font-weight: 600;
+  }
+
+  @media (max-width: 1200px) {
+    nav { padding: 16px 24px; gap: 16px; }
+    .nav-left { gap: 20px; }
+    .nav-analytics { gap: 20px; }
+    .analytics-item { font-size: 13px; }
+    .analytics-icon { font-size: 18px; }
+    .analytics-value { font-size: 16px; }
+  }
+
+  @media (max-width: 800px) {
+    nav { flex-direction: column; align-items: flex-start; padding: 16px 24px; }
+    .nav-left { width: 100%; gap: 20px; }
+    .nav-analytics { width: 100%; gap: 16px; }
   }
 
   /* ── HERO ── */
@@ -327,6 +374,10 @@
     font-size: 13px; color: var(--text-dim);
   }
   footer span { font-family: 'DM Mono', monospace; font-size: 11px; }
+
+  @media (max-width: 800px) {
+    footer { flex-direction: column; align-items: flex-start; gap: 8px; padding: 24px; }
+  }
 </style>
 </head>
 <body>
@@ -337,8 +388,36 @@
 
 <!-- NAV -->
 <nav>
-  <div class="nav-brand">Commvault Cloud Tutorials</div>
-  <div class="nav-tag">Free · Community · Open Access</div>
+  <div class="nav-left">
+    <div class="nav-brand">Commvault Cloud Tutorials</div>
+    <div class="nav-tag">Free · Community · Open Access</div>
+  </div>
+  
+  <div class="nav-analytics">
+    <div class="analytics-item">
+      <span class="analytics-icon">👥</span>
+      <div>
+        <div class="analytics-label">Visitors</div>
+        <div class="analytics-value" id="visitor-count">0</div>
+      </div>
+    </div>
+    
+    <div class="analytics-item">
+      <span class="analytics-icon">🌍</span>
+      <div>
+        <div class="analytics-label">Country</div>
+        <div class="analytics-country" id="visitor-country">Detecting...</div>
+      </div>
+    </div>
+    
+    <div class="analytics-item">
+      <span class="analytics-icon">⏱️</span>
+      <div>
+        <div class="analytics-label">Time Spent</div>
+        <div class="analytics-time" id="time-spent">0s</div>
+      </div>
+    </div>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -620,4 +699,90 @@
 
 <!-- FOOTER -->
 <footer>
-  <div>© Mohammed Abdul · Data Prot
+  <div>© Mohammed Abdul · Data Protection Architect</div>
+  <span>Commvault Cloud Tutorials · 2025</span>
+</footer>
+
+<script>
+  // =====================================================
+  // VISITOR COUNTER - Using CountAPI
+  // =====================================================
+  function initVisitorCounter() {
+    const pageId = 'mohammedabdul-commvault-tutorials';
+    
+    fetch(`https://api.countapi.xyz/hit/${pageId}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('visitor-count').textContent = data.value;
+        // Store in localStorage
+        localStorage.setItem('totalVisitors', data.value);
+      })
+      .catch(error => {
+        console.log('Visitor counter error:', error);
+        // Fallback to localStorage
+        const stored = localStorage.getItem('totalVisitors') || '0';
+        document.getElementById('visitor-count').textContent = stored;
+      });
+  }
+
+  // =====================================================
+  // COUNTRY DETECTION - Using IP API
+  // =====================================================
+  function detectCountry() {
+    fetch('https://ipapi.co/json/')
+      .then(response => response.json())
+      .then(data => {
+        const country = data.country_name || 'Unknown';
+        document.getElementById('visitor-country').textContent = country;
+        // Store in localStorage
+        localStorage.setItem('visitorCountry', country);
+      })
+      .catch(error => {
+        console.log('Country detection error:', error);
+        // Fallback
+        const stored = localStorage.getItem('visitorCountry') || 'Unknown';
+        document.getElementById('visitor-country').textContent = stored;
+      });
+  }
+
+  // =====================================================
+  // TIME SPENT TRACKING
+  // =====================================================
+  let startTime = Date.now();
+  let timeSpentSeconds = 0;
+
+  function updateTimeSpent() {
+    timeSpentSeconds = Math.floor((Date.now() - startTime) / 1000);
+    
+    let displayTime;
+    if (timeSpentSeconds < 60) {
+      displayTime = timeSpentSeconds + 's';
+    } else if (timeSpentSeconds < 3600) {
+      displayTime = Math.floor(timeSpentSeconds / 60) + 'm';
+    } else {
+      displayTime = Math.floor(timeSpentSeconds / 3600) + 'h';
+    }
+    
+    document.getElementById('time-spent').textContent = displayTime;
+  }
+
+  // Update time every second
+  setInterval(updateTimeSpent, 1000);
+
+  // Save time spent on page unload
+  window.addEventListener('beforeunload', () => {
+    localStorage.setItem('timeSpentSeconds', timeSpentSeconds);
+  });
+
+  // =====================================================
+  // INITIALIZE ON PAGE LOAD
+  // =====================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    initVisitorCounter();
+    detectCountry();
+    updateTimeSpent();
+  });
+</script>
+
+</body>
+</html>
