@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Software Administration – Tutorial 11 | Network Troubleshooting, VSA Migration &amp; GCP Backup</title>
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #0f2040;
+    --navy-light: #162b52;
+    --accent: #00c8ff;
+    --accent2: #00e5a0;
+    --accent3: #ff6b35;
+    --accent4: #a78bfa;
+    --gold: #f5c842;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --card: #0d1f3c;
+    --card-border: rgba(0,200,255,0.12);
+    --warn-bg: rgba(255,107,53,0.08);
+    --warn-border: #ff6b35;
+    --tip-bg: rgba(0,229,160,0.08);
+    --tip-border: #00e5a0;
+    --note-bg: rgba(0,200,255,0.08);
+    --note-border: #00c8ff;
+    --exam-bg: rgba(167,139,250,0.08);
+    --exam-border: #a78bfa;
+    --best-bg: rgba(245,200,66,0.08);
+    --best-border: #f5c842;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', Calibri, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 999;
+    background: rgba(10,22,40,0.97);
+    border-bottom: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; min-height: 54px;
+  }
+  .nav-brand {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    color: var(--accent); font-size: 15px; font-weight: bold;
+    letter-spacing: 0.5px; margin-right: 16px; white-space: nowrap;
+  }
+  nav a {
+    color: var(--text-muted); text-decoration: none; font-size: 12px;
+    padding: 6px 10px; border-radius: 4px; transition: all 0.2s; white-space: nowrap;
+  }
+  nav a:hover { color: var(--accent); background: rgba(0,200,255,0.08); }
+
+  .hero {
+    background: linear-gradient(135deg, #0a1628 0%, #0d1e30 40%, #091520 100%);
+    padding: 80px 48px 64px;
+    border-bottom: 1px solid var(--card-border);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,200,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -80px; left: 30%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,229,160,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,200,255,0.08);
+    border: 1px solid rgba(0,200,255,0.3);
+    border-radius: 20px; padding: 6px 16px;
+    font-size: 12px; color: var(--accent);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1.2; color: #fff; max-width: 860px; margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-desc {
+    color: var(--text-muted); max-width: 720px;
+    font-size: 16px; margin-bottom: 36px;
+  }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tag {
+    background: var(--navy-light); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px; padding: 4px 12px; font-size: 12px; color: var(--text-muted);
+  }
+  .tag.purple { border-color: var(--accent4); color: var(--accent4); }
+  .tag.blue { border-color: var(--accent); color: var(--accent); }
+  .tag.green { border-color: var(--accent2); color: var(--accent2); }
+  .tag.gold { border-color: var(--gold); color: var(--gold); }
+  .tag.orange { border-color: var(--accent3); color: var(--accent3); }
+
+  /* ---- LEFT SIDEBAR LAYOUT ---- */
+  .page-body {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .toc-sidebar {
+    width: 260px;
+    min-width: 240px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 54px; /* nav height */
+    height: calc(100vh - 54px);
+    overflow-y: auto;
+    background: var(--navy-mid);
+    border-right: 1px solid var(--card-border);
+    padding: 24px 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,200,255,0.2) transparent;
+  }
+  .toc-sidebar::-webkit-scrollbar { width: 4px; }
+  .toc-sidebar::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.2); border-radius: 2px; }
+
+  .toc-sidebar-title {
+    font-family: Georgia, serif;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .toc-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .toc-item {
+    display: flex; align-items: center; gap: 10px;
+    background: transparent; border: 1px solid transparent;
+    border-radius: 6px; padding: 9px 10px;
+    text-decoration: none; color: var(--text-muted);
+    font-size: 12.5px; transition: all 0.2s;
+  }
+  .toc-item:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.05); }
+  .toc-num {
+    background: rgba(0,200,255,0.1); color: var(--accent);
+    border-radius: 4px; padding: 2px 7px; font-size: 10px;
+    font-family: 'Courier New', monospace; font-weight: bold; flex-shrink: 0;
+  }
+
+  .main-content {
+    flex: 1;
+    min-width: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px;
+  }
+
+  @media (max-width: 900px) {
+    .page-body { flex-direction: column; }
+    .toc-sidebar { width: 100%; min-width: unset; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--card-border); }
+    .toc-grid { flex-direction: row; flex-wrap: wrap; }
+    .toc-item { flex: 1 1 180px; }
+  }
+
+  .section { margin-bottom: 64px; }
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .section-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .icon-blue { background: rgba(0,200,255,0.12); }
+  .icon-green { background: rgba(0,229,160,0.12); }
+  .icon-orange { background: rgba(255,107,53,0.12); }
+  .icon-purple { background: rgba(167,139,250,0.12); }
+  .icon-gold { background: rgba(245,200,66,0.12); }
+  .section-title {
+    font-family: Georgia, 'Times New Roman', Cambria, serif;
+    font-size: clamp(20px, 2.5vw, 28px); color: #fff;
+  }
+  .section-subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 12px; padding: 28px; margin-bottom: 20px;
+  }
+  .card h3 {
+    font-family: Georgia, serif; font-size: 18px; color: var(--accent);
+    margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0,200,255,0.1);
+  }
+  .card h4 { font-size: 14px; color: var(--text); margin: 18px 0 10px; font-weight: 600; }
+  .card p { color: var(--text-muted); font-size: 14px; margin-bottom: 14px; }
+  .card ul { padding-left: 20px; margin-bottom: 14px; }
+  .card li { color: var(--text-muted); font-size: 14px; margin-bottom: 6px; }
+  .card strong { color: var(--text); }
+
+  .callout {
+    border-radius: 8px; padding: 16px 20px; margin: 16px 0;
+    border-left: 3px solid;
+  }
+  .callout-title { font-size: 13px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .callout p { font-size: 13px; margin: 0; }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.warn .callout-title { color: var(--accent3); }
+  .callout.warn p { color: #fca97a; }
+  .callout.tip { background: var(--tip-bg); border-color: var(--tip-border); }
+  .callout.tip .callout-title { color: var(--accent2); }
+  .callout.tip p { color: #6ee7b7; }
+  .callout.note { background: var(--note-bg); border-color: var(--note-border); }
+  .callout.note .callout-title { color: var(--accent); }
+  .callout.note p { color: #7ee8fa; }
+  .callout.exam { background: var(--exam-bg); border-color: var(--exam-border); }
+  .callout.exam .callout-title { color: var(--accent4); }
+  .callout.exam p { color: #c4b5fd; }
+  .callout.best { background: var(--best-bg); border-color: var(--best-border); }
+  .callout.best .callout-title { color: var(--gold); }
+  .callout.best p { color: #fde68a; }
+
+  .code-block {
+    background: #060e1c; border: 1px solid rgba(0,200,255,0.15);
+    border-radius: 8px; overflow: hidden; margin: 16px 0;
+  }
+  .code-header {
+    background: rgba(0,200,255,0.06); border-bottom: 1px solid rgba(0,200,255,0.1);
+    padding: 8px 16px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .code-lang { font-size: 11px; color: var(--accent); font-family: monospace; text-transform: uppercase; letter-spacing: 0.5px; }
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; } .dot-y { background: #febc2e; } .dot-g { background: #28c840; }
+  .code-body {
+    padding: 16px 20px; font-family: 'Courier New', monospace; font-size: 13px;
+    line-height: 1.7; color: #c4b5fd; white-space: pre-wrap; word-break: break-word;
+  }
+  .code-body .comment { color: var(--text-dim); }
+  .code-body .cmd { color: var(--accent2); }
+  .code-body .param { color: var(--accent); }
+  .code-body .val { color: var(--gold); }
+  .code-body .path { color: #fca97a; }
+
+  .flow { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 24px; margin: 16px 0; }
+  .flow-title { font-family: Georgia, serif; font-size: 15px; color: var(--accent); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(0,200,255,0.1); }
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: flex; gap: 16px; padding: 16px 0;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-num {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(0,200,255,0.12); border: 2px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: bold; color: var(--accent);
+    font-family: 'Courier New', monospace; margin-bottom: 28px;
+  }
+  .flow-content { padding-top: 8px; padding-bottom: 16px; flex: 1; }
+  .flow-content strong { color: var(--text); display: block; margin-bottom: 6px; font-size: 15px; }
+  .flow-content p { color: var(--text-muted); font-size: 14px; margin-bottom: 0; }
+
+  .hflow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 20px 0; }
+  .hflow-box {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 8px; padding: 10px 16px; font-size: 13px; color: var(--text-muted);
+    text-align: center; flex: 1; min-width: 110px;
+  }
+  .hflow-box small { display: block; font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+  .hflow-box.active { border-color: rgba(0,200,255,0.4); color: var(--accent); }
+  .hflow-arrow { color: var(--text-dim); font-size: 18px; flex-shrink: 0; }
+
+  .arch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .arch-box {
+    border-radius: 8px; padding: 12px 20px;
+    text-align: center; font-size: 13px; font-weight: 500;
+  }
+  .arch-box small { display: block; font-size: 10px; opacity: 0.7; margin-top: 3px; font-weight: 400; }
+  .abox-blue { background: rgba(0,200,255,0.12); border: 1px solid rgba(0,200,255,0.3); color: #7ee8fa; }
+  .abox-green { background: rgba(0,229,160,0.12); border: 1px solid rgba(0,229,160,0.3); color: #6ee7b7; }
+  .abox-orange { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.3); color: #fca97a; }
+  .abox-purple { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); color: #c4b5fd; }
+  .abox-gold { background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.3); color: #fde68a; }
+  .arch-connector { text-align: center; color: var(--text-dim); font-size: 22px; line-height: 1; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .cmp-box { border-radius: 8px; padding: 18px; }
+  .cmp-box h5 { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .cmp-box ul { padding-left: 18px; } .cmp-box li { font-size: 13px; margin-bottom: 6px; }
+  .cmp-a { background: rgba(0,200,255,0.06); border: 1px solid rgba(0,200,255,0.2); }
+  .cmp-a h5 { color: var(--accent); } .cmp-a li { color: #7ee8fa; }
+  .cmp-b { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.2); }
+  .cmp-b h5 { color: var(--accent4); } .cmp-b li { color: #c4b5fd; }
+  .cmp-c { background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.2); }
+  .cmp-c h5 { color: var(--accent2); } .cmp-c li { color: #6ee7b7; }
+  .cmp-d { background: rgba(245,200,66,0.06); border: 1px solid rgba(245,200,66,0.2); }
+  .cmp-d h5 { color: var(--gold); } .cmp-d li { color: #fde68a; }
+
+  .strip-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 6px; padding: 12px 18px; margin-bottom: 8px;
+  }
+  .strip-label { font-size: 12px; color: var(--text-dim); min-width: 190px; flex-shrink: 0; }
+  .strip-val { font-size: 13px; color: var(--text); flex: 1; }
+  .strip-badge { font-size: 11px; padding: 2px 10px; border-radius: 10px; border: 1px solid; flex-shrink: 0; }
+  .sb-ok { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.07); }
+  .sb-warn { border-color: var(--accent3); color: var(--accent3); background: rgba(255,107,53,0.07); }
+  .sb-info { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.07); }
+  .sb-purple { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.07); }
+  .sb-gold { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.07); }
+  .sb-best { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.07); }
+
+  .status-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 16px; font-size: 12px; border: 1px solid; }
+  .sp-green { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.08); }
+  .sp-red { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
+  .sp-yellow { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.08); }
+  .sp-blue { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.08); }
+  .sp-purple { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.08); }
+
+  .tool-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .tool-table th {
+    background: rgba(0,200,255,0.1); color: var(--accent);
+    padding: 10px 16px; text-align: left; font-size: 13px;
+    border-bottom: 1px solid rgba(0,200,255,0.2);
+  }
+  .tool-table td {
+    padding: 10px 16px; font-size: 13px; color: var(--text-muted);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .tool-table tr:hover td { background: rgba(0,200,255,0.03); }
+
+  .job-line {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 6px; padding: 10px 16px; margin-bottom: 8px;
+  }
+  .job-id { font-family: monospace; font-size: 12px; color: var(--accent); min-width: 60px; }
+  .job-name { font-size: 13px; color: var(--text); flex: 1; }
+  .job-type { font-size: 11px; padding: 2px 10px; border-radius: 10px; border: 1px solid; }
+  .jt-snap { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.07); }
+  .jt-copy { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,160,0.07); }
+  .jt-stream { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.07); }
+
+  .qa-block { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .qa-q {
+    background: rgba(0,200,255,0.08); border-bottom: 1px solid rgba(0,200,255,0.15);
+    padding: 14px 18px; font-size: 14px; color: #7ee8fa; font-weight: 500;
+  }
+  .qa-q::before { content: 'Q  '; opacity: 0.5; font-family: monospace; }
+  .qa-a { padding: 14px 18px; font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+  .qa-a::before { content: 'A  '; color: var(--accent2); font-weight: bold; font-family: monospace; }
+
+  .divider { border: none; border-top: 1px solid var(--card-border); margin: 40px 0; }
+  code {
+    font-family: 'Courier New', Courier, monospace;
+    background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.15);
+    color: var(--accent); padding: 1px 6px; border-radius: 3px; font-size: 12.5px;
+  }
+
+  .highlight-box {
+    border: 1px solid rgba(0,200,255,0.3); border-radius: 10px;
+    padding: 20px 24px; margin: 16px 0;
+    background: rgba(0,200,255,0.05);
+  }
+  .highlight-box h4 { color: var(--accent); margin-bottom: 10px; font-size: 15px; }
+  .highlight-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 0; }
+
+  .author-section { background: linear-gradient(135deg, #0a1628, #0d2040); border-top: 1px solid var(--card-border); padding: 60px 48px; }
+  .author-title { font-family: Georgia, serif; font-size: 22px; color: var(--accent); margin-bottom: 28px; text-align: center; }
+  .author-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; padding: 36px;
+    max-width: 800px; margin: 0 auto 28px; display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;
+  }
+  .author-avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center; font-size: 36px; flex-shrink: 0;
+  }
+  .author-info { flex: 1; min-width: 240px; }
+  .author-name { font-family: Georgia, serif; font-size: 22px; color: #fff; margin-bottom: 4px; }
+  .author-role { color: var(--accent); font-size: 14px; margin-bottom: 14px; }
+  .author-bio { color: var(--text-muted); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .badge { background: var(--navy-light); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 12px; font-size: 11px; color: var(--text-muted); }
+  .badge.cv { border-color: var(--accent4); color: var(--accent4); }
+  .badge.veeam { border-color: var(--accent2); color: var(--accent2); }
+  .badge.nb { border-color: var(--accent3); color: var(--accent3); }
+  .badge.netapp { border-color: var(--accent); color: var(--accent); }
+  .contact-card {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.25);
+    border-radius: 8px; padding: 10px 18px; text-decoration: none;
+    color: var(--accent); font-size: 14px; transition: all 0.2s;
+  }
+  .contact-card:hover { background: rgba(0,200,255,0.15); }
+  .disclaimer { background: var(--warn-bg); border: 1px solid rgba(255,107,53,0.25); border-radius: 8px; padding: 18px 24px; max-width: 800px; margin: 0 auto; }
+  .disclaimer p { font-size: 13px; color: #fca97a; line-height: 1.6; }
+  footer { background: #060e1c; border-top: 1px solid var(--card-border); padding: 24px 48px; text-align: center; color: var(--text-dim); font-size: 12px; }
+
+  .upgrade-box {
+    background: rgba(245,200,66,0.05); border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 10px; padding: 20px 24px; margin: 16px 0;
+  }
+  .upgrade-box h4 { color: var(--gold); margin-bottom: 10px; font-size: 14px; }
+  .upgrade-box p, .upgrade-box li { color: #fde68a; font-size: 13px; }
+  .upgrade-box ul { padding-left: 18px; margin-top: 8px; }
+  .upgrade-box li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">🌐 Commvault Tutorial 11</div>
+  <a href="#network-tools">Network Tools</a>
+  <a href="#cvping">CVPing &amp; Telnet</a>
+  <a href="#network-test-tool">CV Network Test Tool</a>
+  <a href="#wireshark">Wireshark / TCPDump</a>
+  <a href="#vsa-migration">VSA Migration</a>
+  <a href="#gcp-overview">GCP Overview</a>
+  <a href="#gcp-lab-setup">GCP Lab Setup</a>
+  <a href="#gcp-service-account">Service Account &amp; JSON</a>
+  <a href="#gcp-cloud-library">GCP Cloud Library</a>
+  <a href="#gcp-vm-backup">GCP VM Backup &amp; Restore</a>
+  <a href="#gcp-object-storage">GCP Object Storage Backup</a>
+  <a href="#best-practices">Best Practices</a>
+  <a href="#interview">Interview Q&amp;A</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🌐 Tutorial 11 · Network Troubleshooting, VSA Migration &amp; GCP Backup</div>
+  <h1>Commvault <span>Network Troubleshooting</span>,<br>VSA Migration &amp; GCP Cloud Backup</h1>
+  <p class="hero-desc">A comprehensive deep-dive into Commvault's built-in network diagnostic tools — ping, CVPing, CV Network Test Tool, Wireshark, and TCPDump — followed by VSA proxy migration procedures and complete hands-on coverage of GCP (Google Cloud Platform) VM backup, restore, and object storage (Cloud Storage bucket) backup and restore with service account authentication.</p>
+  <div class="hero-tags">
+    <span class="tag blue">🔧 Network Troubleshooting Tools</span>
+    <span class="tag green">📡 CVPing &amp; CV Network Test Tool</span>
+    <span class="tag orange">🦈 Wireshark / TCPDump</span>
+    <span class="tag purple">🔄 VSA Proxy Migration</span>
+    <span class="tag blue">☁ GCP VM Agentless Backup</span>
+    <span class="tag green">🪣 GCP Object Storage Backup</span>
+    <span class="tag gold">🔑 Service Account &amp; JSON Auth</span>
+  </div>
+</div>
+
+<!-- PAGE BODY: sidebar + content -->
+<div class="page-body">
+
+<!-- LEFT SIDEBAR TOC -->
+<aside class="toc-sidebar">
+  <div class="toc-sidebar-title">&#128203; Contents</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#network-tools"><span class="toc-num">01</span> Network Troubleshooting Overview</a>
+    <a class="toc-item" href="#cvping"><span class="toc-num">02</span> Ping, Telnet &amp; CVPing</a>
+    <a class="toc-item" href="#network-test-tool"><span class="toc-num">03</span> CV Network Test Tool</a>
+    <a class="toc-item" href="#wireshark"><span class="toc-num">04</span> Wireshark &amp; TCPDump</a>
+    <a class="toc-item" href="#vsa-migration"><span class="toc-num">05</span> VSA Proxy Migration</a>
+    <a class="toc-item" href="#gcp-overview"><span class="toc-num">06</span> GCP VM Backup Overview</a>
+    <a class="toc-item" href="#gcp-lab-setup"><span class="toc-num">07</span> GCP Lab Setup</a>
+    <a class="toc-item" href="#gcp-service-account"><span class="toc-num">08</span> Service Account &amp; JSON</a>
+    <a class="toc-item" href="#gcp-cloud-library"><span class="toc-num">09</span> GCP Cloud Library Config</a>
+    <a class="toc-item" href="#gcp-vm-backup"><span class="toc-num">10</span> GCP VM Backup &amp; Restore</a>
+    <a class="toc-item" href="#gcp-object-storage"><span class="toc-num">11</span> GCP Object Storage Backup</a>
+    <a class="toc-item" href="#best-practices"><span class="toc-num">12</span> Best Practices</a>
+    <a class="toc-item" href="#interview"><span class="toc-num">13</span> Interview Q&amp;A</a>
+  </div>
+</aside>
+
+<div class="main-content">
+
+<!-- ===== PART 1: NETWORK TROUBLESHOOTING ===== -->
+
+<!-- SECTION 1: OVERVIEW -->
+<section id="network-tools" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🔧</div>
+    <div>
+      <div class="section-title">Network Troubleshooting — Why It Matters</div>
+      <div class="section-subtitle">Acting as an SME advocate — building evidence to get the network team to investigate</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The Real-World Challenge</h3>
+    <p>As a Commvault SME or backup admin, you will encounter situations where backup jobs fail or a media agent goes offline intermittently. Log analysis points to a network connectivity issue — but when you escalate to the network team, they say <strong>"everything is fine on our end"</strong> and refuse to investigate further.</p>
+
+    <div class="highlight-box">
+      <h4>🎯 Your Role as Backup SME</h4>
+      <p>You cannot simply show Commvault log error messages to the network team — they need solid, tool-generated evidence. Your job is to run the right diagnostic tools, capture the output, and present it as <strong>proof</strong> that forces the network team to begin their own investigation. The tools below give you exactly that evidence.</p>
+    </div>
+
+    <h4>Common Connectivity Issues in Commvault Environments</h4>
+    <p>Connectivity problems can occur between any two Commvault entities. These include:</p>
+    <div class="status-row">
+      <span class="status-pill sp-blue">CommServe ↔ Media Agent</span>
+      <span class="status-pill sp-blue">CommServe ↔ VSA Proxy</span>
+      <span class="status-pill sp-blue">CommServe ↔ Client</span>
+      <span class="status-pill sp-blue">Media Agent ↔ Client</span>
+      <span class="status-pill sp-blue">Media Agent ↔ VSA Proxy</span>
+      <span class="status-pill sp-blue">VSA Proxy ↔ ESXi Host</span>
+    </div>
+
+    <h4>Common Root Causes of Network Issues</h4>
+    <ul>
+      <li><strong>Firewall blocking ports:</strong> Windows Defender Firewall or network firewall blocking Commvault ports 8400/8403</li>
+      <li><strong>NSG (Network Security Group) rules:</strong> For cloud-hosted agents, Azure/GCP/AWS NSG rules may block traffic</li>
+      <li><strong>MTU mismatch:</strong> One server using MTU 9000 (jumbo frames), another using MTU 1500 — causes TCP resets</li>
+      <li><strong>Degraded hardware:</strong> Failing NIC card, loose cable, faulty switch port, or degraded NIC firmware/drivers</li>
+      <li><strong>Intermittent TCP resets:</strong> Connection between two entities is being reset, causing media agent to go offline intermittently or backup jobs to go into pending state</li>
+      <li><strong>Wrong IP address:</strong> Human error — incorrect destination IP configured (seen in lab demo)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Toolkit Overview — All Network Diagnostic Tools</h3>
+    <table class="tool-table">
+      <tr>
+        <th>Tool</th>
+        <th>Purpose</th>
+        <th>Platform</th>
+        <th>Use Case</th>
+      </tr>
+      <tr>
+        <td><strong>Ping</strong></td>
+        <td>Basic reachability check — packet loss, latency</td>
+        <td>Windows &amp; Linux</td>
+        <td>First check — is the host even reachable? May be disabled (ICMP blocked)</td>
+      </tr>
+      <tr>
+        <td><strong>Telnet</strong></td>
+        <td>Port-level connectivity test</td>
+        <td>Windows &amp; Linux</td>
+        <td>Verify ports 8400/8403 are open and reachable. May be blocked by security policy</td>
+      </tr>
+      <tr>
+        <td><strong>CVPing</strong></td>
+        <td>Commvault-native port connectivity test — wrapper of telnet</td>
+        <td>Windows &amp; Linux</td>
+        <td>When telnet is blocked, use CVPing. Bundled with every Commvault agent install</td>
+      </tr>
+      <tr>
+        <td><strong>Netstat</strong></td>
+        <td>Verify local port is listening</td>
+        <td>Windows &amp; Linux</td>
+        <td>Confirm port 8400 is actually in LISTENING state on the target machine</td>
+      </tr>
+      <tr>
+        <td><strong>CV Network Test Tool</strong></td>
+        <td>Measure network throughput (bandwidth) between two Commvault entities</td>
+        <td>Windows (GUI) &amp; Linux (CLI)</td>
+        <td>Backup slowness investigation — prove bandwidth is insufficient to network team</td>
+      </tr>
+      <tr>
+        <td><strong>Traceroute / Tracert</strong></td>
+        <td>Show hop-by-hop routing path between two hosts</td>
+        <td>Linux (traceroute) &amp; Windows (tracert)</td>
+        <td>Show network team how many hops between servers and where latency is introduced</td>
+      </tr>
+      <tr>
+        <td><strong>Wireshark</strong></td>
+        <td>Packet-level capture and analysis — find TCP resets and connection drops</td>
+        <td>Windows</td>
+        <td>Last resort when all other tools show "OK" but intermittent failures persist</td>
+      </tr>
+      <tr>
+        <td><strong>TCPDump</strong></td>
+        <td>Linux equivalent of Wireshark — command-line packet capture</td>
+        <td>Linux</td>
+        <td>Capture packets on Linux Media Agents, analyze offline using Wireshark</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 2: CVPING AND TELNET -->
+<section id="cvping" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">📡</div>
+    <div>
+      <div class="section-title">Ping, Telnet, Netstat &amp; CVPing</div>
+      <div class="section-subtitle">First-line connectivity checks — verifying ports and host reachability</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Ping — Basic Reachability</h3>
+    <p>The most common starting point. Use ping to verify basic IP connectivity between two Commvault entities. It also reveals packet loss and intermittent timeouts, which indicate dropped packets on the network path.</p>
+    <div class="callout warn">
+      <div class="callout-title">⚠ ICMP Often Disabled at Customers</div>
+      <p>Ping relies on the ICMP protocol, which most enterprise customers disable on their firewalls and network devices for security reasons. If ping is blocked, do not assume connectivity is broken — move to CVPing or telnet which use TCP ports instead.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">cmd/bash — Ping Examples</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Basic ping from CommServe to Media Agent</span>
+<span class="cmd">ping</span> <span class="val">192.168.1.110</span>
+
+<span class="comment"># Continuous ping (useful for intermittent issues — captures drops)</span>
+<span class="cmd">ping</span> -t <span class="val">192.168.1.110</span>           <span class="comment"># Windows: -t for continuous</span>
+<span class="cmd">ping</span> -c 100 <span class="val">192.168.1.110</span>      <span class="comment"># Linux: -c for count</span>
+
+<span class="comment"># What to look for in output:</span>
+<span class="comment"># "Request timed out" = packet dropped or ICMP blocked</span>
+<span class="comment"># "TTL expired" = routing loop or max hops exceeded</span>
+<span class="comment"># High latency (&gt;100ms) on same LAN = network congestion or bad hardware</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Netstat — Verify Port is Listening Locally</h3>
+    <p>Before diagnosing external connectivity, always verify the Commvault service is actually listening on port 8400/8403 on the target machine. A port that isn't listening cannot be reached regardless of firewall settings.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">cmd/bash — Netstat Commands</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Windows — check if port 8400 is listening</span>
+<span class="cmd">netstat</span> -enob | <span class="cmd">findstr</span> <span class="val">8400</span>
+<span class="comment"># Switches: -e (ethernet stats), -n (numeric), -o (PID), -b (process name)</span>
+<span class="comment"># Look for: 0.0.0.0:8400 ... LISTENING</span>
+
+<span class="comment"># Linux — equivalent command</span>
+<span class="cmd">netstat</span> -tulpn | <span class="cmd">grep</span> <span class="val">8400</span>
+<span class="comment"># Switches: -t (TCP), -u (UDP), -l (listening), -p (PID), -n (numeric)</span>
+<span class="comment"># Look for: 0.0.0.0:8400 ... LISTEN</span>
+
+<span class="comment"># If port is NOT listening:</span>
+<span class="comment"># Check if Commvault services are running</span>
+<span class="comment"># Restart: commvault restart (Linux) or services.msc (Windows)</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>CVPing — Commvault's Built-in Port Connectivity Tool</h3>
+    <p>CVPing is a Commvault-provided binary that tests port-level TCP connectivity between two Commvault entities. It is the equivalent of telnet for port testing but is always available since it ships with every Commvault agent installation. Use it when telnet is blocked by security policy.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">Binary Location</span>
+      <span class="strip-val">Commvault Base Folder — the installation directory (e.g., <code>C:\Program Files\Commvault\ContentStore\Base\</code> on Windows, <code>/opt/commvault/Base/</code> on Linux)</span>
+      <span class="strip-badge sb-info">Base Folder</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Default Port Tested</span>
+      <span class="strip-val">Port 8400 by default if no port is specified. You can specify other ports explicitly.</span>
+      <span class="strip-badge sb-ok">Port 8400 Default</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Available On</span>
+      <span class="strip-val">Every Commvault entity — CommServe, Media Agent, Client, VSA Proxy. Wherever a Commvault agent is installed.</span>
+      <span class="strip-badge sb-ok">All Entities</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">cmd/bash — CVPing Usage</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Run CVPing from CommServe to Media Agent on port 8400 (default)</span>
+<span class="cmd">cvping</span> <span class="val">192.168.1.110</span>
+
+<span class="comment"># Run CVPing on a specific port</span>
+<span class="cmd">cvping</span> <span class="val">192.168.1.110</span> -port <span class="val">8403</span>
+
+<span class="comment"># On Linux: run from base folder</span>
+<span class="cmd">./cvping</span> <span class="val">192.168.1.108</span>
+
+<span class="comment"># Expected output when port is OPEN:</span>
+<span class="comment"># "Connected to 192.168.1.110 on port 8400 successfully"</span>
+
+<span class="comment"># Expected output when port is BLOCKED:</span>
+<span class="comment"># "Connection timed out" or "Connection refused"</span>
+
+<span class="comment"># Troubleshooting CVPing failure when services are running:</span>
+<span class="comment"># 1. Verify correct IP (human error is common — wrong IP gives same timeout)</span>
+<span class="comment"># 2. Check Windows Defender Firewall (may block even if NSG is open)</span>
+<span class="comment"># 3. Check network/corporate firewall between the two servers</span>
+<span class="comment"># 4. For cloud: check NSG/VPC firewall rules — ports 8400, 8403 bidirectional</span></div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Real-World Mistake — Wrong IP Address</div>
+      <p>In the lab demo, CVPing failed even though services were running and Defender was off. Root cause: the destination IP was entered as <code>192.168.1.160</code> instead of the correct <code>192.168.1.110</code>. Human error like this is extremely common. Always double-check the IP using <code>ipconfig</code> (Windows) or <code>ip addr</code> (Linux) on the destination machine before escalating.</p>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Check Readiness in CommCell Console</div>
+      <p>Another quick option: right-click any client in the CommCell Console → <strong>Check Readiness</strong>. This internally performs a port connectivity check (8400/8403) from the CommServe to that client and displays a Pass/Fail result. It is a fast first-check before running manual CVPing.</p>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Firewall Escalation Path</div>
+      <p>If ports are blocked: (1) For Windows OS firewall — ask the OS/Windows team to open ports 8400 and 8403 as inbound rules in Windows Defender Firewall (or disable it temporarily with their consent). (2) For corporate/network firewall — raise a request with the network team to open those ports bidirectionally. (3) For cloud NSG (Azure/GCP/AWS) — ask the cloud team to add inbound rules for 8400 and 8403. Never take unilateral action on production firewalls without change management approval.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 3: CV NETWORK TEST TOOL -->
+<section id="network-test-tool" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">📊</div>
+    <div>
+      <div class="section-title">CV Network Test Tool — Measuring Throughput</div>
+      <div class="section-subtitle">Identifying slow backups caused by insufficient network bandwidth between Commvault entities</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is the CV Network Test Tool?</h3>
+    <p>The CV Network Test Tool measures the actual <strong>network throughput</strong> (bandwidth in MB/s) between two Commvault entities. It is used when backups are running slowly and you suspect the network is the bottleneck. The results give you concrete data to show the network team.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">Windows</span>
+      <span class="strip-val">GUI-based application. Located in the Commvault Base folder. Search for <code>cvnetworktesttool</code> and run as Administrator.</span>
+      <span class="strip-badge sb-ok">GUI Available</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Linux</span>
+      <span class="strip-val">Command-line only (no GUI). Run as <code>./cvnetworktesttool</code> from the Base folder. Case-sensitive filename.</span>
+      <span class="strip-badge sb-info">CLI Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Default Port Used</span>
+      <span class="strip-val">Port <strong>25000</strong>. This port must be open between the two machines. In restricted environments where 25000 is blocked, stop Commvault services and temporarily use port 8400 or 8403 instead.</span>
+      <span class="strip-badge sb-warn">Port 25000 Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Good Throughput</span>
+      <span class="strip-val">156 MB/s or higher on a standard 1 GbE LAN (as demonstrated in the lab). Below 50 MB/s is considered slow; below 20 MB/s is severely degraded.</span>
+      <span class="strip-badge sb-ok">156 MB/s = Good</span>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 How It Works</div>
+      <p>One machine runs in <strong>Server Mode</strong> (listens on port 25000), the other runs in <strong>Client Mode</strong> (connects to the server IP). The tool sends data back and forth and calculates throughput in MB/s. Always run in <strong>both directions</strong> (A→B and B→A) to get a complete picture — throughput can differ by direction due to asymmetric routing or NIC duplex mismatch.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running the Tool — Windows GUI</h3>
+    <div class="flow">
+      <div class="flow-title">Windows Media Agent ↔ CommServe Throughput Test</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Open Tool on Server Machine (e.g., Windows Media Agent)</strong>
+            <p>Base Folder → search for <code>cvnetworktesttool</code> → Right-click → Run as Administrator. In the tool, go to the <strong>Network Check</strong> tab (skip Lookup and Service Check tabs). Select <strong>Server Mode</strong>. Enter the <strong>Bind IP</strong> — this is the IP address of the current machine on the backup network interface. Click <strong>Start</strong>. The server is now listening on port 25000.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Open Tool on Client Machine (e.g., CommServe)</strong>
+            <p>Base Folder → open <code>cvnetworktesttool</code> as Administrator. Network Check tab → Select <strong>Client Mode</strong>. Enter the <strong>Server IP</strong> (IP of the machine running in Server Mode — the Media Agent). Leave port as 25000 default. Click <strong>Run Test</strong>.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Review Throughput Results</strong>
+            <p>The tool displays the calculated throughput in MB/s. Run <strong>multiple iterations</strong> — do not rely on a single result. First iterations can be inaccurate (as seen in lab: first run showed 39 MB/s, second run showed the correct 156 MB/s). Take the consistent result across 2–3 runs as the actual throughput value.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Reverse Direction Test</strong>
+            <p>Swap roles: CommServe in Server Mode, Media Agent in Client Mode. Run the test again. Compare results in both directions — they should be similar. If one direction is significantly slower, it points to a duplex mismatch or asymmetric routing issue on that path.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Always Test in Both Directions</div>
+      <p>Network issues can be directional. Always test A→B and B→A separately. In the lab, throughput was consistent at 156 MB/s in both directions — but in production with NIC duplex mismatches or asymmetric QoS policies, you will see different values per direction. Both results should be shared with the network team.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running the Tool — Linux CLI</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — Linux Media Agent: cvnetworktesttool CLI</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Navigate to the Commvault base folder</span>
+<span class="cmd">cd</span> <span class="path">/opt/commvault/Base/</span>
+
+<span class="comment"># Run the tool (case-sensitive on Linux)</span>
+<span class="cmd">./cvnetworktesttool</span>
+
+<span class="comment"># Menu options presented:</span>
+<span class="comment"># 1 - Lookup (DNS resolution check)</span>
+<span class="comment"># 2 - Service Check</span>
+<span class="comment"># 3 - Network Check (Client Mode) — use this for throughput test</span>
+<span class="comment"># 4 - Network Check (Server Mode) — use this to listen</span>
+<span class="comment"># 5 - Exit</span>
+
+<span class="comment"># TO RUN AS SERVER (Linux Media Agent listens):</span>
+<span class="comment"># Select option 4</span>
+<span class="comment"># Enter Bind IP: IP of this Linux machine (e.g., 192.168.1.108)</span>
+<span class="comment"># Tool listens on port 25000 — "Server is listening..."</span>
+
+<span class="comment"># TO RUN AS CLIENT (CommServe connects to Linux MA):</span>
+<span class="comment"># Select option 3</span>
+<span class="comment"># Select option 1 to Execute</span>
+<span class="comment"># Enter Server IP: IP of the CommServe (e.g., 192.168.1.103)</span>
+<span class="comment"># Tool calculates throughput and displays result in MB/s</span>
+
+<span class="comment"># Run multiple iterations — first result may be inaccurate</span>
+<span class="comment"># Select option 3 again → option 1 to re-execute for next iteration</span></div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Port 25000 Workaround for Restricted Environments</div>
+      <p>Some customers only allow Commvault ports 8400 and 8403. Port 25000 will be blocked. Workaround: schedule a maintenance window, stop all Commvault services on both machines, then run the CV Network Test Tool using port 8400 (enter it manually instead of the default 25000). After the test, restart services on both machines. This is disruptive but necessary when 25000 is not permitted.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 4: WIRESHARK AND TCPDUMP -->
+<section id="wireshark" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🦈</div>
+    <div>
+      <div class="section-title">Wireshark &amp; TCPDump — Deep Packet Inspection</div>
+      <div class="section-subtitle">Last-resort tool when all other checks pass but intermittent failures persist</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>When to Use Wireshark / TCPDump</h3>
+    <p>Use Wireshark (Windows) or TCPDump (Linux) only after exhausting all other tools. The scenario: ping works, CVPing works, CV Network Test Tool shows good throughput, traceroute looks clean — but backups still fail intermittently, or the media agent goes offline randomly. This is when you need packet-level capture to find <strong>TCP connection resets</strong>.</p>
+
+    <div class="highlight-box">
+      <h4>🔍 What to Look for in Wireshark Output</h4>
+      <p><strong>TCP Retransmissions:</strong> These are normal and expected. The network team will tell you to ignore these — they do not indicate a problem by themselves. <strong>TCP Connection Resets (RST flag):</strong> These are critical and must be investigated. Frequent TCP resets between two backup entities will cause jobs to go into pending state, media agents to go offline, or intermittent disconnections. This is the evidence you bring to the network team.</p>
+    </div>
+
+    <h4>Common Causes of TCP Resets</h4>
+    <ul>
+      <li><strong>MTU mismatch:</strong> One server using jumbo frames (MTU 9000) while another uses standard (MTU 1500). The mismatch causes packets to be dropped or reset</li>
+      <li><strong>Degraded NIC hardware:</strong> Failing or degraded NIC card on a physical server — NIC firmware issues, hardware degradation</li>
+      <li><strong>Faulty cable or switch port:</strong> Physical layer issues causing intermittent frame errors</li>
+      <li><strong>Windows NIC driver issues:</strong> Outdated or corrupted NIC drivers causing reset behavior</li>
+      <li><strong>Router or switch configuration:</strong> QoS policies, ACLs, or routing table issues</li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ Real-World Warning — Wireshark Can Crash Degraded Servers</div>
+      <p>In a real customer incident, the instructor ran Wireshark on a CommServe that was already running slowly (degraded hardware). Starting Wireshark further loaded the server, causing it to hang and require a reboot — creating an unexpected outage. <strong>Always:</strong> (1) schedule a downtime window before running Wireshark, (2) involve the Windows/OS team — let them run the tool, (3) stop Commvault services before starting capture if possible, (4) never run Wireshark alone on a production server without on-call support available.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Wireshark — Windows Procedure</h3>
+    <div class="flow">
+      <div class="flow-title">Running Wireshark to Capture Traffic Between CommServe and Media Agent</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Install Wireshark on Both Machines</strong>
+            <p>Download Wireshark installer from wireshark.org. Install on both the CommServe and the Media Agent (or whichever two entities you are investigating). Run the installer wizard with default options — it also installs npcap drivers. A reboot may be requested — schedule accordingly. If machines have no internet, download on a jump server and copy the executable.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Select the Correct Network Interface</strong>
+            <p>Right-click Wireshark → Run as Administrator. On the main screen, click the black dot icon to list network interfaces. Identify the interface where your <strong>backup IP is configured</strong> (e.g., Ethernet 0). Do NOT capture all interfaces — limit to the backup NIC only. To confirm the NIC name: Control Panel → Network Adapters → note the name matching your backup IP.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Start Capture and Generate Traffic</strong>
+            <p>Click the interface to start packet capture. Simultaneously, generate traffic between the two machines — run a backup job, or trigger a package install from CommServe to Media Agent. This creates packets to capture. Start Wireshark on both machines at the same time so you have captures from both ends of the connection.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Apply IP Filter and Analyze</strong>
+            <p>In the Wireshark filter bar, enter: <code>ip.addr == 192.168.1.110</code> (replace with the destination machine's IP). This filters to show only traffic between the two machines. Scroll through the results — dark/black highlighted rows indicate issues. Look specifically for <strong>"TCP RST"</strong> (connection reset) entries. Retransmissions are acceptable; resets are not.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Save as PCAP and Share</strong>
+            <p>File → Save As → give a meaningful name (e.g., <code>cs_to_ma110_backup_capture.pcap</code>). Share the PCAP file with the network team or Commvault Technical Support if they request it. Commvault Support may ask for this file for offline analysis — they will not connect remotely for this step.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>TCPDump — Linux Procedure</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — TCPDump on Linux Media Agent</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Verify tcpdump is installed (available on most Linux distros by default)</span>
+<span class="cmd">which</span> tcpdump
+<span class="comment"># If not found, install: yum install tcpdump (RHEL) or apt install tcpdump (Ubuntu)</span>
+
+<span class="comment"># Identify network interface name</span>
+<span class="cmd">ip addr</span>
+<span class="comment"># Note: interface naming varies — ens33, eth0, ens160, etc.</span>
+
+<span class="comment"># IMPORTANT: Do NOT run tcpdump from the Commvault base folder</span>
+<span class="comment"># The PCAP file can grow very large. Run from a filesystem with free space.</span>
+<span class="cmd">df</span> -h
+<span class="comment"># Find a partition with at least 2-5 GB free (e.g., /var, /tmp)</span>
+
+<span class="comment"># Navigate to free space location</span>
+<span class="cmd">cd</span> <span class="path">/var</span>
+
+<span class="comment"># Run tcpdump — capture on backup interface, save to PCAP file</span>
+<span class="comment"># Syntax: tcpdump -i &lt;interface&gt; -w &lt;output_file.pcap&gt;</span>
+<span class="cmd">tcpdump</span> -i <span class="val">ens33</span> -w <span class="val">ma108_to_cs103_capture.pcap</span>
+<span class="comment"># Press Ctrl+C to stop capture when done</span>
+
+<span class="comment"># Fix permissions before copying</span>
+<span class="cmd">chmod</span> 755 <span class="val">ma108_to_cs103_capture.pcap</span>
+
+<span class="comment"># Copy PCAP to Windows machine for analysis using WinSCP</span>
+<span class="comment"># Connect WinSCP to Linux MA → navigate to /var → copy .pcap to desktop</span>
+
+<span class="comment"># On Windows CommServe (where Wireshark is installed):</span>
+<span class="comment"># Open Wireshark → File → Open → select the .pcap file</span>
+<span class="comment"># Apply filter: ip.addr == 192.168.1.103</span>
+<span class="comment"># Look for dark rows → TCP RST entries</span></div>
+    </div>
+    <div class="callout tip">
+      <div class="callout-title">💡 Analyzing Linux PCAP in Wireshark</div>
+      <p>TCPDump generates .pcap files in the same format as Wireshark captures. You can open them in Wireshark for the same GUI analysis. Simply copy the .pcap file from the Linux machine (via WinSCP or SCP) to any Windows machine with Wireshark installed, then open it with File → Open. The offline analysis process is identical to live capture analysis.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 5: VSA MIGRATION -->
+<section id="vsa-migration" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🔄</div>
+    <div>
+      <div class="section-title">VSA Proxy Migration</div>
+      <div class="section-subtitle">Replacing or decommissioning an existing VSA access node with a new one</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>When VSA Migration Is Needed</h3>
+    <p>There are common scenarios requiring a VSA (Virtual Server Agent) proxy to be replaced: the existing server is being decommissioned, you are migrating from Windows to Linux access node to reduce licensing costs, the current VM is undersized and needs to be replaced with a larger one, or the OS needs upgrading to a newer certified version.</p>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Credentials Are NOT Stored on the VSA</div>
+      <p>A common concern when decommissioning a VSA is: "What happens to the credentials stored on it?" The answer is — <strong>credentials are stored in the Commvault CommServe database</strong>, not on the VSA proxy. You can verify this in Control Panel → Credential Vault — all authentication credentials (cloud managed identities, service accounts, etc.) are stored in the central database. The VSA is just a compute proxy — it holds no sensitive configuration data that would be lost on decommission.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>VSA Migration Steps — Command Center</h3>
+    <div class="flow">
+      <div class="flow-title">Replacing a VSA Access Node (Azure, GCP, VMware, or any hypervisor)</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Deploy and Prepare the New Access Node VM</strong>
+            <p>Create the replacement VM in your cloud or on-premises environment. Verify the OS is in Commvault's supported list for the specific workload (e.g., for Azure VM backup: Windows Server 2019, Oracle Linux, Red Hat Linux). Check the System Requirements Guide in Commvault documentation for your version.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Open Required Ports on the New VM</strong>
+            <p>Ensure ports 8400 and 8403 are open bidirectionally. Port 22 (Linux) or 135/139/445 (Windows) must be open temporarily for push installation. For cloud VMs: add NSG/VPC/Security Group rules before attempting install. For cloud connectivity (e.g., Azure/GCP): ensure the VM has network access to the cloud management endpoints.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Install the Same Packages as the Old VSA</strong>
+            <p>Check what packages are installed on the old VSA: CommCell Console → Client Computers → right-click old VSA → <strong>View Installed Software</strong>. Install exactly the same packages on the new VM via push install (Tools → Add/Remove Software → Install). For Azure VM backup: Media Agent + Virtual Server Agent + IntelliSnap + Storage Accelerator. For GCP VM backup: Virtual Server Agent + Storage Accelerator.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Apply Any Additional Settings</strong>
+            <p>If Commvault Support has previously applied any registry keys, additional settings, or environment-specific customizations on the old VSA, replicate those on the new one. Check the old VSA's additional settings in CommCell Console → Client → Properties → Additional Settings. Copy all custom entries to the new VM.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Edit Hypervisor — Swap the Access Node</strong>
+            <p>Command Center → Protect → Virtualization → select the Hypervisor → Configuration → Edit. Uncheck the old VSA access node and add the new one. Click Save. The hypervisor is now using the new VSA for all backup and restore operations.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Run a Test Backup and Confirm</strong>
+            <p>Trigger a manual backup job using the new VSA. Confirm it completes successfully. Monitor the Job Controller — if it runs as expected, the migration is complete. <strong>Keep the old VSA online for a few days as a rollback option</strong>. Only delete the old VSA from Commvault after confirming multiple successful backup cycles on the new node.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Keep the Old VSA as a Rollback Buffer</div>
+      <p>Do not immediately delete the old VSA from Commvault after the migration. Keep it available for at least a few days. If any unexpected issues arise with the new VSA, you can quickly revert by editing the hypervisor configuration and switching back. Once you confirm multiple successful backup cycles on the new VSA, it is safe to remove the old one.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Dual Interface / Backup Network Configuration</h3>
+    <p>For environments with multiple network interfaces on the access node (e.g., one NIC for backup traffic, another for replication/auxiliary copy), you can configure which IP Commvault uses for which operation.</p>
+    <div class="strip-row">
+      <span class="strip-label">Location in Commvault</span>
+      <span class="strip-val">Control Panel → <strong>Backup Network</strong>. Configure network pairs here — select which IP to use for backup and which for auxiliary copy/replication.</span>
+      <span class="strip-badge sb-info">Control Panel</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">How It Works</span>
+      <span class="strip-val">Define an interface pair: this IP is for backup, that IP is for replication. Commvault auto-detects available IPs. All agents using that access node inherit the same network configuration.</span>
+      <span class="strip-badge sb-ok">Auto-detected</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Prerequisite</span>
+      <span class="strip-val">Both IPs must have network connectivity to their respective destinations. Without connectivity, the jobs will fail regardless of what is configured in Commvault.</span>
+      <span class="strip-badge sb-warn">Connectivity Required</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ===== PART 2: GCP VM BACKUP ===== -->
+
+<!-- SECTION 6: GCP OVERVIEW -->
+<section id="gcp-overview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">☁</div>
+    <div>
+      <div class="section-title">GCP VM Backup — Overview &amp; Architecture</div>
+      <div class="section-subtitle">Why customers use Commvault alongside Google Cloud's native backup tools</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Cloud Coverage — Why GCP?</h3>
+    <p>The majority of enterprise customers worldwide use one of three cloud providers: AWS, Azure, or Google Cloud Platform (GCP). Commvault has strong compatibility with all three. While each cloud has native backup tools, customers prefer Commvault because it provides:</p>
+    <ul>
+      <li><strong>Unified reporting:</strong> A single dashboard for backups across on-premises, AWS, Azure, and GCP</li>
+      <li><strong>Cross-cloud restore:</strong> Restore a GCP VM to Azure or on-premises — not possible with native GCP tools</li>
+      <li><strong>Granular retention control:</strong> Define custom retention per workload, unlike GCP's preset options</li>
+      <li><strong>Enterprise compliance:</strong> Required by many regulatory frameworks to have third-party backup verification</li>
+    </ul>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Agentless VM Backup — Same Principle Across Clouds</div>
+      <p>GCP VM backup in Commvault is <strong>agentless</strong> — just like AWS EC2 and Azure VM backup. You do not install any Commvault agent inside the production VM. Instead, Commvault uses an external <strong>access node (VSA proxy)</strong> running in GCP to orchestrate snapshot-based backups via the GCP API. The production VM can run any OS — Linux, Windows, or otherwise.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>High-Level Architecture</h3>
+    <div class="arch-row">
+      <div class="arch-box abox-orange">Production VMs<small>Any OS (Ubuntu, RHEL, Windows)<br>No Commvault agent<br>Agentless backup</small></div>
+      <div class="arch-connector">→</div>
+      <div class="arch-box abox-purple">GCP Access Node (VSA)<small>Rocky Linux / RHEL / Windows<br>VSA + Storage Accelerator packages<br>Deployed in GCP</small></div>
+      <div class="arch-connector">→</div>
+      <div class="arch-box abox-blue">GCP Cloud Library<small>Google Cloud Storage bucket<br>Nearline storage class<br>Same region as VMs</small></div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-box abox-green">GCP Service Account<small>JSON key file<br>Owner or custom role<br>Authenticates Commvault to GCP API</small></div>
+      <div class="arch-connector">+</div>
+      <div class="arch-box abox-gold">CommServe (on-prem)<small>Commvault management server<br>Command Center configuration<br>Job Controller &amp; reporting</small></div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 GCP Terminology vs Azure/AWS</div>
+      <p>GCP uses different terminology than Azure and AWS. <strong>Project</strong> = Azure Subscription / AWS Account (billing unit). <strong>Instance</strong> = Virtual Machine. <strong>Bucket</strong> = Azure Blob Container / AWS S3 Bucket. <strong>Service Account</strong> = Azure Managed Identity / AWS IAM Role. <strong>Cloud Storage</strong> = Azure Blob Storage / AWS S3. <strong>VPC Firewall Rules</strong> = Azure NSG / AWS Security Groups.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Prerequisites Checklist — GCP VM Backup</h3>
+    <div class="strip-row">
+      <span class="strip-label">Step 1 — List VMs to Protect</span>
+      <span class="strip-val">Identify which GCP VM instances need agentless backup. Discuss with the customer — any OS is supported since backup is agentless from Commvault's side.</span>
+      <span class="strip-badge sb-info">Planning</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 2 — Deploy GCP Access Node</span>
+      <span class="strip-val">Create a GCP VM instance for the access node. Supported OS: Rocky Linux 8, Red Hat Linux, or Windows Server. Deploy in the <strong>same GCP region</strong> as the production VMs.</span>
+      <span class="strip-badge sb-warn">Rocky Linux / RHEL / Windows Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 3 — Open Firewall Ports</span>
+      <span class="strip-val">GCP VPC Firewall Rules: create ingress rules for ports 8400 and 8403 (permanent, all instances in network). Port 22 (Linux) for push install — temporary only. Outbound is open by default in GCP.</span>
+      <span class="strip-badge sb-warn">VPC Firewall Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 4 — Install VSA Packages</span>
+      <span class="strip-val">Push install from CommServe to access node: <strong>Virtual Server Agent + Storage Accelerator</strong>. Storage Accelerator is needed so the VSA can write directly to the GCP Cloud Library without a separate media agent.</span>
+      <span class="strip-badge sb-warn">Both Packages Mandatory</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 5 — Create GCP Service Account</span>
+      <span class="strip-val">GCP Console → IAM → Service Accounts → Create. Assign owner role (or custom role). Download JSON key file — this is the authentication credential for Commvault.</span>
+      <span class="strip-badge sb-warn">JSON File Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 6 — Create Cloud Storage Bucket</span>
+      <span class="strip-val">GCP Console → Cloud Storage → Create Bucket. Select the same region as VMs. Recommended storage class: <strong>Nearline</strong> (best for backup/restore workloads). Standard is for production; Coldline/Archive for long-term retention.</span>
+      <span class="strip-badge sb-info">Nearline Recommended</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Step 7 — Configure in Command Center</span>
+      <span class="strip-val">Cloud hypervisors (GCP, Azure, AWS) can only be configured from <strong>Command Center</strong> — the classic Java CommCell Console does not support this. Create cloud library, plan, and GCP hypervisor in Command Center.</span>
+      <span class="strip-badge sb-purple">Command Center Only</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 7: GCP LAB SETUP -->
+<section id="gcp-lab-setup" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">🖥</div>
+    <div>
+      <div class="section-title">GCP Lab Setup — Creating VMs and Users</div>
+      <div class="section-subtitle">Deploying production VM (Ubuntu) and access node (Rocky Linux) in Google Cloud</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>GCP Free Trial &amp; VM Creation</h3>
+    <p>Google Cloud offers <strong>$300 free credit for 3 months</strong> for new accounts — more generous than Azure's limited $200. Payment details are required at signup, but Google charges a temporary ₹1000 (for Indian accounts) that is refunded when the account is closed. The account will not be auto-charged after trial ends — you must manually upgrade to a paid account.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">Production VM Spec</span>
+      <span class="strip-val">e2-micro (1 vCPU, 1 GB RAM) — sufficient for demo/lab. OS: Ubuntu 22.04 LTS. Disk: 20 GB. No Commvault agent installed — this is the agentless backup target VM.</span>
+      <span class="strip-badge sb-info">Ubuntu — Any OS</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Access Node VM Spec</span>
+      <span class="strip-val">e2-standard-2 (2 vCPU, 4 GB RAM minimum — B2S equivalent). OS: <strong>Rocky Linux 8</strong> (certified by Commvault). Disk: 30 GB+. Commvault VSA + Storage Accelerator will be installed here.</span>
+      <span class="strip-badge sb-warn">Rocky Linux 8 Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Region</span>
+      <span class="strip-val">Deploy both VMs in the same region (e.g., asia-south1 for India). Keeping VMs and cloud library in the same region avoids GCP egress charges for data transfer.</span>
+      <span class="strip-badge sb-best">Same Region = No Egress</span>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 GCP Instance vs VM Naming</div>
+      <p>GCP calls virtual machines <strong>"instances"</strong> — the term "VM instance" is used throughout the GCP console. Machine names must be in <strong>lowercase only</strong> (no uppercase letters allowed). When you click the SSH button on an instance in the GCP console, it opens a browser-based terminal directly connected to that VM — no separate SSH client or key pair setup required initially.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Creating VM Users (Linux — No Default Password)</h3>
+    <p>GCP Linux VMs do not show a username/password creation screen during instance setup. You must create users manually after connecting via the browser console. The steps differ slightly between Ubuntu and Rocky Linux.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — Create User for SSH Access (Ubuntu / Rocky Linux)</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"><span class="comment"># Connect via GCP Console → VM Instances → SSH button</span>
+<span class="comment"># This opens browser terminal — no username/password needed initially</span>
+
+<span class="comment"># Create a new user (Ubuntu uses 'adduser', Rocky/RHEL uses 'useradd')</span>
+<span class="cmd">sudo adduser</span> <span class="val">abdul</span>          <span class="comment"># Ubuntu: adduser (interactive, asks for password)</span>
+<span class="cmd">sudo useradd</span> -m <span class="val">abdul</span>      <span class="comment"># Rocky Linux / RHEL: useradd</span>
+<span class="cmd">sudo passwd</span> <span class="val">abdul</span>          <span class="comment"># Set password for the user</span>
+
+<span class="comment"># Grant sudo (elevated/root) access</span>
+<span class="comment"># Ubuntu: add to 'sudo' group</span>
+<span class="cmd">sudo usermod</span> -aG <span class="val">sudo</span> <span class="val">abdul</span>
+
+<span class="comment"># Rocky Linux / RHEL: add to 'wheel' group</span>
+<span class="cmd">sudo usermod</span> -aG <span class="val">wheel</span> <span class="val">abdul</span>
+
+<span class="comment"># Verify elevated access</span>
+<span class="cmd">su</span> - <span class="val">abdul</span>
+<span class="cmd">sudo whoami</span>          <span class="comment"># Should output: root</span>
+
+<span class="comment"># Enable password authentication for SSH (needed for PuTTY/external SSH)</span>
+<span class="comment"># Edit SSH daemon config</span>
+<span class="cmd">sudo vi</span> <span class="path">/etc/ssh/sshd_config</span>
+
+<span class="comment"># Find and modify these lines:</span>
+<span class="comment">#   PasswordAuthentication no  →  PasswordAuthentication yes</span>
+<span class="comment"># Ubuntu also requires:</span>
+<span class="comment">#   KbdInteractiveAuthentication no  →  KbdInteractiveAuthentication yes</span>
+
+<span class="comment"># Restart SSH service after changes</span>
+<span class="cmd">sudo systemctl restart</span> sshd
+
+<span class="comment"># Now connect from external PuTTY using the GCP instance's External IP</span>
+<span class="comment"># (External IP = Public IP, shown in GCP console VM instances list)</span>
+<span class="comment"># Note: External IP changes every time VM is stopped and started</span>
+<span class="comment"># In production, use static/reserved IP to avoid this</span></div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Simulating Customer Data for Demo</div>
+      <p>On the production VM, create test directories and files to simulate customer data. After backup and restore, verify these files still exist — this proves the backup captured the data correctly. Example: <code>mkdir -p /usr/customer_data</code> then create F1, F2, F3 files inside. After full VM restore, SSH into the restored VM and verify the directory and files are intact.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 8: SERVICE ACCOUNT AND JSON -->
+<section id="gcp-service-account" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">🔑</div>
+    <div>
+      <div class="section-title">GCP Service Account &amp; JSON Authentication</div>
+      <div class="section-subtitle">Creating service accounts, assigning roles, and downloading JSON keys for Commvault</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is a GCP Service Account?</h3>
+    <p>A GCP Service Account is the authentication mechanism for Commvault to interact with GCP APIs. It is equivalent to an Azure Managed Identity or AWS IAM Role. The service account is given specific permissions (roles), and Commvault authenticates using a <strong>JSON key file</strong> downloaded from that service account.</p>
+
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🔵 Owner Role (Highest Privileges)</h5>
+        <ul>
+          <li>Full access to all resources in the GCP project</li>
+          <li>Used for hypervisor (VM backup) configuration</li>
+          <li>Simplest to configure — no custom role creation needed</li>
+          <li>Not recommended for production — too broad</li>
+          <li>Acceptable for lab/test environments</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>🟣 Custom Role (Least Privilege)</h5>
+        <ul>
+          <li>Only the specific permissions Commvault needs</li>
+          <li>Used for cloud library (storage admin for bucket operations)</li>
+          <li>More secure — follows principle of least privilege</li>
+          <li>Requires creating a custom role in GCP IAM</li>
+          <li>Recommended for production environments</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <div class="callout-title">📘 Two Service Accounts — Two JSON Files</div>
+      <p>In the lab, two separate service accounts are created: (1) One with <strong>Owner role</strong> — used for configuring the GCP hypervisor (VM backup). (2) One with <strong>Storage Admin custom role</strong> — used for configuring the GCP Cloud Library (bucket access). You can use a single Owner service account for both, but creating separate accounts demonstrates best practices and how to customize permissions per use case.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Creating a Service Account and Downloading JSON Key</h3>
+    <div class="flow">
+      <div class="flow-title">GCP Console — Service Account Setup for Commvault</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Enable the Cloud Resource Manager API</strong>
+            <p>GCP Console → search for "Cloud Resource Manager API" → Enable. This API allows third-party tools like Commvault to interact with GCP project resources. Without it, the JSON key download may not work and Commvault will be unable to discover resources.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Create the Service Account</strong>
+            <p>GCP Console → IAM &amp; Admin → Service Accounts → Create Service Account. Provide a meaningful name (e.g., <code>commvault-vm-backup</code> or <code>commvault-cloud-library</code>). The Service Account ID is auto-generated — it becomes the email-like identifier (e.g., <code>commvault-vm-backup@my-project.iam.gserviceaccount.com</code>).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Assign a Role to the Service Account</strong>
+            <p>During creation, or via IAM → Grant Access: for VM backup, assign the <strong>Owner</strong> role at project scope. For storage/library access, create a custom role with Storage Admin permissions (IAM → Roles → Create Role → filter by storage admin → add all storage permissions → save). Assign the custom role to the storage service account.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Download the JSON Key File</strong>
+            <p>IAM → Service Accounts → click on the service account → <strong>Keys</strong> tab → Add Key → Create New Key → select <strong>JSON</strong> format → Create. A JSON file downloads immediately. <strong>Store it securely</strong> — it cannot be re-downloaded and grants access to your GCP project. This file is uploaded into Commvault as the authentication credential.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠ JSON File is a One-Time Download</div>
+      <p>Once you close the download dialog, the JSON key cannot be downloaded again from GCP. If you lose it, you must generate a new key (Keys tab → Add Key → Create New Key). Treat the JSON file like a password — store it in a secure location (password manager, secrets vault). Anyone with this file can access your GCP project resources with the permissions granted to that service account.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What's Inside the JSON Key File</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON — GCP Service Account Key Structure</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body">{
+  "type": "service_account",
+  "project_id": "<span class="val">my-first-project-123456</span>",
+  "private_key_id": "<span class="val">abc123def456...</span>",
+  "private_key": "-----BEGIN RSA PRIVATE KEY-----\n<span class="val">...</span>\n-----END RSA PRIVATE KEY-----\n",
+  "client_email": "<span class="val">commvault-vm-backup@my-first-project-123456.iam.gserviceaccount.com</span>",
+  "client_id": "<span class="val">123456789012345678901</span>",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "<span class="val">https://www.googleapis.com/robot/v1/metadata/x509/...</span>"
+}
+
+<span class="comment">// Key fields to identify which service account the JSON belongs to:</span>
+<span class="comment">// "project_id" — your GCP project identifier</span>
+<span class="comment">// "client_email" — the service account ID (email format)</span>
+<span class="comment">// The private_key is the actual authentication secret</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 9: GCP CLOUD LIBRARY -->
+<section id="gcp-cloud-library" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🪣</div>
+    <div>
+      <div class="section-title">GCP Cloud Library Configuration</div>
+      <div class="section-subtitle">Creating the Cloud Storage bucket and configuring it as a Commvault cloud library</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Create the GCP Cloud Storage Bucket</h3>
+    <p>A GCP Cloud Storage bucket is the object storage container that Commvault uses as its cloud library. Backup data is written here by the access node via the Storage Accelerator package.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">Bucket Naming</span>
+      <span class="strip-val">Bucket names must be globally unique across all GCP projects worldwide. Choose a meaningful name (e.g., <code>commvault-cloud-storage-prod</code>). Cannot be changed after creation.</span>
+      <span class="strip-badge sb-warn">Must Be Globally Unique</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Location Type</span>
+      <span class="strip-val">Select <strong>Region</strong> (single region) for lab/cost savings. Multi-Region provides geo-redundancy but costs more. Select the same region as your access node and production VMs (e.g., asia-south1).</span>
+      <span class="strip-badge sb-info">Same Region as VMs</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Storage Class</span>
+      <span class="strip-val"><strong>Nearline</strong> is recommended for Commvault backups — optimized for data accessed less than once per month (infrequent access, good for backup/restore). Standard is for frequently accessed data. Coldline/Archive for long-term archival only.</span>
+      <span class="strip-badge sb-ok">Nearline for Backups</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Public Access</span>
+      <span class="strip-val">Leave public access prevention <strong>enabled</strong> (default). Commvault connects via API with the service account credentials — no public internet exposure needed for the bucket.</span>
+      <span class="strip-badge sb-ok">Keep Private</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bucket Permissions — Critical Lesson</h3>
+    <div class="callout warn">
+      <div class="callout-title">⚠ Bucket Does NOT Automatically Inherit Project-Level Permissions</div>
+      <p>A critical discovery from the lab: even if you create a service account at the project level and assign it the Storage Admin role, the GCP bucket will <strong>not automatically inherit</strong> those permissions. If you configure the cloud library in Commvault without explicitly granting the service account access to the bucket, you will get: <strong>"Access denied. storage.objects.list permission denied on resource."</strong> Fix: go to the bucket → Permissions → Grant Access → enter the service account email → assign the custom storage role. After this explicit grant, library configuration succeeds.</p>
+    </div>
+
+    <div class="compare">
+      <div class="cmp-c cmp-box">
+        <h5>✅ Service Account Created at Project Level</h5>
+        <ul>
+          <li>Service account has role assigned at project scope</li>
+          <li>New buckets <strong>may or may not</strong> inherit — depends on GCP IAM inheritance settings</li>
+          <li>Always verify bucket-level permissions explicitly</li>
+          <li>For safety: always add service account to bucket permissions directly</li>
+        </ul>
+      </div>
+      <div class="cmp-d cmp-box">
+        <h5>✅ Explicit Bucket-Level Permission Grant</h5>
+        <ul>
+          <li>Bucket → Permissions → Grant Access</li>
+          <li>Enter service account email (the "principal")</li>
+          <li>Assign the custom storage role (or Storage Admin)</li>
+          <li>Guaranteed to work — explicit trumps inherited</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Configure Cloud Library in Commvault Command Center</h3>
+    <div class="flow">
+      <div class="flow-title">Adding GCP Cloud Library in Command Center</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Navigate to Storage Configuration</strong>
+            <p>Command Center → Storage → Cloud → Add. Select <strong>Google Cloud</strong> as the cloud type. Give the library a meaningful name (e.g., <code>gcplib</code>).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Select Media Agent</strong>
+            <p>Select the CommServe as the media agent (if it doubles as MA in lab), or select a dedicated media agent. In GCP VM backup lab, the access node acts as the data mover due to the Storage Accelerator package.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Configure Authentication (Service Account Method)</strong>
+            <p>Authentication method: <strong>Service Account</strong>. Click the Credentials field → Add Credential → give a name → upload the JSON file (the storage admin service account JSON). Click Save. The credential is stored in the Commvault database — not on the access node.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Enter Bucket Details</strong>
+            <p>Region: select the GCP region where the bucket was created (e.g., asia-south1). Storage Class: Nearline. Service Host: leave as default (<code>storage.googleapis.com</code> — same for all GCP public cloud). Bucket Name: copy from GCP Console exactly.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Save and Verify</strong>
+            <p>Click Save. If permissions are correct, the library is created successfully. If you see "Access denied" or "Failed to verify device" — go back to GCP Console and explicitly add the service account to the bucket's permissions as described above. After fixing permissions, retry.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 10: GCP VM BACKUP AND RESTORE -->
+<section id="gcp-vm-backup" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🔄</div>
+    <div>
+      <div class="section-title">GCP VM Backup &amp; Restore</div>
+      <div class="section-subtitle">Configuring hypervisor, running backup, and restoring a deleted GCP VM instance</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>GCP Snapshot Backup Process — Unique Differences vs Azure/AWS</h3>
+    <p>GCP VM backup in Commvault works differently from Azure and AWS VM backups at the snapshot level. Understanding this difference is important for interviews and troubleshooting.</p>
+
+    <table class="tool-table">
+      <tr>
+        <th>Step</th>
+        <th>Azure / AWS / VMware</th>
+        <th>GCP (Google Cloud)</th>
+      </tr>
+      <tr>
+        <td>1. Snapshot</td>
+        <td>Snapshot of VM disk created</td>
+        <td>Snapshot of VM disk created (naming: <code>gx-backup-&lt;jobid&gt;</code>)</td>
+      </tr>
+      <tr>
+        <td>2. Mount</td>
+        <td>Snapshot is <strong>directly mounted</strong> on the VSA proxy</td>
+        <td>A new <strong>volume (disk) is created from the snapshot</strong>, then that volume is mounted on the VSA proxy</td>
+      </tr>
+      <tr>
+        <td>3. Snapshot cleanup</td>
+        <td>Snapshot deleted after backup copy</td>
+        <td>Snapshot deleted as soon as the volume is created from it</td>
+      </tr>
+      <tr>
+        <td>4. Read</td>
+        <td>VSA reads data from mounted snapshot</td>
+        <td>VSA reads data from the mounted volume (read-only)</td>
+      </tr>
+      <tr>
+        <td>5. Data visible inside OS?</td>
+        <td>Visible via <code>lsblk</code> on proxy</td>
+        <td>NOT visible inside proxy OS via <code>lsblk</code> — only visible in GCP Console as "Additional disk in use by access node"</td>
+      </tr>
+      <tr>
+        <td>6. Cleanup</td>
+        <td>Snapshot deleted by Commvault after backup</td>
+        <td>Volume deleted by Commvault API request after backup completes</td>
+      </tr>
+    </table>
+
+    <div class="callout note">
+      <div class="callout-title">📘 GCP Snapshot Naming Convention</div>
+      <p>Commvault-created snapshots in GCP follow the naming pattern: <code>gx-backup-&lt;jobid&gt;</code>. If you see a snapshot or disk in GCP Console with a name starting with <code>gx-backup-</code>, it was created by Commvault. The snapshot is created, then a disk/volume is generated from it. The temporary disk (same size as the production volume) is read-only mounted on the access node during backup. Once the backup job completes, Commvault deletes both the temporary disk and the original snapshot via GCP API. OpenStack also uses this same volume-from-snapshot method — it differs from Azure/AWS/VMware where the snapshot is mounted directly.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Configuring the GCP Hypervisor in Command Center</h3>
+    <div class="flow">
+      <div class="flow-title">GCP Hypervisor Setup — Command Center Guided Setup</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Open Hypervisor Configuration Wizard</strong>
+            <p>Command Center → Protect → Virtualization → Add Hypervisor → select <strong>Google Cloud Platform</strong>. Alternatively: Guided Setup → Virtualization → Google Cloud. Cloud hypervisor configuration is available <strong>only in Command Center</strong> — not in the Java CommCell Console.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Provide Server Name and Credentials</strong>
+            <p>Server Name: any user-defined name. Credentials: click Add → enter credential name → upload the JSON file for the <strong>hypervisor service account</strong> (owner role JSON, not the storage JSON). Click Save credential.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Select Access Node</strong>
+            <p>Select the GCP access node (Rocky Linux VM with VSA + Storage Accelerator installed). Click Next. If the configuration fails here with "access node not reachable" — check if the access node VM is powered on and if the IP has changed since the last startup. Update the client hostname/IP in CommCell Console → Client Properties if needed.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Define VM Group Content</strong>
+            <p>Browse by project or by VM name. Select the production VMs to protect (e.g., prod-vm). Remove the default "all unprotected VMs" content — only add the specific VMs you want to back up to avoid unintended VMs being included. Select the GCP storage plan.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Troubleshoot: Access Node IP Change</strong>
+            <p>GCP external IPs change when VMs are stopped and started (unless reserved/static IP is configured). If the access node shows "Not Ready" after restart — update the IP: CommCell Console → Client Computers → right-click access node → Properties → update IP/hostname to the new external IP → Submit. Run Check Readiness again to confirm connectivity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Log File for Hypervisor Configuration Failures</div>
+      <p>If the hypervisor configuration fails or the access node shows issues, the primary log to check is <strong>CVD.log</strong> on the access node. This log captures all communication daemon events including connectivity errors, authentication failures, and configuration issues. It is the first log to check for any client-side connectivity problem.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running Backup and Full VM Restore</h3>
+    <div class="flow">
+      <div class="flow-title">GCP VM Backup → Delete VM → Restore Demo</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Run Full Backup</strong>
+            <p>VM Group → right-click → Backup → Full. Monitor in Job Controller. Watch GCP Console → Snapshots during backup — a <code>gx-backup-*</code> snapshot appears briefly, then a temporary disk is created from it. The snapshot is deleted. The temporary disk shows as "In use by access node" in GCP Console → Disks. Once backup completes, the temporary disk is also deleted.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Verify Backup Then Delete the VM</strong>
+            <p>Confirm backup completed successfully (Job Controller: Completed). Go to GCP Console → VM Instances → select prod-vm → Delete. Confirm deletion. The VM no longer exists in GCP. This simulates accidental deletion or disaster.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Restore In-Place from Commvault</strong>
+            <p>Command Center → Protect → Virtualization → VM Group → select the VM → Recovery Points → select the latest recovery point → <strong>Full Instance Restore</strong>. Choose <strong>In-Place</strong>. Select options: <strong>Power on after restore</strong> and <strong>Unconditionally overwrite</strong>. Submit restore job.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Monitor Restore and Verify</strong>
+            <p>Monitor the restore job in the Job Controller. After completion, go to GCP Console → VM Instances — the VM reappears with its original name and configuration. Verify: SSH into the restored VM → check that the test files (F1, F2, F3 in <code>/usr/customer_data/</code>) still exist. This confirms the backup was complete and the restore was successful.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 11: GCP OBJECT STORAGE BACKUP -->
+<section id="gcp-object-storage" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">🪣</div>
+    <div>
+      <div class="section-title">GCP Object Storage (Cloud Storage Bucket) Backup &amp; Restore</div>
+      <div class="section-subtitle">Backing up GCP Cloud Storage buckets using the Cloud Apps package and service account authentication</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is GCP Object Storage Backup?</h3>
+    <p>In addition to backing up GCP VMs, Commvault can also back up the contents of <strong>GCP Cloud Storage buckets</strong> (object storage). This is useful when customers store critical application data or files in GCP buckets that need protection beyond what GCP's native versioning provides.</p>
+
+    <div class="strip-row">
+      <span class="strip-label">Required Package</span>
+      <span class="strip-val">The <strong>Cloud Apps</strong> package must be installed on the access node (in addition to VSA and Storage Accelerator). Object storage backup uses a different package from VM backup.</span>
+      <span class="strip-badge sb-warn">Cloud Apps Package</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Same Access Node</span>
+      <span class="strip-val">You can use the same GCP access node for both VM backup (VSA package) and object storage backup (Cloud Apps package). Install both packages on the same VM to avoid provisioning separate machines.</span>
+      <span class="strip-badge sb-ok">Reuse Access Node</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Configuration Path</span>
+      <span class="strip-val">Cannot always be found via Protect → Object Storage in Command Center (UI varies by MR version). Use <strong>Guided Setup → Object Storage</strong> instead. Select Google Cloud as the vendor.</span>
+      <span class="strip-badge sb-info">Guided Setup Recommended</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Authentication Methods</span>
+      <span class="strip-val">Two methods: (1) <strong>Access Key + Secret Access Key</strong> — generated from GCP Console → Cloud Storage → Settings → Interoperability tab. (2) <strong>Service Account + JSON file</strong> — same JSON file approach used for VM backup. Both work; Service Account is more secure.</span>
+      <span class="strip-badge sb-info">Two Methods Available</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Access Key Authentication — Important Scope Setting</h3>
+    <div class="callout warn">
+      <div class="callout-title">⚠ Access Keys Require a Default Project to Be Set</div>
+      <p>A critical lab discovery: configuring object storage backup using Access Key + Secret Access Key initially failed with "credentials incorrect." The keys were valid, but GCP requires a <strong>default project to be associated with the access keys</strong>. This is done in GCP Console → Cloud Storage → Settings → Interoperability → define the default project for the user account. Once the project scope was defined, the same keys worked immediately. This is a non-obvious GCP requirement that is easy to miss.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Service Account Authentication — Object Storage</h3>
+    <p>The preferred method. Uses a JSON file from a service account with Storage Admin permissions — the same approach as cloud library authentication.</p>
+    <div class="flow">
+      <div class="flow-title">Configuring GCP Object Storage Backup via Guided Setup</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Install Cloud Apps Package on Access Node</strong>
+            <p>Command Center → the access node client → three-dot menu → Add Software → search for <strong>Cloud Apps</strong> → Install. Monitor via install.log on the access node. After installation, confirm the access node shows "Ready" status. Log files to monitor: <code>install.log</code> and <code>updateinfo.log</code> on the access node.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Create Service Account for Object Storage</strong>
+            <p>GCP Console → IAM → Service Accounts → Create (e.g., <code>gcp-storage-backup-sa</code>). Assign Storage Admin role (or custom storage role). Download the JSON key file. This can be the same service account used for the cloud library, or a separate dedicated one.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Create the Production Bucket with Test Data</strong>
+            <p>GCP Console → Cloud Storage → Create Bucket (e.g., <code>gcp-customer-data-bucket</code>). Upload test files inside the bucket to simulate customer data. Verify the service account has permissions on this bucket (either inherited from project-level role, or explicitly granted at bucket level).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Configure Object Storage in Commvault Guided Setup</strong>
+            <p>Command Center → Guided Setup → Object Storage → Google Cloud → Next. Select the backup plan (same GCP storage plan). Select the access node (where Cloud Apps is installed). Authentication: select <strong>Service Account</strong> → Upload JSON file → enter Project ID (found in GCP Console → Cloud Overview → Project ID). Click Next to validate credentials.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Select Bucket Content and Finish</strong>
+            <p>Browse the dropdown — it shows available buckets in the project. Select the production bucket. Click Finish. The object storage instance is now configured. Run a full backup, then delete the bucket to simulate data loss, then restore in-place to verify the bucket and its contents are recovered.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Bucket in Different Region from Access Node — Does It Work?</div>
+      <p>In the lab, a bucket was accidentally created in US-East-1 while the access node and other resources were in Asia-South-1 (Mumbai). The backup still succeeded — Commvault can access GCP buckets in any region from any access node, provided the service account has the correct permissions. However, cross-region access incurs GCP egress charges. Best practice: always create the production bucket in the same region as the access node to avoid egress costs.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 12: BEST PRACTICES -->
+<section id="best-practices" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">⭐</div>
+    <div>
+      <div class="section-title">Best Practices — Network, GCP, and Cloud Backup</div>
+      <div class="section-subtitle">Production guidance for network diagnostics, GCP deployments, and cloud library design</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Network Troubleshooting Best Practices</h3>
+    <div class="strip-row">
+      <span class="strip-label">Always Work in Layers</span>
+      <span class="strip-val">Start with ping (ICMP) → netstat (local listening) → CVPing/telnet (port reachability) → traceroute (routing path) → CV Network Test Tool (throughput) → Wireshark (packet-level). Do not jump straight to Wireshark.</span>
+      <span class="strip-badge sb-info">Bottom-Up Approach</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Run Multiple Iterations</span>
+      <span class="strip-val">Never rely on a single CV Network Test Tool result. Run 2-3 iterations in both directions. Discard outliers and use the consistent result as the reported throughput.</span>
+      <span class="strip-badge sb-warn">Multiple Runs Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Verify IP Before Escalating</span>
+      <span class="strip-val">Always double-check destination IPs with the target machine directly (<code>ipconfig</code> / <code>ip addr</code>). Human IP entry errors are extremely common and will waste time escalating a non-existent network problem.</span>
+      <span class="strip-badge sb-warn">Verify IP First</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Wireshark — Always Take Downtime</span>
+      <span class="strip-val">Never run Wireshark on a production server without scheduling a downtime window and having the Windows/OS team on-call. A degraded server can hang when Wireshark is started due to additional load.</span>
+      <span class="strip-badge sb-warn">Downtime Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">TCPDump File Location</span>
+      <span class="strip-val">Never run <code>tcpdump</code> from the Commvault base folder. PCAP files grow very large — run from a partition with adequate free space (check with <code>df -h</code> first).</span>
+      <span class="strip-badge sb-warn">Avoid Base Folder</span>
+    </div>
+
+    <div class="callout best">
+      <div class="callout-title">⭐ Your Role Ends at Diagnosis</div>
+      <p>As a backup admin, your responsibility is to diagnose the connectivity issue and present evidence. It is the network team's responsibility to fix MTU mismatches, replace faulty hardware, update switch configurations, or resolve TCP reset issues. Use the tools to generate the proof, present it clearly, and formally escalate to the correct team. Do not attempt to modify network infrastructure yourself unless you own that domain.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>GCP Backup Best Practices</h3>
+    <div class="strip-row">
+      <span class="strip-label">Same Region for All Components</span>
+      <span class="strip-val">Deploy access node, production VMs, and cloud storage bucket all in the same GCP region. Cross-region data transfer incurs significant GCP egress charges and increases latency.</span>
+      <span class="strip-badge sb-best">No Egress Charges</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Static External IP for Access Node</span>
+      <span class="strip-val">Reserve a static external IP for the GCP access node VM. By default, GCP assigns a new external IP every time the VM is stopped and started, requiring manual IP updates in Commvault every restart.</span>
+      <span class="strip-badge sb-warn">Use Static IP</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Service Account Naming Conventions</span>
+      <span class="strip-val">Use meaningful names — never personal names. Use role-based names like <code>commvault-vm-backup-sa</code>, <code>commvault-storage-sa</code>. Makes IAM audits and team handovers much cleaner.</span>
+      <span class="strip-badge sb-info">Meaningful Names</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Nearline for Backup Storage Class</span>
+      <span class="strip-val">Always use Nearline storage class for backup libraries — not Standard (expensive for infrequent access) and not Coldline/Archive (high retrieval cost for frequent restores). Nearline provides the best cost/performance balance for backup and restore workloads.</span>
+      <span class="strip-badge sb-ok">Nearline Always</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Stop VMs When Not in Use (Lab Only)</span>
+      <span class="strip-val">For lab environments, always stop GCP VMs when not in use — billing continues for running instances. In production, VMs must stay running for backup jobs to execute on schedule.</span>
+      <span class="strip-badge sb-gold">Lab Cost Saving</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Secure the JSON Key File</span>
+      <span class="strip-val">Store JSON key files in a password manager or secrets vault. Rotate keys periodically. If a JSON file is compromised, revoke it immediately in GCP Console → Service Account → Keys → Delete key, then generate a new one.</span>
+      <span class="strip-badge sb-warn">Secure JSON Files</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>GCP $300 Free Trial — Maximize for Learning</h3>
+    <div class="upgrade-box">
+      <h4>☁ GCP Free Trial vs Other Clouds</h4>
+      <p>GCP provides <strong>$300 of free credit for 3 months</strong> with no VM type restrictions — you can deploy any VM instance type including the larger ones needed for access nodes. By comparison, Azure provides $200 for 30 days with some resource limits, and AWS does not provide a general free credit for new accounts. For Commvault training and lab purposes, GCP's free trial is the most flexible option. The temporary ₹1000 (India) charged at signup is returned when the account is closed — no surprise charges occur after trial expiry unless you manually upgrade.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 13: INTERVIEW Q&A -->
+<section id="interview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🎓</div>
+    <div>
+      <div class="section-title">Interview &amp; Exam — Scenario-Based Q&amp;A</div>
+      <div class="section-subtitle">Real-world questions on network troubleshooting, VSA migration, and GCP backup</div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A backup admin suspects a network issue between the CommServe and Media Agent. The network team says "everything is fine." What steps do you take to diagnose and prove there is a network problem?</div>
+    <div class="qa-a">Start with layered diagnostics: (1) <strong>Ping</strong> — basic ICMP reachability check. Note: may be disabled at customer sites. (2) <strong>Netstat</strong> — verify port 8400 is in LISTENING state on the media agent. (3) <strong>CVPing</strong> — test port 8400/8403 connectivity from CommServe to MA. CVPing ships with every Commvault agent and works even when telnet is blocked. (4) <strong>Check Readiness</strong> in CommCell Console — quick pass/fail port check. (5) <strong>CV Network Test Tool</strong> — measure throughput between the two entities in both directions. If below 50 MB/s, this is evidence of bandwidth degradation. (6) <strong>Wireshark / TCPDump</strong> — packet capture to find TCP connection resets (not retransmissions, which are normal). Present the captured TCP resets to the network team — this is the definitive proof that forces them to investigate. Common root causes include MTU mismatch, degraded NIC hardware, faulty cables, or switch port issues.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">You run CVPing from CommServe to Media Agent and it times out. Services are running, Windows Defender is off, and NSG allows 8400/8403. What else could be wrong?</div>
+    <div class="qa-a">The most common overlooked cause in this scenario is a <strong>wrong IP address</strong> — a human entry error. Verify the destination IP by running <code>ipconfig</code> directly on the media agent and compare to what was entered in CVPing. A single digit difference (e.g., 160 vs 110) produces the same timeout. Additionally check: (1) Corporate/network firewall between the two servers — NSG open does not mean the network firewall is open. Raise a firewall change request with the network team. (2) For cloud VMs with multiple IPs — ensure the backup IP is being used, not a management or storage IP. (3) Run <code>netstat -enob | findstr 8400</code> on the media agent to confirm the port is actually in LISTENING state — services appearing "running" doesn't guarantee the port is bound.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is the CV Network Test Tool used for, and how do you run it in a restricted environment where port 25000 is blocked?</div>
+    <div class="qa-a">The CV Network Test Tool measures <strong>network throughput (bandwidth in MB/s)</strong> between two Commvault entities. It is used when backups are running slowly and a bandwidth bottleneck is suspected — the results provide concrete data to share with the network team. Normally it uses port 25000. In restricted environments where only 8400/8403 are allowed: schedule a maintenance window, stop all Commvault services on both machines (bringing them to a maintenance state), then run the CV Network Test Tool and manually specify port 8400 (or 8403) instead of the default 25000. After the test completes, restart the Commvault services on both machines. This is disruptive but necessary when port 25000 is blocked by security policy. On Linux, the tool is CLI-only and case-sensitive: <code>./cvnetworktesttool</code> from the base folder.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">You need to replace an existing VSA access node with a new VM. What are the key steps and what data needs to be migrated from the old VSA to the new one?</div>
+    <div class="qa-a">VSA migration is straightforward. Key steps: (1) Deploy the new VM with a supported OS (verify in Commvault documentation System Requirements). (2) Open ports 8400/8403 permanently and port 22 (Linux) temporarily for push install. (3) Check what packages are installed on the old VSA via CommCell Console → right-click client → View Installed Software. Install the exact same packages on the new VM via push install. (4) Copy any additional settings (registry keys, environment-specific settings added by Commvault Support) from old VSA's Additional Settings to the new one. (5) Edit the hypervisor in Command Center → uncheck old access node, add new one → Save. (6) Run a test backup; keep the old VSA live as rollback for a few days before decommissioning. Regarding data migration: <strong>no data needs to be migrated</strong>. Credentials are stored in the Commvault CommServe database (Credential Vault), not on the VSA. Backup job history and catalog are in the CommServe DB. The VSA is stateless compute only.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is a GCP Service Account, and how does it differ from Azure Managed Identity and AWS IAM? How is it used in Commvault?</div>
+    <div class="qa-a">A <strong>GCP Service Account</strong> is a non-human identity that represents an application or service and is used for API authentication. It is the GCP equivalent of Azure Managed Identity (for cloud-native auth) or AWS IAM Role (for programmatic access). The key difference is authentication mechanism: Azure Managed Identity uses a system-assigned identity with no keys to manage. AWS IAM uses access key + secret access key or instance profiles. GCP Service Account uses a <strong>JSON key file</strong> — a downloaded private key that must be stored securely and uploaded to Commvault as a credential. In Commvault, the JSON file is uploaded as a credential in Command Center or the credential vault — it is stored in the CommServe database and used by the access node to authenticate API calls to GCP for VM discovery, snapshot creation, disk mounting, and cloud storage operations.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">You configure a GCP Cloud Library in Commvault and get "Access denied — storage.objects.list permission denied on resource." The service account has Storage Admin role at project level. What is wrong?</div>
+    <div class="qa-a">This is a known GCP IAM inheritance issue. Even though the service account has Storage Admin role assigned at the <strong>project level</strong>, GCP Cloud Storage buckets do not always automatically inherit those project-level permissions. The bucket maintains its own permission list, which must be explicitly populated. Fix: go to GCP Console → Cloud Storage → select the bucket → <strong>Permissions</strong> tab → <strong>Grant Access</strong> → enter the service account email (principal) → assign the Storage Admin or custom storage role → Save. After this explicit bucket-level permission grant, Commvault can successfully verify the device and create the cloud library. This is a common pitfall for engineers migrating from Azure (where resource-level permissions inherit more transparently from subscriptions).</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">How does GCP VM backup in Commvault differ from Azure and AWS VM backup at the snapshot level?</div>
+    <div class="qa-a">The key difference is in how the snapshot data is presented to the VSA proxy. In <strong>Azure and AWS</strong> (and VMware), Commvault takes a snapshot of the VM disk and <strong>directly mounts the snapshot</strong> on the VSA proxy — the proxy reads backup data from the snapshot directly. In <strong>GCP</strong> (and OpenStack), Commvault takes a snapshot of the VM disk, then <strong>creates a new volume (disk) from that snapshot</strong>, and mounts the newly created volume on the VSA proxy. The temporary disk (same size as the production volume) is read-only mounted on the access node and is visible in GCP Console → Disks as "in use by access node" — but it does not appear inside the access node OS via <code>lsblk</code> or <code>fdisk</code>. Once the backup completes, Commvault deletes both the temporary disk and the original snapshot via GCP API. This extra volume-creation step is unique to GCP and OpenStack.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">GCP object storage backup fails with "make sure credentials are correct and active." The access keys from the Interoperability tab are definitely correct. What is the likely cause?</div>
+    <div class="qa-a">This is a non-obvious GCP requirement: when using <strong>Access Key + Secret Access Key</strong> from GCP Cloud Storage's Interoperability settings, GCP requires a <strong>default project to be associated with those keys</strong>. Without setting a default project, GCP cannot determine the billing scope for the request, and authentication fails even if the keys are correct. Fix: GCP Console → Cloud Storage → Settings → Interoperability tab → look for "User Account HMAC keys" → set the default project for your user account. Once the project scope is defined, the same keys work immediately. Alternatively, switch to <strong>Service Account + JSON file</strong> authentication, which does not have this project scope requirement and is the recommended method for production environments.</div>
+  </div>
+</section>
+
+</div><!-- end main-content -->
+</div><!-- end page-body -->
+
+<!-- AUTHOR SECTION -->
+<div class="author-section">
+  <div class="author-title">About the Author</div>
+  <div class="author-card">
+    <div class="author-avatar">👨‍💻</div>
+    <div class="author-info">
+      <div class="author-name">Mohammed Abdul</div>
+      <div class="author-role">Data Protection Architect · 15+ Years Experience</div>
+      <div class="author-bio">Seasoned Data Protection Architect with over 15 years of hands-on experience designing, implementing, and troubleshooting enterprise backup and recovery solutions. Deep expertise in Commvault administration spanning network diagnostics, multi-cloud backup (AWS, Azure, GCP), VSA proxy management, and enterprise-scale storage design. Specialist in cloud-native backup architectures, service account authentication, and network-layer root cause analysis.</div>
+      <div class="badge-row">
+        <span class="badge cv">Commvault Certified</span>
+        <span class="badge veeam">Veeam VMCE</span>
+        <span class="badge nb">NetBackup</span>
+        <span class="badge netapp">NetApp Data ONTAP</span>
+      </div>
+      <a class="contact-card" href="mailto:abdul.md.20000102@gmail.com">&#9993; <span>abdul.md.20000102@gmail.com</span></a>
+    </div>
+  </div>
+  <div class="disclaimer">
+    <p><strong>Disclaimer:</strong> This tutorial is created for educational and training purposes only. All technical procedures, commands, configurations, and troubleshooting steps are based on real-world Commvault implementation experience. Always refer to official Commvault documentation for your specific software version. GCP Console UI, IAM policies, and pricing may vary — consult Google Cloud documentation for the latest guidance. Service account permis
