@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Software Administration – Tutorial 12 | CommServe Migration, SAP HANA &amp; One Touch Recovery</title>
+<style>
+  :root {
+    --navy:#0a1628;--navy-mid:#0f2040;--navy-light:#162b52;
+    --accent:#00c8ff;--accent2:#00e5a0;--accent3:#ff6b35;--accent4:#a78bfa;
+    --gold:#f5c842;--text:#e2e8f0;--text-muted:#94a3b8;--text-dim:#64748b;
+    --card:#0d1f3c;--card-border:rgba(0,200,255,0.12);
+    --warn-bg:rgba(255,107,53,0.08);--warn-border:#ff6b35;
+    --tip-bg:rgba(0,229,160,0.08);--tip-border:#00e5a0;
+    --note-bg:rgba(0,200,255,0.08);--note-border:#00c8ff;
+    --exam-bg:rgba(167,139,250,0.08);--exam-border:#a78bfa;
+    --best-bg:rgba(245,200,66,0.08);--best-border:#f5c842;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Segoe UI',Calibri,'Helvetica Neue',Arial,sans-serif;background:var(--navy);color:var(--text);line-height:1.7;font-size:15px;}
+  nav{position:sticky;top:0;z-index:999;background:rgba(10,22,40,0.97);border-bottom:1px solid var(--card-border);backdrop-filter:blur(12px);padding:0 32px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:54px;}
+  .nav-brand{font-family:Georgia,serif;color:var(--accent4);font-size:15px;font-weight:bold;letter-spacing:0.5px;margin-right:16px;white-space:nowrap;}
+  nav a{color:var(--text-muted);text-decoration:none;font-size:12px;padding:6px 10px;border-radius:4px;transition:all 0.2s;white-space:nowrap;}
+  nav a:hover{color:var(--accent4);background:rgba(167,139,250,0.08);}
+  .hero{background:linear-gradient(135deg,#0a1628 0%,#140d28 40%,#0a1820 100%);padding:80px 48px 64px;border-bottom:1px solid var(--card-border);position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(167,139,250,0.07) 0%,transparent 70%);pointer-events:none;}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:20px;padding:6px 16px;font-size:12px;color:var(--accent4);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;}
+  .hero h1{font-family:Georgia,serif;font-size:clamp(28px,4vw,46px);line-height:1.2;color:#fff;max-width:860px;margin-bottom:20px;}
+  .hero h1 span{color:var(--accent4);}
+  .hero-desc{color:var(--text-muted);max-width:720px;font-size:16px;margin-bottom:36px;}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:10px;}
+  .tag{background:var(--navy-light);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:4px 12px;font-size:12px;color:var(--text-muted);}
+  .tag.purple{border-color:var(--accent4);color:var(--accent4);}
+  .tag.blue{border-color:var(--accent);color:var(--accent);}
+  .tag.green{border-color:var(--accent2);color:var(--accent2);}
+  .tag.gold{border-color:var(--gold);color:var(--gold);}
+  .tag.orange{border-color:var(--accent3);color:var(--accent3);}
+  .toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:40px 48px;background:var(--navy-mid);border-bottom:1px solid var(--card-border);}
+  .toc-item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;text-decoration:none;color:var(--text-muted);font-size:13px;transition:all 0.2s;}
+  .toc-item:hover{border-color:var(--accent4);color:var(--accent4);transform:translateY(-2px);}
+  .toc-num{background:rgba(167,139,250,0.1);color:var(--accent4);border-radius:4px;padding:2px 8px;font-size:11px;font-family:'Courier New',monospace;font-weight:bold;flex-shrink:0;}
+  .main-content{max-width:1100px;margin:0 auto;padding:48px 32px;}
+  .section{margin-bottom:64px;}
+  .section-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--card-border);}
+  .section-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .icon-blue{background:rgba(0,200,255,0.12);}
+  .icon-green{background:rgba(0,229,160,0.12);}
+  .icon-orange{background:rgba(255,107,53,0.12);}
+  .icon-purple{background:rgba(167,139,250,0.12);}
+  .icon-gold{background:rgba(245,200,66,0.12);}
+  .section-title{font-family:Georgia,serif;font-size:clamp(20px,2.5vw,28px);color:#fff;}
+  .section-subtitle{color:var(--text-muted);font-size:13px;margin-top:4px;}
+  .card{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:28px;margin-bottom:20px;}
+  .card h3{font-family:Georgia,serif;font-size:18px;color:var(--accent4);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(167,139,250,0.1);}
+  .card h4{font-size:14px;color:var(--text);margin:18px 0 10px;font-weight:600;}
+  .card p{color:var(--text-muted);font-size:14px;margin-bottom:14px;}
+  .card ul{padding-left:20px;margin-bottom:14px;}
+  .card li{color:var(--text-muted);font-size:14px;margin-bottom:6px;}
+  .card strong{color:var(--text);}
+  .callout{border-radius:8px;padding:16px 20px;margin:16px 0;border-left:3px solid;}
+  .callout-title{font-size:13px;font-weight:bold;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;}
+  .callout p{font-size:13px;margin:0;}
+  .callout.warn{background:var(--warn-bg);border-color:var(--warn-border);}
+  .callout.warn .callout-title{color:var(--accent3);}
+  .callout.warn p{color:#fca97a;}
+  .callout.tip{background:var(--tip-bg);border-color:var(--tip-border);}
+  .callout.tip .callout-title{color:var(--accent2);}
+  .callout.tip p{color:#6ee7b7;}
+  .callout.note{background:var(--note-bg);border-color:var(--note-border);}
+  .callout.note .callout-title{color:var(--accent);}
+  .callout.note p{color:#7ee8fa;}
+  .callout.exam{background:var(--exam-bg);border-color:var(--exam-border);}
+  .callout.exam .callout-title{color:var(--accent4);}
+  .callout.exam p{color:#c4b5fd;}
+  .callout.best{background:var(--best-bg);border-color:var(--best-border);}
+  .callout.best .callout-title{color:var(--gold);}
+  .callout.best p{color:#fde68a;}
+  .code-block{background:#060e1c;border:1px solid rgba(167,139,250,0.15);border-radius:8px;overflow:hidden;margin:16px 0;}
+  .code-header{background:rgba(167,139,250,0.06);border-bottom:1px solid rgba(167,139,250,0.1);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;}
+  .code-lang{font-size:11px;color:var(--accent4);font-family:monospace;text-transform:uppercase;letter-spacing:0.5px;}
+  .code-dots{display:flex;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+  .code-body{padding:16px 20px;font-family:'Courier New',monospace;font-size:13px;line-height:1.7;color:#c4b5fd;white-space:pre-wrap;word-break:break-word;}
+  .flow{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:24px;margin:16px 0;}
+  .flow-title{font-family:Georgia,serif;font-size:15px;color:var(--accent4);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(167,139,250,0.1);}
+  .flow-steps{display:flex;flex-direction:column;gap:0;}
+  .flow-step{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--card-border);}
+  .flow-step:last-child{border-bottom:none;}
+  .flow-num{width:32px;height:32px;border-radius:8px;flex-shrink:0;background:rgba(167,139,250,0.12);border:2px solid var(--accent4);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;color:var(--accent4);font-family:'Courier New',monospace;margin-top:6px;}
+  .flow-content{flex:1;}
+  .flow-content strong{color:var(--text);display:block;margin-bottom:6px;font-size:15px;}
+  .flow-content p{color:var(--text-muted);font-size:14px;margin-bottom:0;}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+  @media(max-width:600px){.compare{grid-template-columns:1fr;}}
+  .cmp-box{border-radius:8px;padding:18px;}
+  .cmp-box h5{font-size:13px;font-weight:bold;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+  .cmp-box ul{padding-left:18px;}.cmp-box li{font-size:13px;margin-bottom:6px;}
+  .cmp-a{background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);}
+  .cmp-a h5{color:var(--accent);}.cmp-a li{color:#7ee8fa;}
+  .cmp-b{background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);}
+  .cmp-b h5{color:var(--accent4);}.cmp-b li{color:#c4b5fd;}
+  .cmp-c{background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);}
+  .cmp-c h5{color:var(--accent2);}.cmp-c li{color:#6ee7b7;}
+  .cmp-d{background:rgba(245,200,66,0.06);border:1px solid rgba(245,200,66,0.2);}
+  .cmp-d h5{color:var(--gold);}.cmp-d li{color:#fde68a;}
+  .strip-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);border-radius:6px;padding:12px 18px;margin-bottom:8px;}
+  .strip-label{font-size:12px;color:var(--text-dim);min-width:190px;flex-shrink:0;}
+  .strip-val{font-size:13px;color:var(--text);flex:1;}
+  .strip-badge{font-size:11px;padding:2px 10px;border-radius:10px;border:1px solid;flex-shrink:0;}
+  .sb-ok{border-color:var(--accent2);color:var(--accent2);background:rgba(0,229,160,0.07);}
+  .sb-warn{border-color:var(--accent3);color:var(--accent3);background:rgba(255,107,53,0.07);}
+  .sb-info{border-color:var(--accent);color:var(--accent);background:rgba(0,200,255,0.07);}
+  .sb-purple{border-color:var(--accent4);color:var(--accent4);background:rgba(167,139,250,0.07);}
+  .sb-gold{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,0.07);}
+  .sb-best{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,0.07);}
+  .tool-table{width:100%;border-collapse:collapse;margin:16px 0;}
+  .tool-table th{background:rgba(167,139,250,0.1);color:var(--accent4);padding:10px 16px;text-align:left;font-size:13px;border-bottom:1px solid rgba(167,139,250,0.2);}
+  .tool-table td{padding:10px 16px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--card-border);}
+  .tool-table tr:hover td{background:rgba(167,139,250,0.03);}
+  .qa-block{background:var(--card);border:1px solid var(--card-border);border-radius:10px;overflow:hidden;margin-bottom:14px;}
+  .qa-q{background:rgba(167,139,250,0.08);border-bottom:1px solid rgba(167,139,250,0.15);padding:14px 18px;font-size:14px;color:#c4b5fd;font-weight:500;}
+  .qa-q::before{content:'Q  ';opacity:0.5;font-family:monospace;}
+  .qa-a{padding:14px 18px;font-size:13px;color:var(--text-muted);line-height:1.7;}
+  .qa-a::before{content:'A  ';color:var(--accent2);font-weight:bold;font-family:monospace;}
+  .divider{border:none;border-top:1px solid var(--card-border);margin:40px 0;}
+  code{font-family:'Courier New',Courier,monospace;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.15);color:var(--accent4);padding:1px 6px;border-radius:3px;font-size:12.5px;}
+  .highlight-box{border:1px solid rgba(167,139,250,0.3);border-radius:10px;padding:20px 24px;margin:16px 0;background:rgba(167,139,250,0.05);}
+  .highlight-box h4{color:var(--accent4);margin-bottom:10px;font-size:15px;}
+  .highlight-box p{color:var(--text-muted);font-size:14px;margin-bottom:0;}
+  .arch-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:16px;}
+  .arch-box{border-radius:8px;padding:12px 20px;text-align:center;font-size:13px;font-weight:500;}
+  .arch-box small{display:block;font-size:10px;opacity:0.7;margin-top:3px;font-weight:400;}
+  .abox-blue{background:rgba(0,200,255,0.12);border:1px solid rgba(0,200,255,0.3);color:#7ee8fa;}
+  .abox-green{background:rgba(0,229,160,0.12);border:1px solid rgba(0,229,160,0.3);color:#6ee7b7;}
+  .abox-purple{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.3);color:#c4b5fd;}
+  .abox-gold{background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.3);color:#fde68a;}
+  .arch-connector{text-align:center;color:var(--text-dim);font-size:22px;line-height:1;}
+  /* LEFT SIDEBAR TOC */
+  .page-wrapper{display:flex;min-height:100vh;}
+  .sidebar-toc{position:fixed;top:54px;left:0;width:260px;height:calc(100vh - 54px);overflow-y:auto;background:#080f1e;border-right:1px solid var(--card-border);z-index:900;padding:0;display:flex;flex-direction:column;}
+  .sidebar-toc::-webkit-scrollbar{width:4px;}
+  .sidebar-toc::-webkit-scrollbar-track{background:transparent;}
+  .sidebar-toc::-webkit-scrollbar-thumb{background:rgba(167,139,250,0.2);border-radius:2px;}
+  .sidebar-toc::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,0.4);}
+  .sidebar-header{padding:16px 18px 12px;border-bottom:1px solid var(--card-border);flex-shrink:0;}
+  .sidebar-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);font-weight:600;}
+  .sidebar-title{font-family:Georgia,serif;font-size:13px;color:var(--accent4);margin-top:4px;line-height:1.4;}
+  .sidebar-nav{padding:12px 0;flex:1;}
+  .sidebar-link{display:flex;align-items:center;gap:10px;padding:9px 18px;text-decoration:none;color:var(--text-muted);font-size:12.5px;line-height:1.35;transition:all 0.15s;border-left:2px solid transparent;}
+  .sidebar-link:hover{color:var(--accent4);background:rgba(167,139,250,0.06);border-left-color:rgba(167,139,250,0.4);}
+  .sidebar-link.active{color:var(--accent4);background:rgba(167,139,250,0.08);border-left-color:var(--accent4);}
+  .sidebar-num{font-family:'Courier New',monospace;font-size:10px;color:var(--accent4);opacity:0.6;flex-shrink:0;min-width:18px;}
+  .sidebar-toggle{display:none;position:fixed;top:62px;left:8px;z-index:1100;background:rgba(10,22,40,0.95);border:1px solid var(--card-border);border-radius:6px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;color:var(--accent4);font-size:16px;}
+  .page-content{margin-left:260px;flex:1;min-width:0;}
+  @media(max-width:900px){
+    .sidebar-toc{transform:translateX(-100%);transition:transform 0.25s ease;}
+    .sidebar-toc.open{transform:translateX(0);}
+    .sidebar-toggle{display:flex;}
+    .page-content{margin-left:0;}
+  }
+  /* ── ARCHITECTURE DIAGRAM STYLES ── */
+  .diagram-wrapper{background:linear-gradient(180deg,rgba(10,22,40,0.95),rgba(13,31,60,0.98));border:1px solid rgba(167,139,250,0.18);border-radius:14px;padding:32px 28px;margin:24px 0;overflow-x:auto;position:relative;}
+  .diagram-wrapper::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent4),var(--accent),var(--accent2));border-radius:14px 14px 0 0;opacity:0.6;}
+  .diagram-title{font-family:Georgia,serif;font-size:14px;color:var(--accent4);margin-bottom:24px;text-align:center;letter-spacing:0.5px;opacity:0.9;}
+  .diagram-title small{display:block;font-family:'Segoe UI',sans-serif;font-size:11px;color:var(--text-dim);margin-top:4px;letter-spacing:0;}
+  /* Horizontal flow diagrams */
+  .hflow{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;padding:8px 0;}
+  .hflow-node{position:relative;border-radius:12px;padding:16px 20px;text-align:center;min-width:130px;max-width:180px;flex-shrink:0;}
+  .hflow-node .node-icon{font-size:24px;margin-bottom:6px;}
+  .hflow-node .node-label{font-size:13px;font-weight:600;line-height:1.3;}
+  .hflow-node .node-sub{font-size:10px;opacity:0.7;margin-top:4px;line-height:1.4;}
+  .node-purple{background:rgba(167,139,250,0.12);border:1.5px solid rgba(167,139,250,0.35);color:#c4b5fd;}
+  .node-blue{background:rgba(0,200,255,0.1);border:1.5px solid rgba(0,200,255,0.3);color:#7ee8fa;}
+  .node-green{background:rgba(0,229,160,0.1);border:1.5px solid rgba(0,229,160,0.3);color:#6ee7b7;}
+  .node-gold{background:rgba(245,200,66,0.1);border:1.5px solid rgba(245,200,66,0.3);color:#fde68a;}
+  .node-orange{background:rgba(255,107,53,0.1);border:1.5px solid rgba(255,107,53,0.3);color:#fca97a;}
+  .node-red{background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.3);color:#fca5a5;}
+  .node-white{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.15);color:var(--text);}
+  .hflow-arrow{display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:11px;padding:0 6px;flex-shrink:0;flex-direction:column;gap:2px;min-width:50px;}
+  .hflow-arrow .arrow-line{width:36px;height:2px;background:linear-gradient(90deg,rgba(167,139,250,0.4),rgba(0,200,255,0.4));position:relative;}
+  .hflow-arrow .arrow-line::after{content:'▶';position:absolute;right:-8px;top:-7px;font-size:12px;color:rgba(0,200,255,0.5);}
+  .hflow-arrow .arrow-label{font-size:9px;color:var(--text-dim);white-space:nowrap;letter-spacing:0.3px;}
+  /* Vertical stacked architecture */
+  .vstack{display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0;}
+  .vstack-node{border-radius:10px;padding:14px 24px;text-align:center;width:100%;max-width:420px;position:relative;}
+  .vstack-node .node-label{font-size:13px;font-weight:600;}
+  .vstack-node .node-sub{font-size:10px;opacity:0.7;margin-top:3px;}
+  .vstack-connector{display:flex;flex-direction:column;align-items:center;padding:4px 0;color:var(--text-dim);}
+  .vstack-connector .vline{width:2px;height:18px;background:linear-gradient(180deg,rgba(167,139,250,0.3),rgba(0,200,255,0.3));}
+  .vstack-connector .vlabel{font-size:9px;color:var(--text-dim);margin:2px 0;letter-spacing:0.3px;}
+  /* Grid layout diagrams */
+  .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:8px 0;}
+  @media(max-width:600px){.dgrid{grid-template-columns:1fr;}}
+  .dgrid-col{display:flex;flex-direction:column;gap:0;align-items:center;}
+  .dgrid-header{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding:6px 16px;border-radius:6px;text-align:center;}
+  .dgh-blue{background:rgba(0,200,255,0.1);color:var(--accent);border:1px solid rgba(0,200,255,0.2);}
+  .dgh-purple{background:rgba(167,139,250,0.1);color:var(--accent4);border:1px solid rgba(167,139,250,0.2);}
+  /* Timeline diagram */
+  .timeline{display:flex;align-items:flex-start;gap:0;padding:12px 0;position:relative;justify-content:center;}
+  .timeline::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent),var(--accent3),var(--accent3));border-radius:2px;opacity:0.3;}
+  .tl-point{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1;min-width:100px;max-width:140px;flex:1;}
+  .tl-dot{width:16px;height:16px;border-radius:50%;border:2px solid;position:relative;}
+  .tl-dot.dot-green{border-color:var(--accent2);background:rgba(0,229,160,0.2);}
+  .tl-dot.dot-blue{border-color:var(--accent);background:rgba(0,200,255,0.2);}
+  .tl-dot.dot-orange{border-color:var(--accent3);background:rgba(255,107,53,0.2);}
+  .tl-dot.dot-red{border-color:#ef4444;background:rgba(239,68,68,0.2);}
+  .tl-dot.dot-purple{border-color:var(--accent4);background:rgba(167,139,250,0.2);}
+  .tl-time{font-size:12px;font-weight:700;color:var(--text);}
+  .tl-desc{font-size:10px;color:var(--text-muted);text-align:center;line-height:1.4;}
+  /* Pipeline / stage diagram */
+  .pipeline{display:flex;align-items:stretch;gap:4px;padding:8px 0;overflow-x:auto;}
+  .pipe-stage{flex:1;min-width:90px;border-radius:8px;padding:12px 10px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+  .pipe-stage .pipe-num{font-size:18px;font-weight:800;opacity:0.4;font-family:'Courier New',monospace;}
+  .pipe-stage .pipe-label{font-size:10px;font-weight:600;line-height:1.3;letter-spacing:0.2px;}
+  .pipe-stage::after{content:'▸';position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:14px;z-index:1;}
+  .pipe-stage:last-child::after{display:none;}
+  /* Container / MDC diagram */
+  .container-diagram{border:2px solid rgba(245,200,66,0.3);border-radius:14px;padding:20px;background:rgba(245,200,66,0.03);position:relative;}
+  .container-diagram .cd-title{position:absolute;top:-11px;left:20px;background:var(--navy-mid);padding:0 10px;font-size:11px;color:var(--gold);font-weight:700;letter-spacing:0.5px;}
+  .cd-inner{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+  .cd-box{border-radius:8px;padding:12px 18px;text-align:center;flex:1;min-width:140px;}
+  .cd-box .cd-label{font-size:12px;font-weight:600;}
+  .cd-box .cd-sub{font-size:10px;opacity:0.65;margin-top:3px;}
+  /* Comparison diagram with VS */
+  .vs-diagram{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:8px 0;}
+  @media(max-width:600px){.vs-diagram{grid-template-columns:1fr;}.vs-badge{margin:8px auto;}}
+  .vs-badge{background:rgba(255,107,53,0.15);border:1.5px solid var(--accent3);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--accent3);flex-shrink:0;justify-self:center;}
+  .vs-side{border-radius:10px;padding:16px 18px;}
+  .vs-side .vs-title{font-size:13px;font-weight:700;margin-bottom:8px;}
+  .vs-side .vs-item{font-size:11px;opacity:0.8;margin-bottom:4px;padding-left:14px;position:relative;line-height:1.5;}
+  .vs-side .vs-item::before{content:'›';position:absolute;left:2px;font-weight:bold;}
+  .author-section{background:linear-gradient(135deg,#0a1628,#0d2040);border-top:1px solid var(--card-border);padding:60px 48px;}
+  .author-title{font-family:Georgia,serif;font-size:22px;color:var(--accent4);margin-bottom:28px;text-align:center;}
+  .author-card{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:36px;max-width:800px;margin:0 auto 28px;display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;}
+  .author-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--accent4),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;}
+  .author-info{flex:1;min-width:240px;}
+  .author-name{font-family:Georgia,serif;font-size:22px;color:#fff;margin-bottom:4px;}
+  .author-role{color:var(--accent4);font-size:14px;margin-bottom:14px;}
+  .author-bio{color:var(--text-muted);font-size:14px;line-height:1.7;margin-bottom:16px;}
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .badge{background:var(--navy-light);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:4px 12px;font-size:11px;color:var(--text-muted);}
+  .badge.cv{border-color:var(--accent4);color:var(--accent4);}
+  .contact-card{display:inline-flex;align-items:center;gap:10px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;padding:10px 18px;text-decoration:none;color:var(--accent4);font-size:14px;transition:all 0.2s;}
+  .contact-card:hover{background:rgba(167,139,250,0.15);}
+  .disclaimer{background:var(--warn-bg);border:1px solid rgba(255,107,53,0.25);border-radius:8px;padding:18px 24px;max-width:800px;margin:0 auto;}
+  .disclaimer p{font-size:13px;color:#fca97a;line-height:1.6;}
+  footer{background:#060e1c;border-top:1px solid var(--card-border);padding:24px 48px;text-align:center;color:var(--text-dim);font-size:12px;}
+</style>
+</head>
+<body>
+<!-- MOBILE TOGGLE -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">☰</button>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">🛠 Commvault Tutorial 12</div>
+  <a href="#cs-migration">CS Migration</a>
+  <a href="#cs-methods">Migration Methods</a>
+  <a href="#cs-recovery-tool">CS Recovery Tool</a>
+  <a href="#cs-post-migration">Post-Migration &amp; DDB</a>
+  <a href="#sap-overview">SAP HANA Overview</a>
+  <a href="#sap-install">HANA Lab Setup</a>
+  <a href="#sap-config">HANA Configuration</a>
+  <a href="#sap-backup">HANA Backup &amp; Restore</a>
+  <a href="#sap-cmdline">Cmdline &amp; Keystore</a>
+  <a href="#otr-overview">One Touch Overview</a>
+  <a href="#otr-windows">One Touch Windows</a>
+  <a href="#otr-linux">One Touch Linux</a>
+  <a href="#best-practices">Best Practices</a>
+  <a href="#interview">Interview Q&amp;A</a>
+</nav>
+
+<!-- HERO -->
+<div class="page-wrapper">
+<!-- SIDEBAR TOC -->
+<aside class="sidebar-toc" id="sidebarToc">
+  <div class="sidebar-header">
+    <div class="sidebar-label">Contents</div>
+    <div class="sidebar-title">Tutorial 12 — CommServe, SAP HANA &amp; One Touch</div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="#cs-migration"><span class="sidebar-num">01</span>CommServe Migration Overview</a>
+    <a class="sidebar-link" href="#cs-methods"><span class="sidebar-num">02</span>Two Migration Methods</a>
+    <a class="sidebar-link" href="#cs-recovery-tool"><span class="sidebar-num">03</span>CS Recovery Assistant Tool</a>
+    <a class="sidebar-link" href="#cs-post-migration"><span class="sidebar-num">04</span>Post-Migration &amp; DDB Re-sync</a>
+    <a class="sidebar-link" href="#sap-overview"><span class="sidebar-num">05</span>SAP HANA — Overview &amp; Arch</a>
+    <a class="sidebar-link" href="#sap-install"><span class="sidebar-num">06</span>HANA Lab Setup &amp; Agent Install</a>
+    <a class="sidebar-link" href="#sap-config"><span class="sidebar-num">07</span>HANA Configuration in Commvault</a>
+    <a class="sidebar-link" href="#sap-backup"><span class="sidebar-num">08</span>HANA Backup &amp; In-Place Restore</a>
+    <a class="sidebar-link" href="#sap-cmdline"><span class="sidebar-num">09</span>Command-Line &amp; HDB Keystore</a>
+    <a class="sidebar-link" href="#otr-overview"><span class="sidebar-num">10</span>One Touch Recovery — Overview</a>
+    <a class="sidebar-link" href="#otr-windows"><span class="sidebar-num">11</span>One Touch Recovery — Windows</a>
+    <a class="sidebar-link" href="#otr-linux"><span class="sidebar-num">12</span>One Touch Recovery — Linux</a>
+    <a class="sidebar-link" href="#best-practices"><span class="sidebar-num">13</span>Best Practices</a>
+    <a class="sidebar-link" href="#interview"><span class="sidebar-num">14</span>Interview Q&amp;A</a>
+  </nav>
+</aside>
+<!-- PAGE CONTENT -->
+<div class="page-content">
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🛠 Tutorial 12 · CommServe Migration · SAP HANA · One Touch Recovery</div>
+  <h1>CommServe <span>Hardware Refresh</span>, SAP HANA Backup &amp; <span>One Touch Recovery</span></h1>
+  <p class="hero-desc">End-to-end coverage of CommServe migration using the CS Recovery Assistant tool, SAP HANA database backup and restore with user credentials and HDB keystore authentication, and complete One Touch Recovery (bare-metal recovery) procedures for physical Windows and Linux servers — including Live CD boot, the six-stage recovery wizard, and DDB re-synchronization after CommServe recovery.</p>
+  <div class="hero-tags">
+    <span class="tag purple">🗄 CommServe Hardware Refresh</span>
+    <span class="tag blue">🔧 CS Recovery Assistant</span>
+    <span class="tag green">♻ DDB Re-synchronization</span>
+    <span class="tag gold">🏢 SAP HANA Backup &amp; Restore</span>
+    <span class="tag orange">🔑 HDB Keystore Auth</span>
+    <span class="tag purple">💿 One Touch Windows</span>
+    <span class="tag blue">🐧 One Touch Linux</span>
+    <span class="tag green">📋 Crash vs App Consistent</span>
+  </div>
+</div>
+<!-- TOC -->
+<div class="toc-grid">
+  <a class="toc-item" href="#cs-migration"><span class="toc-num">01</span> CommServe Migration Overview</a>
+  <a class="toc-item" href="#cs-methods"><span class="toc-num">02</span> Two Migration Methods</a>
+  <a class="toc-item" href="#cs-recovery-tool"><span class="toc-num">03</span> CS Recovery Assistant Tool</a>
+  <a class="toc-item" href="#cs-post-migration"><span class="toc-num">04</span> Post-Migration &amp; DDB Re-sync</a>
+  <a class="toc-item" href="#sap-overview"><span class="toc-num">05</span> SAP HANA — Overview &amp; Architecture</a>
+  <a class="toc-item" href="#sap-install"><span class="toc-num">06</span> HANA Lab Setup &amp; Agent Install</a>
+  <a class="toc-item" href="#sap-config"><span class="toc-num">07</span> HANA Configuration in Commvault</a>
+  <a class="toc-item" href="#sap-backup"><span class="toc-num">08</span> HANA Backup &amp; In-Place Restore</a>
+  <a class="toc-item" href="#sap-cmdline"><span class="toc-num">09</span> Command-Line Backup &amp; HDB Keystore</a>
+  <a class="toc-item" href="#otr-overview"><span class="toc-num">10</span> One Touch Recovery — Overview</a>
+  <a class="toc-item" href="#otr-windows"><span class="toc-num">11</span> One Touch Recovery — Windows</a>
+  <a class="toc-item" href="#otr-linux"><span class="toc-num">12</span> One Touch Recovery — Linux</a>
+  <a class="toc-item" href="#best-practices"><span class="toc-num">13</span> Best Practices</a>
+  <a class="toc-item" href="#interview"><span class="toc-num">14</span> Interview Q&amp;A</a>
+</div>
+<div class="main-content">
+
+<!-- ============================================================ -->
+<!-- SECTION 1: CommServe Migration Overview                       -->
+<!-- ============================================================ -->
+<section id="cs-migration" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🗄</div>
+    <div>
+      <div class="section-title">CommServe Migration — Hardware Refresh Overview</div>
+      <div class="section-subtitle">Use cases, planning considerations, and why this is an offline-only process</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is CommServe Hardware Refresh?</h3>
+    <p>CommServe hardware refresh (also called CommServe migration) is the process of moving the Commvault CommServe database and configuration from one physical or virtual server to another. It is an infrequent but critical operation that requires careful planning. While you may only perform it once in several years for a given customer, the impact of doing it incorrectly is severe — potentially losing all backup job records and configuration.</p>
+    <h4>Common Use Cases</h4>
+    <ul>
+      <li><strong>End-of-life hardware:</strong> The physical server hosting the CommServe is reaching end-of-support and cannot be extended further with CPU, RAM, or disk.</li>
+      <li><strong>OS upgrade with no direct path:</strong> For example, CommServe is on Windows Server 2012. Microsoft says there is no direct upgrade path to Windows Server 2022. A new server with the target OS must be built and a hardware refresh performed.</li>
+      <li><strong>Physical to virtual migration:</strong> Moving the CommServe from a physical server to a VM, or between cloud platforms.</li>
+      <li><strong>Performance upgrade:</strong> Replacing an undersized server with a higher-spec one.</li>
+      <li><strong>OS crash recovery:</strong> After a complete OS failure when the system cannot be recovered by the OS team — use CS Recovery Assistant to restore configuration from DR backup onto a rebuilt server.</li>
+      <li><strong>Post-patch instability:</strong> After applying CommServe patches that cause unexpected behavior, Commvault Support may instruct recovery from the last known-good DR backup.</li>
+    </ul>
+    <div class="callout note">
+      <div class="callout-title">📘 Standalone vs LiveSync</div>
+      <p>This procedure applies to a <strong>standalone CommServe</strong>. For CommServe with LiveSync (high-availability standby), the core procedure is the same but with additional steps. LiveSync significantly reduces data loss risk during a CommServe crash — from potential hours of lost job history (standalone) down to minutes.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Pre-Migration Checklist</h3>
+
+    <!-- DIAGRAM: CommServe Migration High-Level Flow -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">CommServe Hardware Refresh — High-Level Flow<small>End-to-end migration from old server to new server via DR backup</small></div>
+      <div class="hflow">
+        <div class="hflow-node node-purple">
+          <div class="node-icon">🗄</div>
+          <div class="node-label">Old CommServe</div>
+          <div class="node-sub">Windows Server 2012<br>SQL DB + Config</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">DR Backup</div>
+          <div class="arrow-line"></div>
+          <div class="arrow-label">SET_xxx folder</div>
+        </div>
+        <div class="hflow-node node-gold">
+          <div class="node-icon">💾</div>
+          <div class="node-label">Network Share</div>
+          <div class="node-sub">DR Dump Files<br>SET_&lt;number&gt; folder</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">Copy DR dump</div>
+          <div class="arrow-line"></div>
+          <div class="arrow-label">to new server</div>
+        </div>
+        <div class="hflow-node node-blue">
+          <div class="node-icon">🆕</div>
+          <div class="node-label">New CommServe</div>
+          <div class="node-sub">Windows Server 2022<br>Fresh Install + Import</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">Clients reconnect</div>
+          <div class="arrow-line"></div>
+        </div>
+        <div class="hflow-node node-green">
+          <div class="node-icon">✅</div>
+          <div class="node-label">Production</div>
+          <div class="node-sub">All clients, policies<br>schedules restored</div>
+        </div>
+      </div>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Verify OS on supported list</span>
+      <span class="strip-val">Check that the target OS is in the Commvault supported list for your current software version (e.g., v11.36). Refer to Commvault documentation → System Requirements → CommServe Supported Operating Systems.</span>
+      <span class="strip-badge sb-warn">Check Docs First</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Disk and IOPS sizing</span>
+      <span class="strip-val">Review disk size requirements for the SQL Server database that CommServe uses, and the IOPS needed for the CommServe installation path. Refer to documentation for scale-appropriate sizing.</span>
+      <span class="strip-badge sb-warn">Size for Scale</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Take a fresh DR backup</span>
+      <span class="strip-val">Do not rely on the scheduled DR backup. Trigger a manual DR backup immediately before migration. Note the DR path (e.g., <code>E:\DR</code>). Copy the latest <code>SET_&lt;number&gt;</code> folder to an external location before proceeding.</span>
+      <span class="strip-badge sb-warn">Mandatory Step</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">DR location must be a network share</span>
+      <span class="strip-val">Commvault strongly recommends storing DR backups on a <strong>network share</strong>, not on the local drive of the CommServe. If the OS crashes and the local drive is inaccessible, the DR dump is lost. Alternatives: network share, Metallic Cloud, cloud library.</span>
+      <span class="strip-badge sb-warn">Never Local Drive Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Offline process only</span>
+      <span class="strip-val">CommServe migration is an <strong>offline process</strong>. There is no online migration option. The old CommServe must be shut down before the new one can take over. Plan a maintenance window accordingly.</span>
+      <span class="strip-badge sb-info">Offline Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">License file</span>
+      <span class="strip-val">The permanent license may or may not activate on the new hardware automatically. If it does not, contact your Commvault account manager to generate a new license file tied to the new server's hardware fingerprint.</span>
+      <span class="strip-badge sb-info">May Need Re-activation</span>
+    </div>
+    <div class="callout warn">
+      <div class="callout-title">⚠ Local Drive DR Backup — Real-World Risk</div>
+      <p>In the lab demonstration, the DR backup was stored on a local drive (E:\DR) purely for convenience. In production this creates a critical risk: if the OS crashes and the server cannot be booted, the DR dump files are trapped on an inaccessible disk. Best practice: always configure a <strong>network share path</strong> for CommServe DR backup. If a network share is genuinely unavailable, upload DR dumps to Metallic Cloud or a cloud library as the next best option. Tape-based recovery is technically possible but very complex — it requires knowing which specific tape contains the latest DR backup.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 2: Two Migration Methods                              -->
+<!-- ============================================================ -->
+<section id="cs-methods" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🔀</div>
+    <div>
+      <div class="section-title">Two CommServe Database Migration Methods</div>
+      <div class="section-subtitle">Choosing the right method based on whether the IP and hostname change</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Method 1 vs Method 2 — Comparison</h3>
+
+    <!-- DIAGRAM: Side-by-side Method 1 vs Method 2 -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">Two CommServe Migration Paths<small>Decision depends on whether IP address and hostname change</small></div>
+      <div class="vs-diagram">
+        <div class="vs-side node-blue" style="border:1.5px solid rgba(0,200,255,0.3);background:rgba(0,200,255,0.05);">
+          <div class="vs-title" style="color:var(--accent);">🔵 Method 1 — Same IP &amp; Hostname</div>
+          <div class="vs-item">Install Commvault on new server</div>
+          <div class="vs-item">Select "Use Existing Database"</div>
+          <div class="vs-item">Provide DR dump path (SET_ folder)</div>
+          <div class="vs-item">Database imported during install</div>
+          <div class="vs-item" style="color:var(--accent2);opacity:1;">✓ Clients reconnect automatically</div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="vs-side node-purple" style="border:1.5px solid rgba(167,139,250,0.3);background:rgba(167,139,250,0.05);">
+          <div class="vs-title" style="color:var(--accent4);">🟣 Method 2 — Different IP or Hostname</div>
+          <div class="vs-item">Install Commvault on new server</div>
+          <div class="vs-item">Select "Create New Database"</div>
+          <div class="vs-item">Run CS Recovery Assistant post-install</div>
+          <div class="vs-item">Tool handles IP/hostname remapping</div>
+          <div class="vs-item" style="color:var(--accent3);opacity:1;">⚠ Clients may need IP update</div>
+        </div>
+      </div>
+    </div>
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🔵 Method 1 — Same IP &amp; Hostname</h5>
+        <ul>
+          <li>New server will use the <strong>exact same IP and hostname</strong> as the old CommServe</li>
+          <li>At installation wizard: Select <strong>"Use Existing Database"</strong> when asked</li>
+          <li>Provide the path to the DR dump folder (<code>SET_&lt;number&gt;</code>) when prompted</li>
+          <li>CommServe installs and imports the database in a single operation</li>
+          <li>All clients reconnect automatically — no reconfiguration needed on any client</li>
+          <li>Most common scenario for pure hardware refresh (server identity stays the same)</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>🟣 Method 2 — Different IP or Hostname</h5>
+        <ul>
+          <li>New server will have a <strong>different IP address or hostname</strong></li>
+          <li>At installation wizard: Select <strong>"Create New Database"</strong> to install cleanly</li>
+          <li>After installation completes, run the <strong>CS Recovery Assistant tool</strong> to import the old database configuration</li>
+          <li>Handles IP/hostname remapping of the old configuration to the new server identity</li>
+          <li>Used for: IP change, data centre migration, OS platform change to a new server name</li>
+          <li>Clients may need their CommServe IP updated after the migration</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout tip">
+      <div class="callout-title">💡 CS Recovery Assistant — Used by Most Customers Regardless of Method</div>
+      <p>Even for Method 1 (same IP/hostname), many customers prefer to use the CS Recovery Assistant tool because it is a well-tested, documented recovery path. Commvault's official recommendation differentiates the two methods by IP/hostname change, but in practice the CS Recovery Assistant is used for both. The key principle: always confirm the old CommServe is <strong>fully decommissioned and powered off</strong> before running the Recovery Assistant on the new server — the tool explicitly requires you to confirm this before proceeding.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 3: CS Recovery Assistant Tool                         -->
+<!-- ============================================================ -->
+<section id="cs-recovery-tool" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">🔧</div>
+    <div>
+      <div class="section-title">CS Recovery Assistant Tool — Step-by-Step</div>
+      <div class="section-subtitle">Using CSRecoveryAssistant.exe for hardware refresh and disaster recovery</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is the CS Recovery Assistant?</h3>
+    <p>The CommServe Recovery Assistant (<code>CSRecoveryAssistant.exe</code>) is a Commvault-provided tool located in the Base folder of the CommServe installation. It imports a DR backup dump into a freshly installed CommServe SQL database, restoring the complete environment — all clients, storage policies, plans, schedules, libraries, and job history.</p>
+    <div class="strip-row">
+      <span class="strip-label">Tool Location</span>
+      <span class="strip-val">CommServe installation Base folder — e.g. <code>E:\Program Files\Commvault\ContentStore\Base\CSRecoveryAssistant.exe</code>. If unsure of the Base path, open Process Manager — the install path is displayed there.</span>
+      <span class="strip-badge sb-info">Base Folder</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Run As Administrator</span>
+      <span class="strip-val">Must be launched with <strong>Run as Administrator</strong>. Right-click the executable → Run as administrator.</span>
+      <span class="strip-badge sb-warn">Admin Required</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Two Modes</span>
+      <span class="strip-val"><strong>Staging:</strong> Import the old DB on a separate test machine to create a staging/clone environment for testing. Does NOT affect production. <strong>Perform Recovery:</strong> The machine is taking over as the production CommServe. Never use Recovery mode just for testing — use Staging instead.</span>
+      <span class="strip-badge sb-warn">Choose Mode Carefully</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Free space needed</span>
+      <span class="strip-val">At least <strong>double the size</strong> of the DR dump folder. If the <code>SET_&lt;number&gt;</code> folder is 30 GB, you need at least 60 GB free on the extraction drive before starting recovery.</span>
+      <span class="strip-badge sb-warn">2× Dump Size Required</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>CS Recovery Assistant — Full Procedure</h3>
+
+    <!-- DIAGRAM: Recovery Assistant Pipeline -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">CS Recovery Assistant — 8-Step Pipeline Overview<small>Complete CommServe hardware refresh workflow at a glance</small></div>
+      <div class="pipeline" style="flex-wrap:wrap;">
+        <div class="pipe-stage node-purple" style="background:rgba(167,139,250,0.08);border:1.5px solid rgba(167,139,250,0.25);">
+          <div class="pipe-num" style="color:var(--accent4);">1</div>
+          <div class="pipe-label" style="color:#c4b5fd;">Final DR<br>Backup</div>
+        </div>
+        <div class="pipe-stage node-red" style="background:rgba(239,68,68,0.06);border:1.5px solid rgba(239,68,68,0.25);">
+          <div class="pipe-num" style="color:#ef4444;">2</div>
+          <div class="pipe-label" style="color:#fca5a5;">Shut Down<br>Old CS</div>
+        </div>
+        <div class="pipe-stage node-blue" style="background:rgba(0,200,255,0.08);border:1.5px solid rgba(0,200,255,0.25);">
+          <div class="pipe-num" style="color:var(--accent);">3</div>
+          <div class="pipe-label" style="color:#7ee8fa;">Install on<br>New Server</div>
+        </div>
+        <div class="pipe-stage node-purple" style="background:rgba(167,139,250,0.08);border:1.5px solid rgba(167,139,250,0.25);">
+          <div class="pipe-num" style="color:var(--accent4);">4</div>
+          <div class="pipe-label" style="color:#c4b5fd;">Open CS<br>Recovery</div>
+        </div>
+        <div class="pipe-stage node-orange" style="background:rgba(255,107,53,0.08);border:1.5px solid rgba(255,107,53,0.25);">
+          <div class="pipe-num" style="color:var(--accent3);">5</div>
+          <div class="pipe-label" style="color:#fca97a;">Confirm<br>Decommission</div>
+        </div>
+        <div class="pipe-stage node-gold" style="background:rgba(245,200,66,0.08);border:1.5px solid rgba(245,200,66,0.25);">
+          <div class="pipe-num" style="color:var(--gold);">6</div>
+          <div class="pipe-label" style="color:#fde68a;">Provide<br>DR Path</div>
+        </div>
+        <div class="pipe-stage node-blue" style="background:rgba(0,200,255,0.08);border:1.5px solid rgba(0,200,255,0.25);">
+          <div class="pipe-num" style="color:var(--accent);">7</div>
+          <div class="pipe-label" style="color:#7ee8fa;">Start<br>Recovery</div>
+        </div>
+        <div class="pipe-stage node-green" style="background:rgba(0,229,160,0.08);border:1.5px solid rgba(0,229,160,0.25);">
+          <div class="pipe-num" style="color:var(--accent2);">8</div>
+          <div class="pipe-label" style="color:#6ee7b7;">License &amp;<br>Verify</div>
+        </div>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-title">CommServe Hardware Refresh — Recovery Walkthrough</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Take a Final DR Backup on the Old CommServe</strong>
+            <p>CommCell Console → Control Panel → CommServe DR Backup → Run Now. Wait for completion. Navigate to the DR path (e.g., <code>E:\DR</code>) and identify the latest <code>SET_&lt;timestamp&gt;</code> folder (e.g., <code>SET_030</code>). Copy this entire folder to an external server (network share, jump server) accessible from the new CommServe.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Shut Down and Decommission the Old CommServe</strong>
+            <p>Stop all Commvault services on the old CommServe. Power it off or isolate it from the network. This is a mandatory prerequisite — two CommServe machines must never be active simultaneously with the same configuration, as it causes split-brain conflicts and data corruption. The Recovery Assistant explicitly asks you to confirm decommissioning before proceeding.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Install Commvault Software on the New Server</strong>
+            <p>Run the Commvault installer on the new hardware. At the database setup screen, choose appropriately: <strong>Use Existing Database</strong> and provide the dump path (Method 1 — same IP), or <strong>Create New Database</strong> for a fresh install (Method 2 — different IP, then use Recovery Assistant afterwards). Complete the installation and verify Process Manager shows CommServe services running.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Open CS Recovery Assistant</strong>
+            <p>Navigate to the Commvault Base folder on the new server. Locate <code>CSRecoveryAssistant.exe</code>. Right-click → Run as Administrator. The tool opens with two options: Staging or Recovery (Production). Select <strong>Perform Recovery</strong>.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Confirm Decommission — Type the Exact Phrase</strong>
+            <p>The tool displays a statement that must be typed <strong>exactly as shown</strong> — including all punctuation, capitalisation, and spacing. It confirms that the original CommServe has been decommissioned and this machine will take over as production CommServe. Even a single extra period or missing character will prevent the wizard from advancing to the next page. Type carefully and proceed.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Provide the DR Dump Path</strong>
+            <p>Enter the full path to the <code>SET_&lt;number&gt;</code> folder. Ensure the target drive has at least 2× the folder size in free space. The tool validates the path and extracts the database dump files.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">7</div>
+          <div class="flow-content">
+            <strong>Start Recovery — Wait for Completion</strong>
+            <p>Click Start Recovery. The tool imports all CommServe database tables into the SQL Server instance. This restores the complete environment: all clients, storage policies, plans, schedules, libraries, and job history. Wait for the success message: <em>"Recovery completed successfully."</em></p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">8</div>
+          <div class="flow-content">
+            <strong>Apply License, Start Services, Verify</strong>
+            <p>Apply the license file when prompted (or later via CommCell Console). Start all Commvault services via the Process Manager. Open CommCell Console and Command Center — verify both load without errors. Proceed to post-migration verification (next section).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three Use Cases for CS Recovery Assistant</h3>
+    <table class="tool-table">
+      <tr><th>Use Case</th><th>Trigger</th><th>Data Loss?</th><th>Notes</th></tr>
+      <tr>
+        <td><strong>Hardware Refresh</strong></td>
+        <td>Planned migration to new hardware or OS</td>
+        <td>None — take a fresh DR backup immediately before migration</td>
+        <td>Most common use case. Full planned procedure with maintenance window.</td>
+      </tr>
+      <tr>
+        <td><strong>Post-Patch / Post-Change Recovery</strong></td>
+        <td>CommServe misbehaves after applying patches or configuration changes. Commvault Support recommends recovery from last known-good DR backup.</td>
+        <td>Possible — jobs run after the last DR backup are lost from CommServe DB metadata. Actual backup data on media is unaffected.</td>
+        <td>Always use the <strong>Repair</strong> option first (preserves caches and settings). Only proceed to CS Recovery Assistant if Repair does not resolve the issue.</td>
+      </tr>
+      <tr>
+        <td><strong>OS Crash Recovery</strong></td>
+        <td>CommServe OS crashed, cannot be recovered. OS team reinstalls the OS.</td>
+        <td>Yes — all job records between the last DR backup and the crash are lost from CommServe DB. Data on media unaffected.</td>
+        <td>Data loss = time between last DR backup and crash (e.g., DR at 10 AM, crash at 6 PM = 8 hours of lost job records). LiveSync reduces this to minutes.</td>
+      </tr>
+    </table>
+    <div class="callout note">
+      <div class="callout-title">📘 Repair vs Manual Reinstall — Critical Difference</div>
+      <p>When CommServe behaves unexpectedly, Commvault Support often recommends the <strong>Repair</strong> option before recovery. Repair uninstalls and reinstalls CommServe packages while <strong>preserving</strong>: index cache, job results folder, MongoDB cache, and additional settings applied by Support. A manual uninstall + reinstall does NOT preserve these — they are wiped. Always follow Support's recommendation on which path to take.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 4: Post-Migration Tasks & DDB Re-sync                 -->
+<!-- ============================================================ -->
+<section id="cs-post-migration" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">✅</div>
+    <div>
+      <div class="section-title">Post-Migration Tasks &amp; DDB Re-synchronization</div>
+      <div class="section-subtitle">Verification checklist and resolving DDB out-of-sync after CommServe recovery</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Post-Migration Verification Checklist</h3>
+
+    <!-- DIAGRAM: Post-Migration Component Check -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">Post-Migration Verification — Component Health Check<small>All components must be verified after CommServe recovery</small></div>
+      <div class="vstack">
+        <div class="vstack-node node-blue" style="max-width:380px;">
+          <div class="node-label">🗄 New CommServe</div>
+          <div class="node-sub">Services running · License active</div>
+        </div>
+        <div class="vstack-connector"><div class="vline"></div></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:100%;max-width:600px;">
+          <div style="flex:1;min-width:120px;border-radius:8px;padding:10px;text-align:center;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);">
+            <div style="font-size:12px;font-weight:600;color:#7ee8fa;">CommCell Console</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">Clients visible<br>Policies intact</div>
+          </div>
+          <div style="flex:1;min-width:120px;border-radius:8px;padding:10px;text-align:center;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);">
+            <div style="font-size:12px;font-weight:600;color:#c4b5fd;">Command Center</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">Plans & dashboards<br>load correctly</div>
+          </div>
+          <div style="flex:1;min-width:120px;border-radius:8px;padding:10px;text-align:center;background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);">
+            <div style="font-size:12px;font-weight:600;color:#6ee7b7;">Media Agents</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">Online status<br>Libraries ready</div>
+          </div>
+          <div style="flex:1;min-width:120px;border-radius:8px;padding:10px;text-align:center;background:rgba(245,200,66,0.06);border:1px solid rgba(245,200,66,0.2);">
+            <div style="font-size:12px;font-weight:600;color:#fde68a;">DDB Partitions</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">Online or re-sync<br>if out of sync</div>
+          </div>
+        </div>
+        <div class="vstack-connector"><div class="vline"></div><div class="vlabel">Run test backup to validate full pipeline</div><div class="vline"></div></div>
+        <div class="vstack-node node-green" style="max-width:380px;">
+          <div class="node-label">✅ Migration Complete</div>
+          <div class="node-sub">End-to-end functionality confirmed</div>
+        </div>
+      </div>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">All services running</span>
+      <span class="strip-val">Process Manager → verify all CommServe services show Running state. No services in Stopped or Error state.</span>
+      <span class="strip-badge sb-ok">First Check</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">CommCell Console opens</span>
+      <span class="strip-val">Launch the Java CommCell Console → log in → verify all clients are visible, storage policies are present, and no critical alerts are displayed.</span>
+      <span class="strip-badge sb-ok">Verify Config</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Command Center opens</span>
+      <span class="strip-val">Open the Command Center web UI → verify plans, hypervisors, and dashboards load without errors.</span>
+      <span class="strip-badge sb-ok">Verify Web UI</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Media Agents online</span>
+      <span class="strip-val">CommCell Console → Storage Resources → Media Agents → verify all media agents show Online status. Offline agents need connectivity investigation.</span>
+      <span class="strip-badge sb-ok">Check MA Status</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Libraries online</span>
+      <span class="strip-val">Storage Resources → Libraries → verify disk libraries and cloud libraries show Online and Ready.</span>
+      <span class="strip-badge sb-ok">Check Libraries</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">DDB partitions online</span>
+      <span class="strip-val">Check Deduplication Database partitions. After recovery from an older DR backup, DDB may show Offline or Maintenance Mode if CommServe DB and DDB are out of sync. Re-synchronization may be needed.</span>
+      <span class="strip-badge sb-warn">Check DDB Status</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Run a test backup</span>
+      <span class="strip-val">Trigger a manual backup of one non-critical client. Confirm it completes successfully. This validates the full backup pipeline (CommServe → MA → Library) is working after migration.</span>
+      <span class="strip-badge sb-ok">End-to-End Test</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>DDB Re-synchronization — When and Why</h3>
+    <p>The Deduplication Database (DDB) is hosted on a Media Agent and maintains its own records of deduplicated block fingerprints independent of the CommServe SQL database. After CommServe recovery from an older DR backup, the two databases can become <strong>out of sync</strong>, causing DDB partitions to go Offline or enter Maintenance Mode.</p>
+    <div class="highlight-box">
+      <h4>🔍 Understanding the Out-of-Sync Scenario</h4>
+      <p><strong>Scenario:</strong> DR backup taken at <strong>10 AM</strong>. OS crashes at <strong>6 PM</strong>. CommServe recovered at <strong>7 PM</strong> using the 10 AM dump. Result: CommServe SQL database only knows about jobs up to 10 AM. The Media Agent DDB has job records up to 6 PM — 8 hours of additional backup activity. The two are now out of sync → DDB partition shows <strong>Offline / Maintenance Mode</strong>. Fix: DDB Re-synchronization, which reconciles the CommServe database with the DDB state on the media agent.</p>
+    </div>
+
+    <!-- DIAGRAM: DDB Out-of-Sync Timeline -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">DDB Out-of-Sync Timeline<small>CommServe DB vs Media Agent DDB state after recovery from older DR backup</small></div>
+      <div class="timeline">
+        <div class="tl-point">
+          <div class="tl-time">10:00 AM</div>
+          <div class="tl-dot dot-green"></div>
+          <div class="tl-desc">DR Backup taken<br><span style="color:var(--accent2);">✓ CS DB snapshot</span></div>
+        </div>
+        <div class="tl-point">
+          <div class="tl-time">10 AM – 6 PM</div>
+          <div class="tl-dot dot-blue"></div>
+          <div class="tl-desc">8 hrs of jobs run<br><span style="color:var(--accent);">DDB records these</span><br><span style="color:var(--accent3);">CS DB does not</span></div>
+        </div>
+        <div class="tl-point">
+          <div class="tl-time">6:00 PM</div>
+          <div class="tl-dot dot-red"></div>
+          <div class="tl-desc">OS Crashes<br><span style="color:#fca5a5;">💥 CommServe down</span></div>
+        </div>
+        <div class="tl-point">
+          <div class="tl-time">7:00 PM</div>
+          <div class="tl-dot dot-purple"></div>
+          <div class="tl-desc">CS Recovered<br><span style="color:var(--accent4);">DB = 10 AM state</span><br><span style="color:var(--accent3);">DDB = 6 PM state</span></div>
+        </div>
+        <div class="tl-point">
+          <div class="tl-time">Fix</div>
+          <div class="tl-dot dot-green"></div>
+          <div class="tl-desc">Re-synchronize<br><span style="color:var(--accent2);">✓ DDB back online</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">How to Trigger Re-sync</span>
+      <span class="strip-val">CommCell Console → Storage Resources → Deduplication Engines → right-click the DDB store that is offline. The <strong>Re-synchronize</strong> option appears here — but only when DDB is out of sync with CommServe. In newer versions (v11.3x+), the option is hidden when sync is healthy and appears automatically when inconsistency is detected.</span>
+      <span class="strip-badge sb-purple">Right-Click DDB Store</span>
+    </div>
+    <div class="callout best">
+      <div class="callout-title">⭐ DDB Best Practice — Keep DDB on Media Agent, Not CommServe</div>
+      <p>Always host DDB partitions on a <strong>dedicated Media Agent</strong>, not on the CommServe machine. Hosting DDB on the CommServe means a CommServe failure simultaneously takes down both CommServe metadata and DDB — making re-synchronization impossible and recovery far more complex. Disk library mount paths should ideally be on the same media agent as the DDB for that storage pool.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 5: SAP HANA Overview                                  -->
+<!-- ============================================================ -->
+<section id="sap-overview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">🏢</div>
+    <div>
+      <div class="section-title">SAP HANA — Overview &amp; Commvault Integration</div>
+      <div class="section-subtitle">In-memory database architecture, multi-tenant containers, Backint interface, and key terminology</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is SAP HANA?</h3>
+    <p>SAP HANA (High-Performance Analytic Appliance) is an enterprise in-memory database platform designed for processing massive volumes of real-time data. Unlike traditional disk-based databases, HANA stores and processes data <strong>in RAM</strong>, enabling extremely fast analytics and transactional processing. Due to its high licensing and hardware cost, it is primarily deployed by large enterprises.</p>
+    <p>Commvault integrates with SAP HANA via the <strong>Backint interface</strong> — a SAP-defined API that allows third-party backup tools to communicate with HANA and perform backup and restore operations. This integration is analogous to Oracle RMAN for Oracle databases — not identical, but a similar concept of a vendor-defined interface for backup integration.</p>
+    <div class="highlight-box">
+      <h4>🎯 Why Use Commvault for SAP HANA Backup?</h4>
+      <p>SAP HANA has its own native backup capability. Customers use Commvault instead (or in addition) to get: unified backup management and reporting across all workloads (SAP HANA, VMs, file servers), cross-system restore capabilities, enterprise-grade retention and compliance policies, and integration with their existing Commvault infrastructure. The HANA admin retains control and can also trigger ad-hoc backups — those jobs appear in the Commvault Job Controller automatically.</p>
+    </div>
+    <h4>Key SAP HANA Terminology</h4>
+    <table class="tool-table">
+      <tr><th>Term</th><th>Meaning</th><th>Commvault Equivalent</th></tr>
+      <tr><td><strong>SID (System ID)</strong></td><td>Three-character unique identifier for a HANA installation. Default for HANA Express: <code>HXE</code>.</td><td>Similar to an Oracle SID</td></tr>
+      <tr><td><strong>MDC / Multi-Tenant Container</strong></td><td>A single HANA instance hosting multiple isolated tenant databases. Standard deployment model.</td><td>One instance, multiple databases</td></tr>
+      <tr><td><strong>System DB</strong></td><td>Administrative database managing the tenant databases. Not where customer data lives.</td><td>Master/admin database</td></tr>
+      <tr><td><strong>Tenant DB (HXE)</strong></td><td>The actual customer/application database. Contains schemas, tables, and data.</td><td>User database</td></tr>
+      <tr><td><strong>&lt;SID&gt;adm user</strong></td><td>HANA OS administrator user (e.g., <code>hxeadm</code>). Used to run HANA admin commands.</td><td>Database admin OS user</td></tr>
+      <tr><td><strong>HDB SQL</strong></td><td>HANA command-line SQL tool. Required for connecting to HANA databases from shell.</td><td>sqlplus (Oracle) / sqlcmd (MSSQL)</td></tr>
+      <tr><td><strong>Backint Interface</strong></td><td>SAP-defined API allowing third-party tools to receive HANA backup streams.</td><td>VSS (Windows) / RMAN (Oracle)</td></tr>
+      <tr><td><strong>HDB Keystore</strong></td><td>Secure credential store on the HANA server (managed via <code>hdbuserstore</code>). Maps a key name to DB credentials.</td><td>Commvault Credential Vault</td></tr>
+      <tr><td><strong>HANA Studio</strong></td><td>Legacy Java GUI for HANA administration. Deprecated — HANA Cockpit (web-based) is the modern replacement.</td><td>CommCell Console (legacy Java)</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>SAP HANA + Commvault — Architecture</h3>
+
+    <!-- DIAGRAM: SAP HANA + Commvault Full Architecture -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">SAP HANA Backup Architecture with Commvault<small>End-to-end data flow from HANA databases through Backint to storage</small></div>
+      <div class="vstack">
+        <!-- HANA Server Container -->
+        <div class="container-diagram" style="width:100%;max-width:520px;">
+          <div class="cd-title">SAP HANA SERVER — SUSE Linux 15 / RHEL 8+ · 32 GB RAM min</div>
+          <div class="cd-inner">
+            <div class="cd-box node-gold" style="border:1.5px solid rgba(245,200,66,0.3);background:rgba(245,200,66,0.08);">
+              <div class="cd-label" style="color:var(--gold);">System DB</div>
+              <div class="cd-sub">Administrative DB<br>Manages tenants</div>
+            </div>
+            <div class="cd-box node-gold" style="border:1.5px solid rgba(245,200,66,0.3);background:rgba(245,200,66,0.08);">
+              <div class="cd-label" style="color:var(--gold);">Tenant DB (HXE)</div>
+              <div class="cd-sub">Customer data<br>Schemas &amp; Tables</div>
+            </div>
+          </div>
+        </div>
+        <div class="vstack-connector">
+          <div class="vline"></div>
+          <div class="vlabel">Backint Interface (SAP API)</div>
+          <div class="vline"></div>
+        </div>
+        <div class="vstack-node node-purple" style="max-width:520px;">
+          <div class="node-label">Commvault SAP HANA Agent</div>
+          <div class="node-sub">Installed on HANA server · Auto-discovers databases · Communicates via Backint</div>
+        </div>
+        <div class="vstack-connector">
+          <div class="vline"></div>
+          <div class="vlabel">Ports 8400 / 8403</div>
+          <div class="vline"></div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%;max-width:520px;">
+          <div class="vstack-node node-blue" style="flex:1;min-width:200px;">
+            <div class="node-label">CommServe</div>
+            <div class="node-sub">Job scheduling · Policies<br>Metadata &amp; history</div>
+          </div>
+          <div class="vstack-node node-green" style="flex:1;min-width:200px;">
+            <div class="node-label">Storage Library</div>
+            <div class="node-sub">Cloud (GCP/Azure/AWS)<br>or Disk Library</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout note">
+      <div class="callout-title">📘 Who Does What — Admin Responsibilities</div>
+      <p>The SAP HANA database server is managed by the <strong>SAP HANA admin</strong>. The backup admin installs the Commvault agent and configures the backup/restore policies. The HANA admin provides to the backup admin: OS user credentials (<code>hxeadm</code>), HANA system user DB credentials, HDB SQL binary path, and (for keystore auth) the keystore key name. The backup admin does not control or administer the HANA database itself.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 6: HANA Lab Setup & Agent Install                     -->
+<!-- ============================================================ -->
+<section id="sap-install" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🌿</div>
+    <div>
+      <div class="section-title">SAP HANA Lab Setup &amp; Commvault Agent Installation</div>
+      <div class="section-subtitle">Deploying HANA Express on GCP and pushing the SAP HANA agent from Command Center</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Lab Environment — Why GCP?</h3>
+    <p>SAP HANA requires a minimum of <strong>32 GB RAM</strong> because it is an in-memory database. This makes local laptop deployment impractical. The recommended lab approach: deploy a GCP VM from the Marketplace using a SUSE Linux 15 for SAP image, which includes most SAP prerequisites pre-installed.</p>
+    <div class="strip-row">
+      <span class="strip-label">Supported Operating Systems</span>
+      <span class="strip-val">SAP HANA 2.0 is supported on <strong>SUSE Linux Enterprise Server (SLES) 15</strong> and <strong>Red Hat Enterprise Linux (RHEL) 8/9</strong>. Not supported on Ubuntu, Debian, or other distributions.</span>
+      <span class="strip-badge sb-warn">SLES 15 or RHEL Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">RAM Requirement</span>
+      <span class="strip-val">Minimum <strong>32 GB RAM</strong> for HANA Express Edition. Attempting installation with 8 GB fails — services cannot start. In GCP, use a machine type with 32 GB+ (e.g., n2-standard-8).</span>
+      <span class="strip-badge sb-warn">32 GB RAM Minimum</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Dedicated Disk Mount</span>
+      <span class="strip-val">Create a dedicated mount path for HANA installation (e.g., <code>/mnt/my_data</code>) with at least 100 GB free. Do not install HANA on the root partition.</span>
+      <span class="strip-badge sb-warn">100 GB Dedicated Mount</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">GCP Marketplace Image</span>
+      <span class="strip-val">Search GCP Marketplace for <strong>"SUSE Linux Enterprise Server 15 for SAP"</strong> — the image is provided by SUSE. It includes most SAP prerequisite packages. Once deployed, use <code>registercloudguest --force-new</code> to register to SUSE repositories without a paid registration code (works only on GCP Marketplace SLES images).</span>
+      <span class="strip-badge sb-ok">Use SAP-Optimised Image</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">HANA Express Edition</span>
+      <span class="strip-val">Free download from SAP website — no SAP support account required. Download the tar file to your laptop, then copy to the GCP VM using WinSCP or <code>scp</code>.</span>
+      <span class="strip-badge sb-ok">Free Download</span>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — Key SAP HANA Installation &amp; Service Commands</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"># Register SLES to SUSE repositories (GCP Marketplace VMs only — no paid license needed)
+registercloudguest --force-new
+
+# Extract HANA installation package
+tar -xvf hxe_download.tgz
+
+# Navigate to installer and launch (case-sensitive binary name)
+cd HANA_EXPRESS_20/DATA_UNITS/HDB_SERVER_LINUX_X86_64
+chmod +x hdblcm
+./hdblcm
+# Wizard choices:
+#   Option 1: Install
+#   Component: 2 (server only — not all components)
+#   Install path: /mnt/my_data   (dedicated mount, not root)
+#   SID: HXE   Instance ID: 90   (defaults)
+#   Backup encryption: N   (keep simple for lab)
+#   Master password: set a strong password
+
+# Enable HANA services to auto-start after VM reboot
+systemctl enable sapinit
+
+# Switch to HANA admin OS user (format: &lt;SID&gt;adm, all lowercase)
+su - hxeadm
+
+# Check HANA service status
+HDB info
+
+# Stop HANA services
+HDB stop
+
+# Start HANA services
+HDB start
+
+# Limit memory usage to prevent HANA consuming all RAM (lab environments)
+# Edit: /usr/sap/HXE/SYS/global/hdb/custom/config/global.ini
+# Under [memorymanager] section: global_allocation_limit = 16384  (16 GB)
+# Restart after edit: HDB stop &amp;&amp; HDB start
+
+# Find HDB SQL binary path (needed for Commvault configuration)
+find /usr/sap -name "hdbsql" 2&gt;/dev/null</div>
+    </div>
+    <div class="callout warn">
+      <div class="callout-title">⚠ HANA Commands are Case-Sensitive</div>
+      <p>All Linux commands and HANA-specific commands (<code>HDB</code>, <code>HDB info</code>, <code>hdblcm</code>) are case-sensitive. <code>HDB</code> is uppercase; <code>hdblcm</code> is lowercase. A wrong case gives "command not found" errors. The HANA command prompt is also case-sensitive for SQL statements.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Installing the Commvault SAP HANA Agent</h3>
+    <p>Unlike VM backup which is agentless, SAP HANA backup requires a Commvault agent installed <strong>directly on the HANA server</strong>. The agent communicates with HANA via the Backint interface.</p>
+
+    <!-- DIAGRAM: Agent Push Install Architecture -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">SAP HANA Agent — Push Install Architecture<small>Command Center pushes agent to HANA server; agent auto-discovers databases</small></div>
+      <div class="hflow">
+        <div class="hflow-node node-blue" style="min-width:130px;">
+          <div class="node-icon">🖥</div>
+          <div class="node-label">Command Center</div>
+          <div class="node-sub">Add Server wizard<br>Select SAP HANA pkg</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">Push install</div>
+          <div class="arrow-line"></div>
+          <div class="arrow-label">via SSH</div>
+        </div>
+        <div class="hflow-node node-gold" style="min-width:150px;">
+          <div class="node-icon">🐧</div>
+          <div class="node-label">HANA Server (GCP)</div>
+          <div class="node-sub">SUSE Linux 15<br>32 GB RAM · SAP HANA</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">Auto-discover</div>
+          <div class="arrow-line"></div>
+        </div>
+        <div class="hflow-node node-green" style="min-width:130px;">
+          <div class="node-icon">🔍</div>
+          <div class="node-label">Databases Found</div>
+          <div class="node-sub">System DB + HXE<br>Subclients created</div>
+        </div>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-title">Push Install of SAP HANA Agent from Command Center</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Add Server in Command Center</strong>
+            <p>Command Center → Manage → Servers → Add Server. Enter the public/private IP of the HANA VM. OS type: Unix/Linux. Credentials: the OS user on the HANA VM (e.g., <code>hanaadmin</code>) with sudo privileges. This user is created and provided by the HANA admin — it is not the <code>hxeadm</code> HANA system user.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Select SAP HANA Package and Plan</strong>
+            <p>In the package selection screen, search for and select the <strong>SAP HANA</strong> agent package. Select the appropriate backup plan (e.g., a GCP Cloud Library plan). Click Install.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Monitor Installation</strong>
+            <p>Monitor progress in the Job Controller. On the HANA server itself, the installation can also be tracked via <code>install.log</code>. Run <code>commvault list</code> and <code>commvault status</code> on the HANA server to confirm the agent services are running post-install.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Verify Auto-Discovery</strong>
+            <p>After installation, Commvault <strong>automatically discovers</strong> all HANA databases on the server — the SID, System DB, Tenant DB(s), and HDB SQL path are detected without manual entry. CommCell Console → Client Computers → the new HANA client → verify System DB and tenant databases (e.g., HXE) appear with default subclients created.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout tip">
+      <div class="callout-title">💡 Auto-Discovery — Only Works When Client is Ready</div>
+      <p>If the HANA host does not appear in the dropdown during Command Center configuration, or if databases do not auto-discover correctly, the root cause is almost always that Check Readiness is failing. Always run <strong>Check Readiness</strong> on the HANA client and confirm it shows Ready before attempting to configure or discover databases. If the external IP changed (VM restart), update the IP in CommCell Console → Client Properties first.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 7: HANA Configuration in Commvault                    -->
+<!-- ============================================================ -->
+<section id="sap-config" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">⚙</div>
+    <div>
+      <div class="section-title">SAP HANA Configuration in Commvault</div>
+      <div class="section-subtitle">Two authentication methods and configuring the HANA instance in Command Center</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Two Authentication Methods</h3>
+
+    <!-- DIAGRAM: Authentication Methods Visual Flow -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">HANA Authentication — Credential Flow Comparison<small>How credentials travel from HANA admin to Commvault in each method</small></div>
+      <div class="vs-diagram">
+        <div class="vs-side" style="border:1.5px solid rgba(0,200,255,0.25);background:rgba(0,200,255,0.04);border-radius:10px;padding:16px 18px;">
+          <div class="vs-title" style="color:var(--accent);">🔵 User Credentials</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px;">
+            <div style="font-size:11px;color:var(--gold);background:rgba(245,200,66,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(245,200,66,0.2);">HANA Admin</div>
+            <div style="color:var(--text-dim);font-size:10px;">shares username + password ↓</div>
+            <div style="font-size:11px;color:var(--accent4);background:rgba(167,139,250,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(167,139,250,0.2);">Backup Admin</div>
+            <div style="color:var(--text-dim);font-size:10px;">enters credentials ↓</div>
+            <div style="font-size:11px;color:var(--accent);background:rgba(0,200,255,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(0,200,255,0.2);">Commvault Config</div>
+            <div style="font-size:10px;color:var(--accent3);margin-top:4px;">⚠ Password stored in vault</div>
+          </div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="vs-side" style="border:1.5px solid rgba(167,139,250,0.25);background:rgba(167,139,250,0.04);border-radius:10px;padding:16px 18px;">
+          <div class="vs-title" style="color:var(--accent4);">🟣 HDB Keystore</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px;">
+            <div style="font-size:11px;color:var(--gold);background:rgba(245,200,66,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(245,200,66,0.2);">HANA Admin</div>
+            <div style="color:var(--text-dim);font-size:10px;">creates keystore on server ↓</div>
+            <div style="font-size:11px;color:var(--accent2);background:rgba(0,229,160,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(0,229,160,0.2);">🔐 Keystore (on HANA server)</div>
+            <div style="color:var(--text-dim);font-size:10px;">shares only key name ↓</div>
+            <div style="font-size:11px;color:var(--accent);background:rgba(0,200,255,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(0,200,255,0.2);">Commvault Config</div>
+            <div style="font-size:10px;color:var(--accent2);margin-top:4px;">✓ No password in Commvault</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="compare">
+      <div class="cmp-a cmp-box">
+        <h5>🔵 User Credentials — Simpler</h5>
+        <ul>
+          <li>Provide the HANA DB username (<code>SYSTEM</code>) and password directly in Commvault</li>
+          <li>Commvault stores credentials in the Credential Vault (encrypted)</li>
+          <li>Simpler to configure — no keystore preparation needed</li>
+          <li>Suitable for lab and non-sensitive environments</li>
+          <li>Less secure in strict compliance environments</li>
+          <li>HANA admin provides the DB username and password to the backup admin</li>
+        </ul>
+      </div>
+      <div class="cmp-b cmp-box">
+        <h5>🟣 HDB Keystore — More Secure (Recommended for Production)</h5>
+        <ul>
+          <li>HANA admin creates an HDB user keystore entry on the HANA server using <code>hdbuserstore SET</code></li>
+          <li>Keystore maps a key name to credentials (username, password, host, port)</li>
+          <li>Backup admin provides only the <strong>key name</strong> to Commvault — no raw password</li>
+          <li>No password stored in Commvault configuration</li>
+          <li>Recommended for all production environments</li>
+          <li>HANA admin must create the keystore before Commvault can be configured with this method</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout note">
+      <div class="callout-title">📘 Information Required from HANA Admin Before Configuration</div>
+      <p>Regardless of authentication method, the backup admin needs the following from the HANA admin: (1) <strong>HANA OS admin username</strong> — format <code>&lt;SID&gt;adm</code>, e.g., <code>hxeadm</code>. (2) <strong>HANA SID</strong> — three-character system ID (e.g., <code>HXE</code>). (3) <strong>HANA DB credentials</strong> — DB username (<code>SYSTEM</code>) and password for User Credentials method, or key name for Keystore method. (4) <strong>HDB SQL binary path</strong> — run <code>find /usr/sap -name "hdbsql" 2&gt;/dev/null</code> on the HANA server to locate it. This path is required by Commvault regardless of authentication method.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Configuring HANA Instance in Command Center</h3>
+    <div class="flow">
+      <div class="flow-title">Command Center — Guided Setup → Databases → SAP HANA</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Navigate to Database Configuration</strong>
+            <p>Command Center → Guided Setup (left panel) → Databases → Configure → select <strong>SAP HANA</strong>. Alternatively: Protect → Databases → Instances → Add SAP HANA instance. Both paths reach the same wizard.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Select Plan and HANA Host</strong>
+            <p>Select the backup plan (storage policy). For HANA Host, the client must already show as <strong>Ready</strong> in Check Readiness to appear in the dropdown. If it does not appear, run Check Readiness first and resolve any connectivity issues.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Provide Instance Details</strong>
+            <p><strong>System Name</strong>: user-defined label (not the IP address — e.g., "HANA-Production"). <strong>HANA Host</strong>: select from dropdown. <strong>SID</strong>: e.g., <code>HXE</code>. <strong>OS Admin User</strong>: <code>hxeadm</code>. <strong>Authentication Method</strong>: User Credentials or HDB Keystore. <strong>HDB SQL Path</strong>: full path to the <code>hdbsql</code> binary (auto-detected after agent install, or enter manually).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Verify Auto-Discovery Result</strong>
+            <p>After saving, navigate to Protect → Databases → Instances. The HANA instance should show both System DB and tenant databases (e.g., HXE) as auto-discovered entries with default subclients. If the instance was already auto-discovered (agent install triggered discovery), edit the existing record rather than creating a duplicate — you will see the message "SAP HANA is already configured with a different name, please de-configure first."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 8: HANA Backup & Restore                              -->
+<!-- ============================================================ -->
+<section id="sap-backup" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">💾</div>
+    <div>
+      <div class="section-title">SAP HANA Backup &amp; In-Place Restore</div>
+      <div class="section-subtitle">Running backups, creating test schemas, and verifying restore success</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Running a SAP HANA Backup</h3>
+    <div class="strip-row">
+      <span class="strip-label">Backup Types Available</span>
+      <span class="strip-val">Full backup, incremental, differential — same options as Oracle/SQL Server. Log backup for point-in-time recovery. HANA admins can also schedule independent log backups.</span>
+      <span class="strip-badge sb-info">Full / Incremental / Log</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">System DB vs Tenant DB</span>
+      <span class="strip-val">Both System DB and all tenant databases (e.g., HXE) must be backed up. System DB contains metadata about tenant databases — without a System DB backup, tenant DB recovery is not possible. Always back up both.</span>
+      <span class="strip-badge sb-warn">Back Up Both DBs</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Verify in Job Controller</span>
+      <span class="strip-val">In the Commvault Job Controller, HANA backup jobs show HANA database files in the "Currently Backing Up" column. This confirms the backup is a genuine application-consistent HANA backup via the Backint interface.</span>
+      <span class="strip-badge sb-ok">Monitor in Job Controller</span>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">hdbsql — Creating a Test Schema for Backup/Restore Verification</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"># Connect to HANA admin OS user
+su - hxeadm
+
+# Connect to tenant database (HXE)
+hdbsql -n localhost -i 90 -d HXE -u SYSTEM -p '\&lt;Password&gt;'
+# Note: escape special chars in password with backslash, or wrap in quotes
+
+# Create a schema (logical container within the tenant DB)
+CREATE SCHEMA SAMPLE_DB;
+
+# IMPORTANT: Write entire SQL statement on ONE LINE to avoid parse errors
+# Multi-line SQL causes "incomplete statement" errors in HDB SQL
+CREATE TABLE SAMPLE_DB.CUSTOMERS (ID INT, NAME VARCHAR(50), REGION VARCHAR(30));
+
+# Insert test data — single line
+INSERT INTO SAMPLE_DB.CUSTOMERS VALUES (1, 'Alpha Corp', 'Asia'), (2, 'Beta Ltd', 'Europe'), (3, 'Gamma Inc', 'Americas');
+
+# Verify data
+SELECT * FROM SAMPLE_DB.CUSTOMERS;
+-- Expected: 3 rows returned
+
+# --- Now take a Commvault backup from Command Center ---
+
+# Simulate data loss by dropping the schema
+DROP SCHEMA SAMPLE_DB CASCADE;
+
+# Confirm deletion
+SELECT * FROM SAMPLE_DB.CUSTOMERS;
+-- Expected: ERROR: invalid schema name: Could not find table/view SAMPLE_DB.CUSTOMERS
+
+# --- Trigger in-place restore from Commvault Command Center ---
+
+# Verify restore was successful
+SELECT * FROM SAMPLE_DB.CUSTOMERS;
+-- Expected: 3 rows returned again — restore successful</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>In-Place vs Out-of-Place Restore</h3>
+
+    <!-- DIAGRAM: In-Place vs Out-of-Place -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">SAP HANA Restore Scenarios<small>In-place recovery vs cross-system restore</small></div>
+      <div class="vs-diagram">
+        <div class="vs-side" style="border:1.5px solid rgba(0,229,160,0.25);background:rgba(0,229,160,0.04);border-radius:10px;padding:16px 18px;">
+          <div class="vs-title" style="color:var(--accent2);">✅ In-Place Restore</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px;">
+            <div style="font-size:11px;color:var(--gold);background:rgba(245,200,66,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(245,200,66,0.2);">HANA Server A</div>
+            <div style="color:var(--text-dim);font-size:18px;">↻</div>
+            <div style="font-size:11px;color:var(--gold);background:rgba(245,200,66,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(245,200,66,0.2);">HANA Server A</div>
+            <div style="font-size:10px;color:var(--accent2);margin-top:4px;">Same server, same instance</div>
+            <div style="font-size:10px;color:var(--text-dim);">→ Schema drop, corruption fix</div>
+          </div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="vs-side" style="border:1.5px solid rgba(245,200,66,0.25);background:rgba(245,200,66,0.04);border-radius:10px;padding:16px 18px;">
+          <div class="vs-title" style="color:var(--gold);">🔶 Out-of-Place Restore</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px;">
+            <div style="font-size:11px;color:var(--gold);background:rgba(245,200,66,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(245,200,66,0.2);">HANA Server A</div>
+            <div style="color:var(--text-dim);font-size:18px;">→</div>
+            <div style="font-size:11px;color:var(--accent);background:rgba(0,200,255,0.1);padding:4px 14px;border-radius:6px;border:1px solid rgba(0,200,255,0.2);">HANA Server B</div>
+            <div style="font-size:10px;color:var(--accent3);margin-top:4px;">Different server or instance</div>
+            <div style="font-size:10px;color:var(--text-dim);">→ Cloning, DR, migration</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="compare">
+      <div class="cmp-c cmp-box">
+        <h5>✅ In-Place Restore</h5>
+        <ul>
+          <li>Restore to the <strong>same HANA server and same database</strong></li>
+          <li>Overwrites existing database state with the backup point-in-time</li>
+          <li>Use case: accidental schema drop, data corruption, logical errors</li>
+          <li>Only one HANA server required</li>
+          <li>Most common restore scenario in production</li>
+          <li>Command Center: Restore → In-Place → same instance, same database</li>
+        </ul>
+      </div>
+      <div class="cmp-d cmp-box">
+        <h5>🔶 Out-of-Place Restore</h5>
+        <ul>
+          <li>Restore to a <strong>different HANA server or different instance</strong></li>
+          <li>Requires a second HANA server with the same software version and agent installed</li>
+          <li>Use case: clone for testing, cross-system migration, DR site restore</li>
+          <li>Target must appear in Commvault (agent installed + Check Readiness passing)</li>
+          <li>Command Center: Restore → Out-of-Place → select target client and instance from dropdown</li>
+          <li>Not possible when only one HANA server is available</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 9: Command-Line Backup & HDB Keystore                 -->
+<!-- ============================================================ -->
+<section id="sap-cmdline" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">💻</div>
+    <div>
+      <div class="section-title">Command-Line Backup &amp; HDB Keystore Authentication</div>
+      <div class="section-subtitle">HANA admin-triggered backups via HDB SQL and switching Commvault to keystore auth</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Command-Line Backups by the HANA Admin</h3>
+    <p>HANA admins can trigger backups directly from the HANA server command line using <code>hdbsql</code>. When these run, they appear as jobs in the Commvault Job Controller — because Commvault's Backint interface captures all HANA backup events regardless of their trigger source. As a backup admin, you will see these jobs and must <strong>not kill them</strong> — they are legitimate backup operations initiated by the HANA team.</p>
+
+    <!-- DIAGRAM: USING BACKINT vs TO FILES -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">HANA Command-Line Backup — Correct vs Incorrect Syntax<small>USING BACKINT routes through Commvault · TO FILES bypasses Commvault entirely</small></div>
+      <div class="vs-diagram">
+        <div class="vs-side" style="border:1.5px solid rgba(0,229,160,0.25);background:rgba(0,229,160,0.04);border-radius:10px;padding:16px 18px;">
+          <div class="vs-title" style="color:var(--accent2);">✅ USING BACKINT</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:8px;">
+            <div style="font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);color:var(--gold);">hdbsql</div>
+            <div style="font-size:9px;color:var(--text-dim);">↓ BACKUP DATA USING BACKINT</div>
+            <div style="font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);color:var(--accent4);">Backint Interface</div>
+            <div style="font-size:9px;color:var(--text-dim);">↓</div>
+            <div style="font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.2);color:var(--accent2);">Commvault Storage</div>
+            <div style="font-size:9px;color:var(--accent2);margin-top:3px;">✓ Appears in Job Controller</div>
+            <div style="font-size:9px;color:var(--accent2);">✓ Managed retention</div>
+          </div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="vs-side" style="border:1.5px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.04);border-radius:10px;padding:16px 18px;">
+          <div class="vs-title" style="color:#fca5a5;">❌ TO FILES</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:8px;">
+            <div style="font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);color:var(--gold);">hdbsql</div>
+            <div style="font-size:9px;color:var(--text-dim);">↓ BACKUP DATA TO FILES</div>
+            <div style="font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;">Local Disk Path</div>
+            <div style="font-size:9px;color:var(--text-dim);">↓</div>
+            <div style="font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(100,116,139,0.1);border:1px solid rgba(100,116,139,0.2);color:var(--text-dim);">Bypasses Commvault</div>
+            <div style="font-size:9px;color:var(--accent3);margin-top:3px;">⚠ Not in Job Controller</div>
+            <div style="font-size:9px;color:var(--accent3);">⚠ No managed retention</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">hdbsql — HANA Admin Command-Line Backup via Backint</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"># Connect as HANA admin OS user
+su - hxeadm
+
+# Connect to System DB for system DB backup
+hdbsql -n localhost -i 90 -d SYSTEMDB -u SYSTEM -p '\&lt;Password&gt;'
+
+# CORRECT syntax for command-line backup via Backint interface
+# "USING BACKINT" routes backup through Commvault — do NOT use "TO &lt;path&gt;"
+BACKUP DATA USING BACKINT (PREFIX 'COMPLETE_DATA_BACKUP');
+
+# "TO &lt;path&gt;" writes to local file, bypassing Commvault entirely — incorrect for Commvault-integrated backup
+# BACKUP DATA TO FILES PREFIX '/tmp/mybackup'  &lt;-- DO NOT USE THIS for Commvault integration
+
+# For tenant database backup, connect to tenant DB
+hdbsql -n localhost -i 90 -d HXE -u SYSTEM -p '\&lt;Password&gt;'
+BACKUP DATA USING BACKINT (PREFIX 'COMPLETE_DATA_BACKUP');
+
+# View backup catalog — list all backups taken
+SELECT ENTRY_TYPE_NAME, STATE_NAME, UTC_START_TIME, COMMENT
+  FROM M_BACKUP_CATALOG WHERE ENTRY_TYPE_NAME = 'complete data backup'
+  ORDER BY UTC_START_TIME DESC;
+
+# Both System DB and tenant DB commands show jobs in Commvault Job Controller</div>
+    </div>
+    <div class="callout warn">
+      <div class="callout-title">⚠ Common Mistake: BACKUP DATA TO vs BACKUP DATA USING BACKINT</div>
+      <p>Using <code>BACKUP DATA TO FILES PREFIX '/path'</code> writes backup directly to a local file path, completely bypassing Commvault. This means the backup is NOT in Commvault storage, will NOT appear correctly in backup reports, and cannot be restored via Commvault. Always use <code>BACKUP DATA USING BACKINT</code> when Commvault is the backup destination. This was the exact error made in the lab demonstration — the fix was switching from <code>TO</code> syntax to <code>USING BACKINT</code>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Creating the HDB Keystore (Steps for HANA Admin)</h3>
+
+    <!-- DIAGRAM: Keystore Creation Flow -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">HDB Keystore Setup — Step Flow<small>Performed by the HANA admin on the HANA server before Commvault configuration</small></div>
+      <div class="hflow">
+        <div class="hflow-node node-gold" style="min-width:115px;">
+          <div class="node-icon">👤</div>
+          <div class="node-label" style="font-size:11px;">su - hxeadm</div>
+          <div class="node-sub">Switch to<br>HANA admin user</div>
+        </div>
+        <div class="hflow-arrow"><div class="arrow-line"></div></div>
+        <div class="hflow-node node-blue" style="min-width:115px;">
+          <div class="node-icon">🗄</div>
+          <div class="node-label" style="font-size:11px;">CREATE USER</div>
+          <div class="node-sub">In System DB<br>cv_backup user</div>
+        </div>
+        <div class="hflow-arrow"><div class="arrow-line"></div></div>
+        <div class="hflow-node node-purple" style="min-width:115px;">
+          <div class="node-icon">🔑</div>
+          <div class="node-label" style="font-size:11px;">GRANT privs</div>
+          <div class="node-sub">BACKUP ADMIN<br>CATALOG READ</div>
+        </div>
+        <div class="hflow-arrow"><div class="arrow-line"></div></div>
+        <div class="hflow-node node-green" style="min-width:115px;">
+          <div class="node-icon">🔐</div>
+          <div class="node-label" style="font-size:11px;">hdbuserstore SET</div>
+          <div class="node-sub">Map key name<br>to credentials</div>
+        </div>
+        <div class="hflow-arrow"><div class="arrow-line"></div></div>
+        <div class="hflow-node node-green" style="min-width:115px;">
+          <div class="node-icon">📤</div>
+          <div class="node-label" style="font-size:11px;">Share Key Name</div>
+          <div class="node-sub">Give key name<br>to backup admin</div>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — HDB Keystore Creation on HANA Server</span><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+      <div class="code-body"># Step 1: Connect as HANA admin OS user
+su - hxeadm
+
+# Step 2: Connect to SYSTEM DB (user must be created in System DB, not tenant DB)
+hdbsql -n localhost -i 90 -d SYSTEMDB -u SYSTEM -p '\&lt;Password&gt;'
+# Note: Use \$ to escape dollar sign in passwords, or quote the entire password
+
+# Step 3: Create a dedicated backup user in System DB
+CREATE USER cv_backup PASSWORD "BackupPass123";
+# If NO FORCE_FIRST_PASSWORD_CHANGE syntax fails (version-dependent), omit that clause
+
+# Step 4: Grant backup privileges to the user
+GRANT BACKUP ADMIN, CATALOG READ, MONITORING TO cv_backup;
+
+# Step 5: Grant restore privileges (if same user handles restores)
+GRANT DATABASE RECOVERY OPERATOR TO cv_backup;
+
+# Step 6: Exit HDB SQL
+quit
+
+# Step 7: Create HDB user keystore entry
+# Syntax: hdbuserstore SET &lt;key_name&gt; &lt;host&gt;:&lt;port&gt; &lt;username&gt; &lt;password&gt;
+# Port format: 3&lt;InstanceID&gt;13 for System DB (instance 90 → port 39013)
+hdbuserstore SET cv_backup_key localhost:39013 cv_backup "BackupPass123"
+
+# Step 8: Verify the keystore entry was created
+hdbuserstore LIST
+# Output: KEY cv_backup_key  ENV: localhost:39013  USER: cv_backup
+
+# Provide the key name "cv_backup_key" to the backup admin for Commvault configuration</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Switching Commvault to HDB Keystore Authentication</h3>
+    <div class="flow">
+      <div class="flow-title">Update Authentication Method in Command Center</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Confirm Keystore Exists</strong>
+            <p>Ask the HANA admin to confirm the keystore was created (<code>hdbuserstore LIST</code> shows the key). Confirm the key name (e.g., <code>cv_backup_key</code>) and that the keystore user has BACKUP ADMIN + CATALOG READ + DATABASE RECOVERY OPERATOR privileges in System DB.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Edit the HANA Instance in Command Center</strong>
+            <p>Command Center → Protect → Databases → Instances → click the HANA instance name → Edit. Change Authentication Method from <strong>User Credentials</strong> to <strong>Store Key (HDB Keystore)</strong>. Enter the key name exactly as created on the HANA server. Other fields (SID, OS user, HDB SQL path) remain unchanged. Save.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Run Check Readiness and Test Backup</strong>
+            <p>Run Check Readiness on the HANA client. Then trigger a manual full backup. If the job completes successfully, keystore authentication is working correctly. If it fails with authentication errors, verify the keystore user has the correct privileges in HANA System DB — the user must exist in System DB, not in the tenant DB.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout note">
+      <div class="callout-title">📘 Keystore User Must Be in System DB, Not Tenant DB</div>
+      <p>A common mistake when creating the HDB keystore user: creating it in the tenant DB (HXE) instead of System DB (SYSTEMDB). The Commvault SAP HANA integration requires the backup user to exist in the <strong>System DB</strong> with appropriate privileges. Creating the user in the tenant DB only results in authentication failures when Commvault tries to connect to System DB for backup coordination. Always connect to SYSTEMDB when running the CREATE USER and GRANT commands.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 10: One Touch Recovery Overview                       -->
+<!-- ============================================================ -->
+<section id="otr-overview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">💿</div>
+    <div>
+      <div class="section-title">One Touch Recovery — Overview &amp; Concepts</div>
+      <div class="section-subtitle">Bare-metal recovery for physical servers, terminology, and backup consistency types</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is One Touch Recovery?</h3>
+    <p>One Touch Recovery (OTR) is Commvault's feature for complete backup and recovery of physical servers — including the operating system, drivers, installed applications, configuration files, registry (Windows), and all file system data. It is Commvault's term for what other vendors call Bare Metal Recovery (BMR) or System State Backup.</p>
+    <div class="highlight-box">
+      <h4>🎯 Why One Touch Recovery Is Critical</h4>
+      <p>Without OTR, if a physical server crashes the server team must: reinstall the OS from scratch, reinstall all applications and databases, reconfigure all settings (many undocumented), restore data files from backup. This is extremely time-consuming. With One Touch Recovery, the entire server — OS + applications + data — is restored in one operation, bringing it back to exactly the state it was at backup time.</p>
+    </div>
+
+    <!-- DIAGRAM: OTR Architecture -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">One Touch Recovery — Architecture &amp; Recovery Flow<small>Physical server disaster recovery using Live CD boot media and CommServe</small></div>
+      <div class="hflow">
+        <div class="hflow-node node-red" style="min-width:110px;">
+          <div class="node-icon">💥</div>
+          <div class="node-label">Crashed Server</div>
+          <div class="node-sub">Physical hardware<br>OS unbootable</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">Boot from</div>
+          <div class="arrow-line"></div>
+          <div class="arrow-label">Live CD/ISO</div>
+        </div>
+        <div class="hflow-node node-orange" style="min-width:120px;">
+          <div class="node-icon">💿</div>
+          <div class="node-label">Live CD / WinPE</div>
+          <div class="node-sub">Temporary boot env<br>Recovery wizard</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">Connects to</div>
+          <div class="arrow-line"></div>
+          <div class="arrow-label">8400/8403</div>
+        </div>
+        <div class="hflow-node node-blue" style="min-width:110px;">
+          <div class="node-icon">🗄</div>
+          <div class="node-label">CommServe</div>
+          <div class="node-sub">Backup metadata<br>Job selection</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">Restores from</div>
+          <div class="arrow-line"></div>
+        </div>
+        <div class="hflow-node node-green" style="min-width:110px;">
+          <div class="node-icon">📦</div>
+          <div class="node-label">Storage / MA</div>
+          <div class="node-sub">OS + Apps + Data<br>pulled to server</div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-label">Reboot</div>
+          <div class="arrow-line"></div>
+        </div>
+        <div class="hflow-node node-green" style="min-width:100px;">
+          <div class="node-icon">✅</div>
+          <div class="node-label">Recovered!</div>
+          <div class="node-sub">Exact backup state<br>OS + config + data</div>
+        </div>
+      </div>
+    </div>
+    <h4>Vendor Terminology</h4>
+    <div class="strip-row">
+      <span class="strip-label">Commvault</span>
+      <span class="strip-val"><strong>One Touch Recovery</strong> — superset of both System State backup (Windows terminology) and Bare Metal Recovery. This is the official Commvault term.</span>
+      <span class="strip-badge sb-purple">One Touch Recovery</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Veritas NetBackup</span>
+      <span class="strip-val"><strong>Bare Metal Recovery (BMR)</strong> — equivalent feature, different product name. Same concept of full physical server restore.</span>
+      <span class="strip-badge sb-info">BMR</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Microsoft / Windows</span>
+      <span class="strip-val"><strong>System State Backup</strong> — Windows-specific term. Also used as the toggle label in Commvault's subclient content tab for Windows OTR.</span>
+      <span class="strip-badge sb-blue">System State</span>
+    </div>
+    <h4>Key Constraints — What OTR Does and Does Not Cover</h4>
+    <ul>
+      <li><strong>Physical servers only</strong> — designed for bare-metal physical hardware. Not recommended for virtual machines (VMs use hypervisor-based snapshot/image backup instead).</li>
+      <li><strong>Hypervisors NOT supported</strong> — ESXi, Hyper-V, OpenStack hypervisor layer cannot be protected by OTR. You cannot install a Commvault agent on a hypervisor OS layer directly.</li>
+      <li><strong>File System agent required</strong> — unlike agentless VM backup, OTR requires the Commvault File System agent installed on the physical server.</li>
+      <li><strong>Restore requires console access to the client</strong> — unlike VM backup restore (triggered entirely from CommCell Console), OTR restore requires direct console access to the physical server to mount the Live CD and boot from it. This is the key operational difference.</li>
+      <li><strong>Supported OS (Linux)</strong>: Red Hat, SUSE, Ubuntu, Oracle Linux, Rocky Linux, AlmaLinux. AIX and Solaris also supported (critical for banking customers on legacy physical hardware).</li>
+      <li><strong>Supported OS (Windows)</strong>: Most Windows Server versions. WinPE 10 for modern hardware; WinPE 5.1 for older hardware.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Backup Consistency Types — Crash vs Application vs Agent-Based</h3>
+    <p>Understanding these three consistency levels is critical for advising customers on the right backup approach and frequently tested in interviews.</p>
+
+    <!-- DIAGRAM: Backup Consistency Spectrum -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">Backup Consistency Spectrum<small>From basic crash consistency to full application-aware agent-based backup</small></div>
+      <div class="hflow" style="gap:12px;">
+        <div class="hflow-node node-blue" style="min-width:160px;max-width:210px;">
+          <div class="node-icon">📸</div>
+          <div class="node-label">Crash Consistent</div>
+          <div class="node-sub" style="text-align:left;margin-top:8px;line-height:1.5;">
+            Hypervisor snapshot via API<br>
+            <span style="color:var(--accent2);">✓ No agent needed</span><br>
+            <span style="color:var(--accent3);">⚠ App may need recovery</span><br>
+            <span style="color:var(--text-dim);">→ Web servers, file shares</span>
+          </div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-line"></div>
+        </div>
+        <div class="hflow-node node-purple" style="min-width:160px;max-width:210px;">
+          <div class="node-icon">🔄</div>
+          <div class="node-label">App Consistent</div>
+          <div class="node-sub" style="text-align:left;margin-top:8px;line-height:1.5;">
+            Plugin quiesces app<br>
+            <span style="color:var(--accent2);">✓ No agent needed</span><br>
+            <span style="color:var(--accent2);">✓ App starts cleanly</span><br>
+            <span style="color:var(--text-dim);">→ PostgreSQL, lightweight</span>
+          </div>
+        </div>
+        <div class="hflow-arrow">
+          <div class="arrow-line"></div>
+        </div>
+        <div class="hflow-node node-green" style="min-width:160px;max-width:210px;">
+          <div class="node-icon">🔧</div>
+          <div class="node-label">Agent-Based</div>
+          <div class="node-sub" style="text-align:left;margin-top:8px;line-height:1.5;">
+            Full agent + native API<br>
+            <span style="color:var(--accent3);">⚠ Agent required</span><br>
+            <span style="color:var(--accent2);">✓ Granular recovery</span><br>
+            <span style="color:var(--text-dim);">→ Oracle, HANA, SQL, DB2</span>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px;">
+        <span style="font-size:10px;color:var(--text-dim);letter-spacing:1px;">INCREASING CONSISTENCY &amp; GRANULARITY ───────────────────────────▶</span>
+      </div>
+    </div>
+    <table class="tool-table">
+      <tr><th>Type</th><th>How It Works</th><th>Post-Restore State</th><th>Agent Needed?</th><th>Use Case</th></tr>
+      <tr>
+        <td><strong>Crash Consistent</strong></td>
+        <td>Hypervisor snapshot via API — same as a manual vSphere snapshot. No application quiescing.</td>
+        <td>File system is consistent (no chkdsk needed). Application state may need recovery on first start.</td>
+        <td>No — agentless</td>
+        <td>VMs without I/O-intensive databases. Web servers, lightweight apps, file shares.</td>
+      </tr>
+      <tr>
+        <td><strong>Application Consistent</strong></td>
+        <td>Commvault pushes a lightweight plugin into the VM that freezes the application before snapshot, then thaws after. Available for select supported applications.</td>
+        <td>Both file system and application are consistent post-restore. Application should start cleanly.</td>
+        <td>No — plugin via agentless mechanism</td>
+        <td>VMs running supported applications (e.g., PostgreSQL, some web servers) where full agent install is not feasible or required.</td>
+      </tr>
+      <tr>
+        <td><strong>Agent-Based (Application Agent)</strong></td>
+        <td>Full Commvault agent inside the VM/server communicates directly with the application via its native API (Oracle: RMAN, SQL Server: VDI, HANA: Backint). Provides granular backup and guaranteed consistency.</td>
+        <td>Application is fully consistent. Granular object-level restore possible (individual tables, schemas, mailboxes).</td>
+        <td>Yes — installed inside VM or on physical server</td>
+        <td>I/O-intensive databases: Oracle, SAP HANA, SQL Server, DB2. Any workload requiring point-in-time recovery or granular restore. Mandatory for Oracle (no app-consistent agentless option).</td>
+      </tr>
+    </table>
+    <div class="callout exam">
+      <div class="callout-title">🎓 Interview Answer — When to Install an Agent Inside a VM?</div>
+      <p>Recommended answer: <em>"Ask the customer what application is running in the VM. If it is an I/O-intensive database — Oracle, SAP HANA, SQL Server, DB2 — recommend an agent-based backup. With only agentless backup, we can restore the VM but cannot guarantee the database application will start or be in a consistent state post-restore. For lightweight applications like web servers or file shares, agentless backup is sufficient. Always communicate the risk clearly: if the customer declines an agent for a database VM, document that they accepted the risk of potential application inconsistency on restore."</em></p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 11: One Touch Recovery - Windows                      -->
+<!-- ============================================================ -->
+<section id="otr-windows" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🪟</div>
+    <div>
+      <div class="section-title">One Touch Recovery — Windows Server</div>
+      <div class="section-subtitle">Enabling system state, BMR report, WinPE Live CD, and interactive recovery wizard</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Enabling One Touch Recovery — Windows Configuration</h3>
+    <p>Enabling OTR for a Windows physical server requires a single checkbox change in the file system subclient. Prerequisites: the server is already configured as a Commvault client with the Windows File System agent installed.</p>
+    <div class="flow">
+      <div class="flow-title">Windows One Touch Backup — Configuration Steps</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Ensure File System Agent is Installed</strong>
+            <p>The server must be registered in CommCell Console with the <strong>Windows File System agent</strong> installed. Verify the client shows as Online and Check Readiness passes.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Open Subclient Properties → Content Tab</strong>
+            <p>CommCell Console → Client Computers → expand the Windows client → File System → Backup Sets → Default Backup Set → right-click Default Subclient → Properties → <strong>Content</strong> tab. Content must be set to <code>\</code> (backslash) — meaning all drives. If limited to specific folders, system files will be missed.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Check "Backup System State"</strong>
+            <p>In the Content tab, locate the checkbox <strong>"Backup System State"</strong>. Enable it. This is the only configuration change required. Click OK to save. The next full backup will include the Windows system state (registry, boot files, Active Directory if applicable, driver files, COM+ class registrations).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Run Full Backup and Verify</strong>
+            <p>Right-click the subclient → Backup → Full. While running, the <strong>Currently Backing Up</strong> column in Job Controller shows Windows system directories (Windows folder, System32). When browsing the completed job, you will see both the C: drive and a <strong>System State</strong> entry listed separately — confirming OTR data was captured.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout note">
+      <div class="callout-title">📘 Bare Metal Recovery (BMR) Report</div>
+      <p>To see all clients configured with One Touch / System State backup: CommCell Console → Reports → Bare Metal Recovery Report. This lists all clients with successful system state backups, their backup dates, and status. Use this report to audit OTR coverage across your environment and to prove compliance during DR readiness reviews.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Windows One Touch Recovery — Restore Procedure</h3>
+
+    <!-- DIAGRAM: Windows OTR Recovery Pipeline -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">Windows OTR — Interactive Recovery Wizard at a Glance<small>8-step WinPE-based bare-metal recovery flow</small></div>
+      <div class="pipeline" style="flex-wrap:wrap;">
+        <div class="pipe-stage node-orange" style="background:rgba(255,107,53,0.08);border:1.5px solid rgba(255,107,53,0.25);">
+          <div class="pipe-num" style="color:var(--accent3);">1</div>
+          <div class="pipe-label" style="color:#fca97a;">Mount ISO<br>Boot Order</div>
+        </div>
+        <div class="pipe-stage node-blue" style="background:rgba(0,200,255,0.08);border:1.5px solid rgba(0,200,255,0.25);">
+          <div class="pipe-num" style="color:var(--accent);">2</div>
+          <div class="pipe-label" style="color:#7ee8fa;">Static IP<br>Config</div>
+        </div>
+        <div class="pipe-stage node-purple" style="background:rgba(167,139,250,0.08);border:1.5px solid rgba(167,139,250,0.25);">
+          <div class="pipe-num" style="color:var(--accent4);">3</div>
+          <div class="pipe-label" style="color:#c4b5fd;">Disk<br>Detection</div>
+        </div>
+        <div class="pipe-stage node-blue" style="background:rgba(0,200,255,0.08);border:1.5px solid rgba(0,200,255,0.25);">
+          <div class="pipe-num" style="color:var(--accent);">4</div>
+          <div class="pipe-label" style="color:#7ee8fa;">CommServe<br>Details</div>
+        </div>
+        <div class="pipe-stage node-purple" style="background:rgba(167,139,250,0.08);border:1.5px solid rgba(167,139,250,0.25);">
+          <div class="pipe-num" style="color:var(--accent4);">5</div>
+          <div class="pipe-label" style="color:#c4b5fd;">Select<br>Computer</div>
+        </div>
+        <div class="pipe-stage node-gold" style="background:rgba(245,200,66,0.08);border:1.5px solid rgba(245,200,66,0.25);">
+          <div class="pipe-num" style="color:var(--gold);">6</div>
+          <div class="pipe-label" style="color:#fde68a;">Domain<br>Creds</div>
+        </div>
+        <div class="pipe-stage node-orange" style="background:rgba(255,107,53,0.08);border:1.5px solid rgba(255,107,53,0.25);">
+          <div class="pipe-num" style="color:var(--accent3);">7</div>
+          <div class="pipe-label" style="color:#fca97a;">Job Select<br>Format</div>
+        </div>
+        <div class="pipe-stage node-green" style="background:rgba(0,229,160,0.08);border:1.5px solid rgba(0,229,160,0.25);">
+          <div class="pipe-num" style="color:var(--accent2);">8</div>
+          <div class="pipe-label" style="color:#6ee7b7;">Reboot<br>Remove CD</div>
+        </div>
+      </div>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">WinPE 10 vs WinPE 5.1</span>
+      <span class="strip-val"><strong>WinPE 10</strong>: for modern hardware with 64-bit OS (recommended first choice). <strong>WinPE 5.1</strong>: for older hardware, fallback if WinPE 10 does not boot correctly. Always download the latest version matching your CommServe software version from <strong>store.commvault.com</strong>.</span>
+      <span class="strip-badge sb-info">Try WinPE 10 First</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Minimum RAM for WinPE</span>
+      <span class="strip-val">The WinPE boot environment requires at least <strong>1.4 GB RAM</strong>. Physical servers typically have far more — this is rarely a constraint.</span>
+      <span class="strip-badge sb-info">1.4 GB RAM Min</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Console Access Required</span>
+      <span class="strip-val">Physical server: connect via <strong>iLO</strong> (HP), <strong>iDRAC</strong> (Dell), or <strong>ILOM</strong> (Oracle/Sun) — the hardware management console that gives remote access to the server's screen even when the OS is down. Virtual machine: connect via vSphere console. RDP will NOT work when the OS is down.</span>
+      <span class="strip-badge sb-warn">ILOM / iDRAC Access Needed</span>
+    </div>
+    <div class="flow">
+      <div class="flow-title">Windows OTR — Interactive Recovery Wizard Steps</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Mount WinPE ISO and Set Boot Order to CD-ROM First</strong>
+            <p>In ILOM/iDRAC console: mount the WinPE ISO as a virtual CD/DVD drive. Open BIOS setup (press F2 at POST). In Boot section: set <strong>CD-ROM as first boot device</strong>. Save and exit. Server reboots from the WinPE live environment.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Configure IP Address (Static)</strong>
+            <p>The WinPE wizard opens and asks for network configuration. Provide the <strong>same IP address, subnet mask, gateway, and DNS</strong> that the server had before the crash. Use Tab/Space keys for field navigation (mouse often does not work in ILOM console). If unsure of the IP, check CommCell Console — the IP is recorded in Client Properties.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Confirm Disk Detection</strong>
+            <p>The wizard detects hard disks present. Confirm all drives are detected. If any expected disks are missing, this indicates a driver issue that must be resolved before proceeding.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Provide CommServe Details</strong>
+            <p>Enter the CommServe IP address and Commvault login credentials (the CommCell Console username and password — not OS credentials). The WinPE environment connects to the CommServe and fetches backup jobs for this client.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Select Computer Name from Dropdown</strong>
+            <p>After connecting to CommServe, the wizard shows a dropdown of known client computers. Select the hostname of the server being recovered. It is populated automatically — do not type it manually if the dropdown shows the correct name.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Domain Controller Credentials (If Domain-Joined)</strong>
+            <p>If the server is a domain member, provide domain credentials so it can rejoin the domain during recovery. Skip this screen if not domain-joined.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">7</div>
+          <div class="flow-content">
+            <strong>Select Backup Job, Review Disk Layout, Confirm Format</strong>
+            <p>Select the backup job (date/time) to restore from. Review the disk partition layout — accept the default to preserve original partitioning, or modify if recovering to different hardware. Confirm disk formatting (this deletes all existing disk contents). Restore begins — data pulled from CommServe/media agent.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">8</div>
+          <div class="flow-content">
+            <strong>Restore Complete — Reboot and Remove Live CD</strong>
+            <p>After <em>"Restore completed successfully"</em>: reboot the server. <strong>Remove the WinPE ISO from the virtual CD drive</strong> before the reboot completes — otherwise it boots back into WinPE instead of the restored hard disk. The server boots from disk. Verify via RDP or console that all applications and data are intact.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout warn">
+      <div class="callout-title">⚠ Job Retention Must Cover the Recovery Window</div>
+      <p>Lab demonstration lesson: the OTR backup was taken on one day, and the restore was attempted the next day — but the job retention was set to only 24 hours. The job had expired by restore time and the WinPE wizard showed <em>"System state components not available in the backup selected."</em> In production, always set OTR backup retention to several weeks or months minimum. Never set it to 1 day — you may not discover the need for recovery within that window.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 12: One Touch Recovery - Linux                        -->
+<!-- ============================================================ -->
+<section id="otr-linux" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">🐧</div>
+    <div>
+      <div class="section-title">One Touch Recovery — Linux Server</div>
+      <div class="section-subtitle">Advanced options toggle, Linux Live CD boot, and the six-stage recovery wizard</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Enabling One Touch Recovery — Linux Configuration</h3>
+    <p>For Linux, the One Touch option is in a different location than Windows. In Windows it is in the <strong>Content tab</strong>. In Linux it is inside the subclient's <strong>Advanced options</strong> — a common point of confusion.</p>
+
+    <!-- DIAGRAM: Windows vs Linux OTR Config Location -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">OTR Configuration — Windows vs Linux<small>The checkbox location differs between the two platforms</small></div>
+      <div class="vs-diagram">
+        <div class="vs-side" style="border:1.5px solid rgba(0,200,255,0.25);background:rgba(0,200,255,0.04);border-radius:10px;padding:16px 18px;">
+          <div class="vs-title" style="color:var(--accent);">🪟 Windows</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:8px;">
+            <div style="font-size:10px;padding:3px 12px;border-radius:4px;background:rgba(0,200,255,0.1);border:1px solid rgba(0,200,255,0.2);color:#7ee8fa;">Subclient Properties</div>
+            <div style="color:var(--text-dim);font-size:10px;">↓</div>
+            <div style="font-size:10px;padding:3px 12px;border-radius:4px;background:rgba(0,200,255,0.15);border:1px solid rgba(0,200,255,0.3);color:#7ee8fa;font-weight:600;">Content Tab</div>
+            <div style="color:var(--text-dim);font-size:10px;">↓</div>
+            <div style="font-size:10px;padding:4px 12px;border-radius:4px;background:rgba(0,229,160,0.12);border:1px solid rgba(0,229,160,0.3);color:var(--accent2);">☑ Backup System State</div>
+            <div style="font-size:9px;color:var(--text-dim);margin-top:4px;">Content = <code>\</code> (backslash)</div>
+          </div>
+        </div>
+        <div class="vs-badge">≠</div>
+        <div class="vs-side" style="border:1.5px solid rgba(167,139,250,0.25);background:rgba(167,139,250,0.04);border-radius:10px;padding:16px 18px;">
+          <div class="vs-title" style="color:var(--accent4);">🐧 Linux</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:8px;">
+            <div style="font-size:10px;padding:3px 12px;border-radius:4px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);color:#c4b5fd;">Subclient Properties</div>
+            <div style="color:var(--text-dim);font-size:10px;">↓</div>
+            <div style="font-size:10px;padding:3px 12px;border-radius:4px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);color:#c4b5fd;font-weight:600;">Advanced Button</div>
+            <div style="color:var(--text-dim);font-size:10px;">↓</div>
+            <div style="font-size:10px;padding:4px 12px;border-radius:4px;background:rgba(0,229,160,0.12);border:1px solid rgba(0,229,160,0.3);color:var(--accent2);">☑ One Touch Recovery</div>
+            <div style="font-size:9px;color:var(--text-dim);margin-top:4px;">Content = <code>/</code> (forward slash)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-title">Linux One Touch Backup — Configuration Steps</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Configure Linux Server as Commvault Client with File System Agent</strong>
+            <p>Add the Linux server to CommCell Console, push install the Unix/Linux File System agent. Verify Check Readiness passes (status: Ready).</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Set Subclient Content to / (Forward Slash)</strong>
+            <p>CommCell Console → the Linux client → File System → Default Backup Set → Default Subclient → Properties → Content tab. Set content to <code>/</code> (forward slash) — the root of the Linux file system. This ensures all partitions including <code>/boot</code>, <code>/usr</code>, <code>/var</code>, <code>/etc</code>, and any additional mounts are captured.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Enable One Touch in Advanced Options</strong>
+            <p>In the same subclient Properties window, click the <strong>Advanced</strong> button at the bottom. In the Advanced Options dialog, locate the <strong>One Touch Recovery</strong> checkbox. Check it. Click OK. Unlike Windows where System State is directly in the Content tab, Linux requires this advanced toggle.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Run Full Backup and Verify</strong>
+            <p>Run a full backup. In Job Controller → Operations Type column, the job will show <strong>"One Touch Backup"</strong>. This label confirms OTR is active. For regular file backups, the type shows as "Backup" — the "One Touch Backup" label is the confirmation indicator.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout note">
+      <div class="callout-title">📘 Troubleshooting Linux OTR Backup Failures — SR.log</div>
+      <p>If a Linux One Touch backup fails, the primary log to check on the client machine is <strong>SR.log</strong>. When analyzing: (1) Filter the log by Job ID first. (2) Start reading from the <strong>beginning</strong> of the job entries — the first occurrence of an error is the root cause. Later entries may be cascaded secondary errors. (3) For complex Linux file system issues (LVM, device mapper, major/minor number mismatches), engage the Linux/OS team. Spending excessive time on low-level OS diagnostics alone is not productive — the OS team has the expertise and tools for these issues.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The Six Stages of Linux One Touch Recovery</h3>
+    <p>The Linux OTR recovery wizard has exactly <strong>six stages</strong>. Knowing all six stages is a direct interview question. These six stages are specific to the <strong>Linux</strong> One Touch Recovery wizard. Windows OTR follows a similar recovery flow using the WinPE environment but has a differently structured wizard — the stage names and screen order differ between the two operating systems.</p>
+
+    <!-- DIAGRAM: 6-Stage Pipeline -->
+    <div class="diagram-wrapper">
+      <div class="diagram-title">Linux One Touch Recovery — Six-Stage Pipeline<small>Complete recovery wizard flow from Live CD boot to restored server</small></div>
+      <div class="pipeline">
+        <div class="pipe-stage node-blue" style="background:rgba(0,200,255,0.08);border:1.5px solid rgba(0,200,255,0.25);">
+          <div class="pipe-num" style="color:var(--accent);">1</div>
+          <div class="pipe-label" style="color:#7ee8fa;">Network<br>Config</div>
+        </div>
+        <div class="pipe-stage node-purple" style="background:rgba(167,139,250,0.08);border:1.5px solid rgba(167,139,250,0.25);">
+          <div class="pipe-num" style="color:var(--accent4);">2</div>
+          <div class="pipe-label" style="color:#c4b5fd;">Client<br>Config</div>
+        </div>
+        <div class="pipe-stage node-blue" style="background:rgba(0,200,255,0.08);border:1.5px solid rgba(0,200,255,0.25);">
+          <div class="pipe-num" style="color:var(--accent);">3</div>
+          <div class="pipe-label" style="color:#7ee8fa;">CommServe<br>Config</div>
+        </div>
+        <div class="pipe-stage node-orange" style="background:rgba(255,107,53,0.08);border:1.5px solid rgba(255,107,53,0.25);">
+          <div class="pipe-num" style="color:var(--accent3);">4</div>
+          <div class="pipe-label" style="color:#fca97a;">Firewall<br>Config</div>
+        </div>
+        <div class="pipe-stage node-gold" style="background:rgba(245,200,66,0.08);border:1.5px solid rgba(245,200,66,0.25);">
+          <div class="pipe-num" style="color:var(--gold);">5</div>
+          <div class="pipe-label" style="color:#fde68a;">Package<br>Install</div>
+        </div>
+        <div class="pipe-stage node-green" style="background:rgba(0,229,160,0.08);border:1.5px solid rgba(0,229,160,0.25);">
+          <div class="pipe-num" style="color:var(--accent2);">6</div>
+          <div class="pipe-label" style="color:#6ee7b7;">Job Select<br>&amp; Recover</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;max-width:100%;padding:4px 4px 0;flex-wrap:wrap;gap:4px;">
+        <span style="font-size:9px;color:var(--text-dim);flex:1;min-width:80px;text-align:center;">IP, Mask, GW, DNS</span>
+        <span style="font-size:9px;color:var(--text-dim);flex:1;min-width:80px;text-align:center;">Hostname identity</span>
+        <span style="font-size:9px;color:var(--text-dim);flex:1;min-width:80px;text-align:center;">CS IP + credentials</span>
+        <span style="font-size:9px;color:var(--text-dim);flex:1;min-width:80px;text-align:center;">Optional ports</span>
+        <span style="font-size:9px;color:var(--text-dim);flex:1;min-width:80px;text-align:center;">8 GB RAM req.</span>
+        <span style="font-size:9px;color:var(--text-dim);flex:1;min-width:80px;text-align:center;">Disk format + restore</span>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-title">Linux One Touch Recovery — Six-Stage Interactive Wizard</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <strong>Stage 1 — Network Configuration</strong>
+            <p>After booting from the Linux Live CD (type <code>default</code> at the boot prompt and press Enter): provide the server's IP address, netmask, gateway, and DNS server. These must match the original network configuration. Once applied, the server is on the network and can communicate with CommServe.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <strong>Stage 2 — Client Configuration</strong>
+            <p>Provide the Commvault client name (hostname as registered in CommCell Console) and confirm the IP/hostname of this machine. The wizard establishes the client identity to be recovered.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <strong>Stage 3 — CommServe Configuration</strong>
+            <p>Provide the CommServe IP address and Commvault login credentials (CommCell Console username and password — not the OS username of the CommServe machine). The wizard connects to CommServe and authenticates.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <strong>Stage 4 — Firewall Configuration</strong>
+            <p>If a firewall exists between the client being recovered and the CommServe, provide the firewall port and proxy details here. In most environments this screen does not appear (bypassed automatically). Only relevant in environments with strict network segmentation between backup clients and CommServe.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <strong>Stage 5 — Silent Install of Commvault Packages</strong>
+            <p>The wizard installs Commvault agent packages into the temporary Live CD environment. This allows the recovery process to communicate with CommServe and manage the restore job. <strong>Minimum 8 GB RAM required</strong> for this stage. Installations with less RAM fail during post-install actions.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <strong>Stage 6 — Job Selection and Full Recovery</strong>
+            <p>CommServe presents all available OTR backup jobs for this client. Select the job to restore from. The wizard then: confirms disk formatting (all existing data deleted), restores OS and all files from CommServe backup, optionally configures multipath (for SAN-attached servers), and asks whether to persist the network configuration from Stage 1. After completion: reboot, remove the Live CD, and the server boots from the restored hard disk.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Linux Live CD Download</span>
+      <span class="strip-val">Download from <strong>store.commvault.com</strong> — search for One Touch Recovery, select the Linux Live CD ISO matching your CommServe version. Always use the latest version, not older ISOs.</span>
+      <span class="strip-badge sb-warn">Always Latest ISO</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Boot Entry Command</span>
+      <span class="strip-val">At the Live CD boot prompt, type <code>default</code> and press Enter to start the interactive recovery wizard. Interactive mode is preferred by most customers as it allows them to review each stage. Automated response-file mode is also available but rarely used.</span>
+      <span class="strip-badge sb-info">Type "default" at Boot Prompt</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">AIX and Solaris Support</span>
+      <span class="strip-val">Commvault One Touch Recovery also supports <strong>AIX</strong> and <strong>Solaris</strong> — critical for banking customers still running legacy physical servers on these platforms. These systems cannot run on VMs and carry high hardware and licensing costs, making OTR especially important for protecting them.</span>
+      <span class="strip-badge sb-ok">AIX &amp; Solaris Supported</span>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 13: Best Practices                                    -->
+<!-- ============================================================ -->
+<section id="best-practices" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-gold">⭐</div>
+    <div>
+      <div class="section-title">Best Practices</div>
+      <div class="section-subtitle">Production guidance for CommServe migration, SAP HANA, and One Touch Recovery</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>CommServe Migration Best Practices</h3>
+    <div class="strip-row">
+      <span class="strip-label">DR backup on a network share</span>
+      <span class="strip-val">Always configure CommServe DR backup to write to a <strong>network share</strong>, not a local drive. Local drive = inaccessible if OS crashes. Network share, Metallic Cloud, or cloud library are the acceptable alternatives.</span>
+      <span class="strip-badge sb-warn">Network Share Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Take a fresh DR backup before any migration</span>
+      <span class="strip-val">Do not rely on the scheduled backup. Trigger a manual DR backup immediately before migration and copy the SET folder off the server before proceeding.</span>
+      <span class="strip-badge sb-warn">Manual DR Before Migration</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Repair before CS Recovery Assistant</span>
+      <span class="strip-val">For CommServe instability, try the <strong>Repair</strong> option first — it preserves index cache, job results folder, MongoDB cache, and additional settings. Only escalate to CS Recovery Assistant if Repair does not resolve the issue.</span>
+      <span class="strip-badge sb-info">Repair First</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Use Staging mode for DR testing</span>
+      <span class="strip-val">Periodically use CS Recovery Assistant in <strong>Staging mode</strong> (separate server, different IP) to validate DR backup integrity and test the recovery process. Never discover issues with your DR process during a real disaster.</span>
+      <span class="strip-badge sb-best">Test DR Regularly</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Keep DDB on Media Agent, not CommServe</span>
+      <span class="strip-val">DDB partitions should always be on a dedicated Media Agent, not on the CommServe machine. Co-locating CommServe and DDB means a CommServe failure takes down both simultaneously, making recovery harder.</span>
+      <span class="strip-badge sb-best">Separate DDB from CommServe</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>SAP HANA Backup Best Practices</h3>
+    <div class="strip-row">
+      <span class="strip-label">Use HDB Keystore in production</span>
+      <span class="strip-val">Use the <strong>HDB Keystore</strong> authentication method in all production environments. User Credentials method is acceptable only in lab/development. Keystore avoids raw passwords in the CommServe configuration and is the recommended security posture.</span>
+      <span class="strip-badge sb-best">Keystore for Production</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Check Readiness before configuring HANA instance</span>
+      <span class="strip-val">Always run Check Readiness on the HANA client and confirm it shows Ready before attempting to configure or discover databases in Command Center. Client not Ready = HANA host not visible in dropdown.</span>
+      <span class="strip-badge sb-warn">Ready State First</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Back up both System DB and Tenant DB</span>
+      <span class="strip-val">Both must be included in backup schedules. System DB is required to restore tenant databases — without it, tenant DB recovery is not possible.</span>
+      <span class="strip-badge sb-warn">Both DBs Mandatory</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Do not kill HANA admin command-line jobs</span>
+      <span class="strip-val">HANA backup jobs appearing in Job Controller that you did not initiate are legitimate operations by the HANA admin (scheduled or ad-hoc HDB SQL backups). Always confirm with the HANA team before terminating any HANA-related jobs.</span>
+      <span class="strip-badge sb-warn">Coordinate with HANA Admin</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Keystore user belongs in System DB, not tenant DB</span>
+      <span class="strip-val">When the HANA admin creates the backup user for keystore authentication, it must be created in the <strong>System DB</strong>, not the tenant database. User + privileges + keystore all reference System DB.</span>
+      <span class="strip-badge sb-warn">System DB Only</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>One Touch Recovery Best Practices</h3>
+    <div class="strip-row">
+      <span class="strip-label">OTR only for physical servers</span>
+      <span class="strip-val">Configure One Touch Recovery only for physical servers. For virtual machines, use agentless hypervisor-based image backup — it is simpler to restore and does not require console access to the VM during recovery.</span>
+      <span class="strip-badge sb-warn">Physical Only</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Sufficient retention period</span>
+      <span class="strip-val">OTR backup retention must be long enough to cover realistic recovery scenarios — minimum several weeks, ideally months. Short retention (e.g., 1 day) risks the backup expiring before recovery is needed.</span>
+      <span class="strip-badge sb-warn">Weeks/Months Retention</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Always download the latest Live CD</span>
+      <span class="strip-val">Always download the Live CD from <strong>store.commvault.com</strong> and use the version matching your current CommServe software. Using old ISO files can cause incompatibility with new CommServe versions.</span>
+      <span class="strip-badge sb-warn">Latest ISO from Store</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Communicate OTR limitations to server teams</span>
+      <span class="strip-val">Before configuring OTR, share the documentation on supported file systems, volume managers, and OS versions with the server team. Set expectations: OTR restore requires console access, a maintenance window, and coordination — it is not a click-and-done restore like VM backup.</span>
+      <span class="strip-badge sb-best">Communicate Upfront</span>
+    </div>
+    <div class="strip-row">
+      <span class="strip-label">Test OTR recovery periodically</span>
+      <span class="strip-val">Schedule periodic test restores (to a test environment or using a staging server) to verify the OTR process works end-to-end. Discovering that OTR recovery fails during a real disaster is the worst possible time.</span>
+      <span class="strip-badge sb-best">Test Periodically</span>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<!-- ============================================================ -->
+<!-- SECTION 14: Interview Q&A                                     -->
+<!-- ============================================================ -->
+<section id="interview" class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🎓</div>
+    <div>
+      <div class="section-title">Interview Q&amp;A</div>
+      <div class="section-subtitle">Scenario-based questions on CommServe migration, SAP HANA, and One Touch Recovery</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>CommServe Migration Questions</h3>
+
+    <div class="qa-block">
+      <div class="qa-q">A customer needs to upgrade their CommServe from Windows Server 2012 to Windows Server 2022. Microsoft says there is no direct in-place upgrade path. What do you recommend?</div>
+      <div class="qa-a">Perform a CommServe hardware refresh. Steps: (1) Verify Windows Server 2022 is in Commvault's supported OS list for the current CommServe version. (2) Build a new server with Windows Server 2022 and the required disk/RAM/IOPS configuration. (3) Take a fresh DR backup on the existing CommServe and copy the SET folder off the server to a network share. (4) Shut down the old CommServe. (5) Install Commvault on the new server — using "Use Existing Database" if the IP/hostname stays the same, or "Create New Database" followed by the CS Recovery Assistant if the IP/hostname changes. (6) After recovery, verify services, clients, media agents, libraries, and DDB partitions. (7) Run a test backup to confirm end-to-end functionality.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">A CommServe OS has crashed and cannot be recovered. The last scheduled DR backup ran at 8 AM. It is now 5 PM. If we recover using the 8 AM DR backup, what data is lost and what is preserved?</div>
+      <div class="qa-a">The CommServe SQL database (CommServe metadata) is restored to its state at 8 AM. This means: all backup job records from 8 AM to 5 PM are lost from the CommServe database — the CommServe has no record of those 9 hours of jobs. However, the actual backup data written to media (disk libraries, cloud libraries, tape) during that 9-hour window is NOT deleted — it still physically exists on the media. The problem is the CommServe no longer has the index/catalog records to browse and restore that data. If the Media Agents are still running and the DDB is not out of sync, jobs can sometimes be re-catalogued. For the DDB — if media agents ran jobs during those 9 hours, the DDB will be out of sync with the restored CommServe DB, and DDB re-synchronization will be needed to bring DDB partitions back online.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">What is the difference between the Staging and Recovery modes in the CS Recovery Assistant? When would you use each?</div>
+      <div class="qa-a">Staging mode imports a DR backup database onto a separate machine (different IP/hostname) to create a test or staging environment that mirrors the production CommServe. It does NOT affect production — the staged CommServe is used for testing, demo, or validation only. Recovery (Production) mode is used when a machine is taking over as the actual production CommServe — it replaces the old CommServe permanently. Never use Recovery mode just for testing because it sets the machine as the production CommServe and the tool requires you to confirm the old CommServe has been decommissioned. Best practice: use Staging mode regularly to test DR backup integrity and practice the recovery procedure before a real disaster forces you to use it.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">After a CommServe recovery from a DR backup, some DDB partitions are showing as Offline in Maintenance Mode. What is the cause and how do you fix it?</div>
+      <div class="qa-a">The cause is a timing mismatch between the CommServe database and the DDB on the Media Agent. The CommServe was recovered from a DR backup taken at a specific point in time (e.g., 10 AM). The Media Agent DDB continued running and accumulated job records after that time (say, up to 6 PM when the crash occurred). When the CommServe came back with the 10 AM database, it no longer has records of jobs 10 AM to 6 PM — but the DDB has those records. This inconsistency triggers the DDB to go into Maintenance Mode. Fix: CommCell Console → Storage Resources → Deduplication Engines → right-click the offline DDB store → select Re-synchronize. This reconciles the CommServe database with the DDB state. The option appears only when inconsistency is detected — it may be hidden or greyed out when DDB and CommServe are in sync.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>SAP HANA Questions</h3>
+
+    <div class="qa-block">
+      <div class="qa-q">A customer is asking whether they should use User Credentials or HDB Keystore for SAP HANA authentication in Commvault. What do you recommend and why?</div>
+      <div class="qa-a">For any production environment, recommend <strong>HDB Keystore</strong>. Reasons: (1) No raw password is stored in the Commvault configuration — the keystore on the HANA server holds the credentials and Commvault only knows the key name. (2) If the HANA admin changes the database password, they update the keystore entry on the HANA server without requiring any changes to the Commvault configuration (as long as the key name stays the same). (3) It follows the principle of least privilege and separation of duties — the backup admin never needs to know the HANA DB password. User Credentials method is acceptable for lab and dev environments where security requirements are relaxed and simplicity is prioritised.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">You see SAP HANA backup jobs appearing in the Commvault Job Controller that you did not schedule. What do they indicate and what should you do?</div>
+      <div class="qa-a">These are legitimate backup operations triggered by the HANA admin from the HANA server command line using <code>hdbsql</code> with the <code>BACKUP DATA USING BACKINT</code> command. Commvault's Backint interface captures all HANA backup events regardless of their source, so they appear in Job Controller. This is expected and correct behavior — it means Commvault is properly integrated with HANA. Do NOT kill these jobs without first confirming with the HANA admin team. They may be scheduled by the HANA admin, ad-hoc emergency backups, or part of a maintenance procedure. If they run regularly and unexpectedly, ask the HANA admin to document their backup schedule so you can distinguish planned jobs from anomalies.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">During SAP HANA configuration in Command Center, the HANA host does not appear in the dropdown. What are the possible causes and how do you resolve them?</div>
+      <div class="qa-a">The most common cause is that the Commvault agent on the HANA server is not in a Ready state — either the service is not running, the external IP changed after a VM restart, or there is a network connectivity issue on ports 8400/8403. Resolution steps: (1) In CommCell Console, go to the HANA client properties and check the registered IP address. If the VM was restarted and the IP changed, update it to the new IP. (2) Run Check Readiness — this actively tests connectivity and reports why it may be failing. (3) On the HANA server, run <code>commvault status</code> to verify services are running. (4) Once Check Readiness shows Ready, go back to Command Center and the host will appear in the dropdown. Always run Check Readiness before attempting any database configuration.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">A HANA admin has run command-line backups using HDB SQL but the jobs fail with authentication errors. What is the likely cause?</div>
+      <div class="qa-a">The most likely cause is an incorrect syntax — specifically using <code>BACKUP DATA TO FILES</code> instead of <code>BACKUP DATA USING BACKINT</code>. The <code>TO FILES</code> syntax writes to a local path and bypasses Commvault entirely, causing the backup to fail when it cannot find the Backint handler. The correct syntax for Commvault-integrated command-line backup is: <code>BACKUP DATA USING BACKINT (PREFIX 'COMPLETE_DATA_BACKUP');</code>. Another possible cause: special characters in the HANA system user password not being properly escaped — for example a <code>$</code> in the password must be escaped with a backslash (<code>\$</code>) or the entire password must be wrapped in double quotes when used in the HDB SQL command.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>One Touch Recovery Questions</h3>
+
+    <div class="qa-block">
+      <div class="qa-q">A customer asks if they can configure One Touch Recovery for their virtual machines to get the same protection as their physical servers. How do you respond?</div>
+      <div class="qa-a">One Touch Recovery is designed specifically for physical servers and is not the right approach for virtual machines. For VMs, the correct solution is hypervisor-based agentless image backup (VSA backup via VMware/Hyper-V snapshots), which gives similar full-server protection with important advantages: the restore is triggered entirely from CommCell Console or Command Center with no need for console access to the VM, no Live CD is required, restore is faster, and backup is agentless (no agent inside each VM). OTR for VMs has a key practical problem: restore requires direct console access to the VM (to mount the bootable recovery media and go through the recovery wizard), which is operationally more complex than simply triggering a restore from the central management console. For VMs without databases, use agentless image backup. For VMs with I/O-intensive databases (Oracle, SAP HANA), add the appropriate database agent inside the VM for application-consistent backup.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">What are the six stages of the Linux One Touch Recovery wizard? Why is knowing these stages important?</div>
+      <div class="qa-a">The six stages are: (1) <strong>Network Configuration</strong> — assign IP address, netmask, gateway, and DNS to the server being recovered so it can communicate with CommServe. (2) <strong>Client Configuration</strong> — provide the Commvault client name (hostname) and confirm the machine identity. (3) <strong>CommServe Configuration</strong> — provide CommServe IP/hostname and CommCell Console login credentials. (4) <strong>Firewall Configuration</strong> — optional; provide firewall details if the client is behind a firewall relative to the CommServe. (5) <strong>Silent Install of Commvault Packages</strong> — Commvault agent packages are installed into the temporary Live CD environment (requires 8 GB RAM minimum). (6) <strong>Job Selection and Recovery</strong> — select the backup job to restore from; confirm disk formatting; data is restored from CommServe backup storage; disk layout and network persistence are configured. Knowing these stages demonstrates you understand the complete recovery workflow and can guide a server team through the process under pressure during a real disaster.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">A physical Linux server has crashed. The HANA team says they need it restored urgently from the Commvault One Touch backup taken yesterday. Walk through what you would do.</div>
+      <div class="qa-a">Step 1: Confirm the OTR backup from yesterday is available and not expired — check in CommCell Console that the backup job exists and its retention has not elapsed. Step 2: Download the latest Linux Live CD ISO from store.commvault.com if not already available. Step 3: Coordinate with the server team to get ILOM/iDRAC console access to the crashed server. Step 4: Mount the Linux Live CD ISO as a virtual CD/DVD drive in the ILOM/iDRAC. Step 5: Change the BIOS boot order to CD-ROM first (F2 at POST → Boot section). Step 6: Boot from the Live CD — at the boot prompt, type <code>default</code> and press Enter. Step 7: Walk through all six stages of the wizard — providing the server's original IP (Stage 1), client name (Stage 2), CommServe IP and credentials (Stage 3), skipping firewall if not applicable (Stage 4), waiting for package install (Stage 5), selecting yesterday's backup job and confirming disk format (Stage 6). Step 8: Wait for restore completion. Step 9: Reboot, remove Live CD ISO, and the server boots from the restored hard disk. Step 10: Verify OS, applications, and data are intact. Notify the HANA team the server is available. The entire process is coordinated with the server team since they manage the physical server and ILOM access.</div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q">What is the difference between Crash Consistent, Application Consistent, and Agent-Based backup? When would you recommend each?</div>
+      <div class="qa-a"><strong>Crash Consistent:</strong> A hypervisor snapshot taken via API, same as a manual snapshot. The file system is consistent post-restore (no chkdsk needed), but in-memory application state is not captured. Suitable for VMs without I/O-intensive databases — web servers, lightweight apps, file shares. <strong>Application Consistent:</strong> A lightweight plugin pushed by Commvault into the VM that quiesces the application before the snapshot, then thaws after. Both file system and application are consistent post-restore. Suitable for VMs running supported applications (e.g., PostgreSQL) where full agent install is not feasible. <strong>Agent-Based:</strong> A full Commvault database agent installed inside the VM or on the physical server, communicating directly with the application via its native API (RMAN for Oracle, VDI for SQL Server, Backint for SAP HANA). Provides granular backup, point-in-time recovery, and guaranteed application consistency. Mandatory for I/O-intensive databases: Oracle, SAP HANA, SQL Server, DB2. Recommendation guideline: ask the customer what application is running in the VM. If it is a production database — recommend agent-based. If it is a lightweight application — agentless is sufficient. Always document the customer's decision if they decline an agent for a database VM.</div>
+    </div>
+  </div>
+</section>
+
+</div><!-- end main-content -->
+</div><!-- end page-content -->
+</div><!-- end page-wrapper -->
+<!-- AUTHOR SECTION -->
+<div class="author-section">
+  <div class="author-title">About the Instructor</div>
+  <div class="author-card">
+    <div class="author-avatar">👨‍💻</div>
+    <div class="author-info">
+      <div class="author-name">Mohammed Abdul</div>
+      <div class="author-role">Data Protection Architect</div>
+      <div class="author-bio">Over a decade of hands-on experience designing, implementing, and supporting enterprise backup and recovery solutions across on-premises, hybrid, and multi-cloud environments. Specialized in Commvault, Veeam, Veritas NetBackup, and NetApp SnapCenter. These tutorials document real-world implementation experience and are designed to prepare engineers for both production deployments and technical interviews.</div>
+      <div class="badge-row">
+        <span class="badge cv">Commvault Certified Professional</span>
+        <span class="badge">Veeam VMCE</span>
+        <span class="badge">NetBackup Administration</span>
+        <span class="badge">NetApp SnapCenter</span>
+        <span class="badge">GCP / Azure / AWS</span>
+      </div>
+      <a class="contact-card" href="mailto:abdul.md.20000102@gmail.com">📧 abdul.md.20000102@gmail.com</a>
+    </div>
+  </div>
+  <div class="disclaimer">
+    <p><strong>Disclaimer:</strong> All demonstrations in this tutorial were performed in isolated lab environments using evaluation software and free-tier cloud resources. No production systems or licensed SAP HANA production instances were used. CommServe migration, SAP HANA configuration, and One Touch Recovery procedures shown here are for educational purposes. Always follow your organization's change management process and obtain proper approvals before performing CommServe migrations, database agent installations, or physical server recoveries in production environments. Test all procedures in a staging environment first.</p>
+  </div>
+</div>
+
+<footer>
+  <p>Commvault Software Administration · Tutorial 12 · CommServe Hardware Refresh · SAP HANA Backup &amp; Restore · One Touch Recovery (Windows &amp; Linux)</p>
+  <p style="margin-top:8px;"></p>
+</footer>
+
+<script>
+// Mobile sidebar toggle
+const toggle = document.getElementById('sidebarToggle');
+const sidebar = document.getElementById('sidebarToc');
+toggle && toggle.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+});
+
+// Active link highlighting on scroll
+const sections = document.querySelectorAll('section[id]');
+const links = document.querySelectorAll('.sidebar-link');
+
+function updateActive() {
+  let current = '';
+  sections.forEach(sec => {
+    if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+  });
+  links.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+  });
+}
+
+window.addEventListener('scroll', updateActive, {passive: true});
+updateActive();
+</script>
+</body>
+</html>
