@@ -1,0 +1,2974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commvault Software Administration – Tutorial 13 | Microsoft 365 Backup, Workflows & REST API</title>
+<style>
+  /* ========== CSS RESET & BASE ========== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-card: #1c2128;
+    --bg-hover: #22272e;
+    --border: #30363d;
+    --border-accent: #444c56;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+    --accent-blue: #58a6ff;
+    --accent-cyan: #39d0d8;
+    --accent-green: #3fb950;
+    --accent-orange: #f0883e;
+    --accent-red: #f85149;
+    --accent-purple: #bc8cff;
+    --accent-yellow: #e3b341;
+    --gradient-header: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    --font-body: 'Segoe UI', Calibri, 'Helvetica Neue', Arial, sans-serif;
+    --font-heading: Georgia, 'Times New Roman', Cambria, serif;
+    --font-code: 'Courier New', Courier, 'Lucida Console', monospace;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow: 0 4px 20px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ========== STICKY NAV ========== */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(13,17,23,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .nav-logo {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--accent-blue);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+  }
+  .nav-links {
+    display: flex;
+    gap: 6px;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-links a:hover {
+    color: var(--accent-blue);
+    border-color: var(--accent-blue);
+    background: rgba(88,166,255,0.08);
+  }
+
+  /* ========== HERO BANNER ========== */
+  .hero {
+    background: var(--gradient-header);
+    padding: 72px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='1' cy='1' r='1' fill='rgba(88,166,255,0.07)'/%3E%3C/svg%3E") repeat;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(88,166,255,0.15);
+    border: 1px solid rgba(88,166,255,0.4);
+    color: var(--accent-blue);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(26px, 4vw, 44px);
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .hero h1 span { color: var(--accent-cyan); }
+  .hero-subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    max-width: 700px;
+    margin: 0 auto 28px;
+    position: relative;
+  }
+  .hero-tags {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .hero-tag {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ========== LAYOUT ========== */
+  .container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 32px 0;
+  }
+  .toc-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+  }
+  .toc-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .toc-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(88,166,255,0.15);
+    color: var(--accent-blue);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ========== SECTION HEADINGS ========== */
+  .section {
+    padding: 60px 0 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section:last-of-type { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .icon-blue { background: rgba(88,166,255,0.15); border: 1px solid rgba(88,166,255,0.3); }
+  .icon-cyan { background: rgba(57,208,216,0.15); border: 1px solid rgba(57,208,216,0.3); }
+  .icon-green { background: rgba(63,185,80,0.15); border: 1px solid rgba(63,185,80,0.3); }
+  .icon-orange { background: rgba(240,136,62,0.15); border: 1px solid rgba(240,136,62,0.3); }
+  .icon-purple { background: rgba(188,140,255,0.15); border: 1px solid rgba(188,140,255,0.3); }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: clamp(22px, 3vw, 32px);
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+  .section-title .accent { color: var(--accent-blue); }
+  .section-subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  h3.subsection {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    color: var(--text-primary);
+    margin: 32px 0 14px;
+    padding-left: 14px;
+    border-left: 3px solid var(--accent-blue);
+  }
+  h4.topic {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 22px 0 8px;
+  }
+  p { color: var(--text-secondary); margin-bottom: 14px; }
+  p strong { color: var(--text-primary); }
+
+  ul.bullet-list {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+  }
+  ul.bullet-list li {
+    color: var(--text-secondary);
+    padding: 5px 0 5px 22px;
+    position: relative;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  ul.bullet-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent-blue);
+    font-size: 12px;
+    top: 6px;
+  }
+
+  /* ========== CARDS ========== */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover {
+    border-color: var(--border-accent);
+    transform: translateY(-2px);
+  }
+  .card-icon { font-size: 24px; margin-bottom: 10px; }
+  .card h4 { font-size: 14px; color: var(--text-primary); margin-bottom: 6px; font-weight: 700; }
+  .card p { font-size: 13px; margin: 0; }
+  .card.blue-accent { border-left: 3px solid var(--accent-blue); }
+  .card.green-accent { border-left: 3px solid var(--accent-green); }
+  .card.orange-accent { border-left: 3px solid var(--accent-orange); }
+  .card.purple-accent { border-left: 3px solid var(--accent-purple); }
+  .card.cyan-accent { border-left: 3px solid var(--accent-cyan); }
+
+  /* ========== CALLOUT BOXES ========== */
+  .callout {
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-left: 4px solid;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body h5 { font-size: 13px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .callout-body p, .callout-body li { font-size: 13px; margin: 0; }
+  .callout-body ul { list-style: disc; padding-left: 18px; }
+  .callout-body li { margin: 3px 0; }
+  .callout.warning { background: rgba(248,81,73,0.08); border-color: var(--accent-red); }
+  .callout.warning .callout-body h5 { color: var(--accent-red); }
+  .callout.tip { background: rgba(63,185,80,0.08); border-color: var(--accent-green); }
+  .callout.tip .callout-body h5 { color: var(--accent-green); }
+  .callout.note { background: rgba(88,166,255,0.08); border-color: var(--accent-blue); }
+  .callout.note .callout-body h5 { color: var(--accent-blue); }
+  .callout.exam { background: rgba(188,140,255,0.08); border-color: var(--accent-purple); }
+  .callout.exam .callout-body h5 { color: var(--accent-purple); }
+  .callout.best-practice { background: rgba(57,208,216,0.08); border-color: var(--accent-cyan); }
+  .callout.best-practice .callout-body h5 { color: var(--accent-cyan); }
+
+  /* ========== CODE BLOCKS ========== */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 16px 0;
+    overflow: hidden;
+  }
+  .code-header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--font-code);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .code-content {
+    padding: 18px 20px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    line-height: 1.7;
+    color: #a5d6ff;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code-content .cmd { color: #79c0ff; }
+  .code-content .str { color: #a5d6ff; }
+  .code-content .key { color: #ff7b72; }
+  .code-content .val { color: #ffa657; }
+  .code-content .cmt { color: var(--text-muted); font-style: italic; }
+  .code-content .url { color: var(--accent-cyan); }
+
+  /* ========== ENHANCED BLOCK DIAGRAMS ========== */
+  .diagram-block {
+    background: linear-gradient(135deg, rgba(13,17,23,0.95), rgba(22,27,34,0.98));
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent-blue);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    margin: 24px 0;
+    position: relative;
+  }
+  .diagram-block .diagram-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .diagram-block .diagram-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 22px;
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  /* Horizontal flow with colored nodes */
+  .dflow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .dnode {
+    padding: 12px 16px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 110px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    border: 1px solid;
+    transition: transform 0.2s;
+  }
+  .dnode:hover { transform: translateY(-2px); }
+  .dnode small { display: block; font-size: 10px; font-weight: 400; opacity: 0.75; margin-top: 3px; }
+  .dnode.n-blue { background: rgba(88,166,255,0.1); border-color: rgba(88,166,255,0.35); color: var(--accent-blue); }
+  .dnode.n-cyan { background: rgba(57,208,216,0.1); border-color: rgba(57,208,216,0.35); color: var(--accent-cyan); }
+  .dnode.n-green { background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.35); color: var(--accent-green); }
+  .dnode.n-orange { background: rgba(240,136,62,0.1); border-color: rgba(240,136,62,0.35); color: var(--accent-orange); }
+  .dnode.n-purple { background: rgba(188,140,255,0.1); border-color: rgba(188,140,255,0.35); color: var(--accent-purple); }
+  .dnode.n-red { background: rgba(248,81,73,0.1); border-color: rgba(248,81,73,0.35); color: var(--accent-red); }
+  .dnode.n-yellow { background: rgba(227,179,65,0.1); border-color: rgba(227,179,65,0.35); color: var(--accent-yellow); }
+  .dnode.n-white { background: rgba(230,237,243,0.06); border-color: rgba(230,237,243,0.2); color: var(--text-primary); }
+  .darrow {
+    color: var(--accent-blue);
+    font-size: 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .darrow span { font-size: 9px; color: var(--text-muted); }
+
+  /* VS comparison diagram */
+  .dvs {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+  @media (max-width: 650px) { .dvs { grid-template-columns: 1fr; } }
+  .dvs-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .dvs-panel.panel-good { border-top: 3px solid var(--accent-green); }
+  .dvs-panel.panel-warn { border-top: 3px solid var(--accent-orange); }
+  .dvs-panel.panel-info { border-top: 3px solid var(--accent-blue); }
+  .dvs-panel.panel-purple { border-top: 3px solid var(--accent-purple); }
+  .dvs-panel .panel-head {
+    font-size: 13px;
+    font-weight: 700;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dvs-panel .panel-head.h-green { color: var(--accent-green); }
+  .dvs-panel .panel-head.h-orange { color: var(--accent-orange); }
+  .dvs-panel .panel-head.h-blue { color: var(--accent-blue); }
+  .dvs-panel .panel-head.h-purple { color: var(--accent-purple); }
+  .dvs-panel .panel-row {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 4px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .dvs-panel .panel-row .row-icon { flex-shrink: 0; }
+  .dvs-badge {
+    align-self: center;
+    background: rgba(240,136,62,0.15);
+    border: 2px solid var(--accent-orange);
+    color: var(--accent-orange);
+    font-size: 14px;
+    font-weight: 900;
+    padding: 8px 14px;
+    border-radius: 50%;
+    letter-spacing: 1px;
+  }
+  @media (max-width: 650px) {
+    .dvs-badge { margin: 0 auto; }
+  }
+
+  /* Layered stack diagram */
+  .dlayer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .dlayer-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .dlayer-box {
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid;
+    min-width: 140px;
+    line-height: 1.4;
+  }
+  .dlayer-box small { display: block; font-size: 10px; font-weight: 400; opacity: 0.7; margin-top: 2px; }
+  .dlayer-box.l-blue { background: rgba(88,166,255,0.1); border-color: rgba(88,166,255,0.3); color: var(--accent-blue); }
+  .dlayer-box.l-cyan { background: rgba(57,208,216,0.1); border-color: rgba(57,208,216,0.3); color: var(--accent-cyan); }
+  .dlayer-box.l-green { background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.3); color: var(--accent-green); }
+  .dlayer-box.l-orange { background: rgba(240,136,62,0.1); border-color: rgba(240,136,62,0.3); color: var(--accent-orange); }
+  .dlayer-box.l-purple { background: rgba(188,140,255,0.1); border-color: rgba(188,140,255,0.3); color: var(--accent-purple); }
+  .dlayer-box.l-red { background: rgba(248,81,73,0.1); border-color: rgba(248,81,73,0.3); color: var(--accent-red); }
+  .dlayer-box.l-yellow { background: rgba(227,179,65,0.1); border-color: rgba(227,179,65,0.3); color: var(--accent-yellow); }
+  .dlayer-conn {
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 2px 0;
+  }
+  .dlayer-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-align: center;
+    padding: 6px 0 2px;
+    border-top: 1px dashed var(--border);
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  /* Workload comparison table diagram */
+  .dtable {
+    display: grid;
+    gap: 2px;
+    margin-top: 8px;
+  }
+  .dtable-row {
+    display: grid;
+    gap: 2px;
+  }
+  .dtable-cell {
+    background: var(--bg-secondary);
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dtable-cell.cell-head {
+    background: rgba(88,166,255,0.08);
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .dtable-cell.cell-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    background: rgba(22,27,34,0.8);
+  }
+  .dtable-5col { grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr; }
+  @media (max-width: 700px) {
+    .dtable-5col { grid-template-columns: 1fr; }
+    .dtable-cell.cell-head { display: none; }
+    .dtable-cell.cell-label { border-top: 2px solid var(--accent-blue); margin-top: 8px; }
+  }
+
+  /* Responsibility matrix */
+  .dmatrix {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+  }
+  @media (max-width: 600px) { .dmatrix { grid-template-columns: 1fr; } }
+  .dmatrix-col {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .dmatrix-head {
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .dmatrix-head.m-blue { background: rgba(88,166,255,0.1); color: var(--accent-blue); }
+  .dmatrix-head.m-orange { background: rgba(240,136,62,0.1); color: var(--accent-orange); }
+  .dmatrix-head.m-cyan { background: rgba(57,208,216,0.1); color: var(--accent-cyan); }
+  .dmatrix-body {
+    padding: 12px 14px;
+  }
+  .dmatrix-item {
+    font-size: 11px;
+    color: var(--text-secondary);
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dmatrix-item::before { content: '▸'; color: var(--accent-blue); font-size: 10px; }
+
+  /* ========== FLOW DIAGRAMS ========== */
+  .flow-diagram {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+  .flow-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .flow-steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    text-align: center;
+    min-width: 120px;
+    transition: border-color 0.2s;
+    cursor: default;
+  }
+  .flow-step:hover { border-color: var(--accent-blue); }
+  .flow-step .step-num {
+    font-size: 10px;
+    color: var(--accent-blue);
+    font-weight: 700;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .flow-step .step-label {
+    font-size: 12px;
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .flow-step .step-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .flow-arrow {
+    color: var(--accent-blue);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .flow-steps.vertical {
+    flex-direction: column;
+  }
+  .flow-steps.vertical .flow-arrow {
+    transform: rotate(90deg);
+  }
+
+  /* Vertical flow with decision */
+  .flow-decision {
+    background: rgba(240,136,62,0.12);
+    border: 1px solid var(--accent-orange);
+    border-radius: 6px;
+    padding: 10px 16px;
+    text-align: center;
+    min-width: 140px;
+  }
+  .flow-decision .step-label { color: var(--accent-orange); }
+
+  /* ========== ARCH DIAGRAM ========== */
+  .arch-diagram {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    margin: 24px 0;
+  }
+  .arch-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+  .arch-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    text-align: center;
+    min-width: 130px;
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .arch-box.azure { border-color: var(--accent-blue); color: var(--accent-blue); }
+  .arch-box.o365 { border-color: var(--accent-orange); color: var(--accent-orange); }
+  .arch-box.cv { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+  .arch-box.storage { border-color: var(--accent-green); color: var(--accent-green); }
+  .arch-box small { display: block; font-size: 10px; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
+  .arch-connector {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 18px;
+    gap: 4px;
+  }
+  .arch-connector span { font-size: 10px; color: var(--text-muted); }
+  .arch-divider {
+    border-top: 1px dashed var(--border);
+    margin: 14px 0;
+    position: relative;
+    text-align: center;
+  }
+  .arch-divider::after {
+    content: attr(data-label);
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    padding: 0 10px;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ========== STEP LIST ========== */
+  .step-list { list-style: none; counter-reset: step; margin: 16px 0; }
+  .step-list li {
+    counter-increment: step;
+    padding: 12px 16px 12px 50px;
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: border-color 0.2s;
+  }
+  .step-list li:hover { border-color: var(--border-accent); }
+  .step-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 14px;
+    top: 12px;
+    width: 24px;
+    height: 24px;
+    background: rgba(88,166,255,0.15);
+    color: var(--accent-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .step-list li strong { color: var(--text-primary); display: block; margin-bottom: 2px; }
+
+  /* ========== COMPARISON ========== */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+  }
+  .compare-panel h4 {
+    font-size: 14px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-panel.good { border-top: 3px solid var(--accent-green); }
+  .compare-panel.good h4 { color: var(--accent-green); }
+  .compare-panel.caution { border-top: 3px solid var(--accent-orange); }
+  .compare-panel.caution h4 { color: var(--accent-orange); }
+
+  /* ========== INLINE CODE ========== */
+  code {
+    background: rgba(110,118,129,0.2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: var(--font-code);
+    font-size: 12px;
+    color: var(--accent-cyan);
+  }
+
+  /* ========== PERMISSION TABLE (no tables - flex) ========== */
+  .perm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .perm-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    font-family: var(--font-code);
+    font-size: 12px;
+    color: var(--accent-purple);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .perm-item::before { content: '🔑'; font-size: 14px; }
+
+  /* ========== INTERVIEW Q&A ========== */
+  .qa-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin: 14px 0;
+    overflow: hidden;
+  }
+  .qa-q {
+    background: rgba(188,140,255,0.08);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent-purple);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .qa-q::before { content: 'Q'; font-weight: 700; opacity: 0.7; flex-shrink: 0; }
+  .qa-a {
+    padding: 12px 18px;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .qa-a::before { content: 'A'; font-weight: 700; color: var(--accent-green); flex-shrink: 0; }
+
+  /* ========== BADGES / TAGS ========== */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 2px;
+  }
+  .tag-blue { background: rgba(88,166,255,0.15); color: var(--accent-blue); border: 1px solid rgba(88,166,255,0.3); }
+  .tag-green { background: rgba(63,185,80,0.15); color: var(--accent-green); border: 1px solid rgba(63,185,80,0.3); }
+  .tag-orange { background: rgba(240,136,62,0.15); color: var(--accent-orange); border: 1px solid rgba(240,136,62,0.3); }
+  .tag-red { background: rgba(248,81,73,0.15); color: var(--accent-red); border: 1px solid rgba(248,81,73,0.3); }
+  .tag-purple { background: rgba(188,140,255,0.15); color: var(--accent-purple); border: 1px solid rgba(188,140,255,0.3); }
+  .tag-cyan { background: rgba(57,208,216,0.15); color: var(--accent-cyan); border: 1px solid rgba(57,208,216,0.3); }
+
+  /* ========== SUMMARY BOXES ========== */
+  .summary-box {
+    background: linear-gradient(135deg, rgba(88,166,255,0.05), rgba(57,208,216,0.05));
+    border: 1px solid rgba(88,166,255,0.2);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin: 28px 0;
+  }
+  .summary-box h4 {
+    font-size: 13px;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+  .summary-box ul { list-style: none; padding: 0; }
+  .summary-box li {
+    padding: 4px 0 4px 20px;
+    position: relative;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+  }
+  .summary-box li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+    font-weight: 700;
+  }
+
+  /* ========== AUTHOR SECTION ========== */
+  .author-section {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    padding: 56px 0;
+  }
+  .author-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: start;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  @media (max-width: 600px) { .author-card { grid-template-columns: 1fr; } }
+  .author-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    flex-shrink: 0;
+  }
+  .author-name {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .author-title {
+    font-size: 13px;
+    color: var(--accent-blue);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .author-bio { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+  .author-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .author-badge {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .email-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.3);
+    border-radius: var(--radius);
+    padding: 8px 16px;
+    text-decoration: none;
+    color: var(--accent-blue);
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .email-card:hover {
+    background: rgba(88,166,255,0.18);
+    border-color: var(--accent-blue);
+  }
+
+  /* ========== FOOTER ========== */
+  footer {
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border);
+    padding: 24px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  footer a { color: var(--accent-blue); text-decoration: none; }
+
+  /* ========== DIVIDERS ========== */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero { padding: 48px 20px 40px; }
+    .section { padding: 40px 0 30px; }
+  }
+
+  /* ========== PRINT ========== */
+  @media print {
+    .nav-bar { display: none; }
+    body { background: #fff; color: #000; }
+    .section { page-break-inside: avoid; }
+  }
+
+  /* ========== LEFT SIDEBAR TOC ========== */
+  .page-wrapper { display: flex; min-height: 100vh; }
+
+  .sidebar-toc {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 260px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    background: #0a0e14;
+    border-right: 1px solid var(--border);
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-toc::-webkit-scrollbar { width: 4px; }
+  .sidebar-toc::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-toc::-webkit-scrollbar-thumb { background: rgba(88,166,255,0.2); border-radius: 2px; }
+  .sidebar-toc::-webkit-scrollbar-thumb:hover { background: rgba(88,166,255,0.4); }
+
+  .sidebar-header {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .sidebar-title {
+    font-family: var(--font-heading);
+    font-size: 12.5px;
+    color: var(--accent-blue);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .sidebar-nav { padding: 10px 0; flex: 1; }
+
+  .sidebar-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 18px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    line-height: 1.35;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .sidebar-link:hover {
+    color: var(--accent-blue);
+    background: rgba(88,166,255,0.06);
+    border-left-color: rgba(88,166,255,0.4);
+  }
+  .sidebar-link.active {
+    color: var(--accent-blue);
+    background: rgba(88,166,255,0.08);
+    border-left-color: var(--accent-blue);
+  }
+  .sidebar-num {
+    font-family: var(--font-code);
+    font-size: 10px;
+    color: var(--accent-blue);
+    opacity: 0.6;
+    flex-shrink: 0;
+    min-width: 18px;
+    padding-top: 1px;
+  }
+
+  .sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 8px;
+    z-index: 1100;
+    background: rgba(13,17,23,0.95);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--accent-blue);
+    font-size: 16px;
+  }
+
+  .page-content { margin-left: 260px; flex: 1; min-width: 0; }
+
+  @media (max-width: 900px) {
+    .sidebar-toc { transform: translateX(-100%); transition: transform 0.25s ease; }
+    .sidebar-toc.open { transform: translateX(0); }
+    .sidebar-toggle { display: flex; }
+    .page-content { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MOBILE TOGGLE -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">☰</button>
+
+<!-- NAVIGATION -->
+<nav class="nav-bar">
+  <a class="nav-logo" href="#">Commvault Tutorial 13</a>
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#m365-setup">M365 Setup</a></li>
+    <li><a href="#azure-app">Azure App Reg</a></li>
+    <li><a href="#exchange-backup">Exchange Backup</a></li>
+    <li><a href="#teams-backup">Teams Backup</a></li>
+    <li><a href="#onedrive">OneDrive</a></li>
+    <li><a href="#sharepoint">SharePoint</a></li>
+    <li><a href="#workflows">Workflows</a></li>
+    <li><a href="#restapi">REST API</a></li>
+    <li><a href="#interview">Interview Q&amp;A</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="page-wrapper">
+
+<!-- SIDEBAR TOC -->
+<aside class="sidebar-toc" id="sidebarToc">
+  <div class="sidebar-header">
+    <div class="sidebar-label">Contents</div>
+    <div class="sidebar-title">Tutorial 13 — M365 Backup, Workflows &amp; REST API</div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="#overview"><span class="sidebar-num">01</span>Overview &amp; Prerequisites</a>
+    <a class="sidebar-link" href="#m365-setup"><span class="sidebar-num">02</span>Microsoft 365 Subscription Setup</a>
+    <a class="sidebar-link" href="#azure-app"><span class="sidebar-num">03</span>Azure App Registration</a>
+    <a class="sidebar-link" href="#exchange-backup"><span class="sidebar-num">04</span>Exchange Online Backup</a>
+    <a class="sidebar-link" href="#teams-backup"><span class="sidebar-num">05</span>Teams Backup &amp; Restore</a>
+    <a class="sidebar-link" href="#onedrive"><span class="sidebar-num">06</span>OneDrive for Business</a>
+    <a class="sidebar-link" href="#sharepoint"><span class="sidebar-num">07</span>SharePoint Online</a>
+    <a class="sidebar-link" href="#workflows"><span class="sidebar-num">08</span>Workflow Automation</a>
+    <a class="sidebar-link" href="#restapi"><span class="sidebar-num">09</span>Commvault REST API</a>
+    <a class="sidebar-link" href="#interview"><span class="sidebar-num">10</span>Interview Q&amp;A</a>
+  </nav>
+</aside>
+
+<!-- PAGE CONTENT -->
+<div class="page-content">
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-badge">Tutorial 13 &nbsp;·&nbsp; Commvault Software Administration</div>
+  <h1>Microsoft 365 Backup & Recovery,<br><span>Workflows & REST API Automation</span></h1>
+  <p class="hero-subtitle">A complete practitioner's guide to protecting Exchange Online, Teams, OneDrive, and SharePoint with Commvault — plus workflow creation and REST API integration.</p>
+  <div class="hero-tags">
+    <span class="hero-tag">Microsoft 365 Backup</span>
+    <span class="hero-tag">Exchange Online</span>
+    <span class="hero-tag">Teams & OneDrive</span>
+    <span class="hero-tag">SharePoint Online</span>
+    <span class="hero-tag">Workflow Automation</span>
+    <span class="hero-tag">Commvault REST API</span>
+    <span class="hero-tag">Azure App Registration</span>
+    <span class="hero-tag">Postman Integration</span>
+  </div>
+</header>
+
+<!-- TABLE OF CONTENTS -->
+<div class="container">
+  <div class="toc-grid">
+    <a href="#overview" class="toc-item"><span class="toc-num">1</span> Overview & Prerequisites</a>
+    <a href="#m365-setup" class="toc-item"><span class="toc-num">2</span> Microsoft 365 Subscription Setup</a>
+    <a href="#azure-app" class="toc-item"><span class="toc-num">3</span> Azure App Registration</a>
+    <a href="#exchange-backup" class="toc-item"><span class="toc-num">4</span> Exchange Online Backup</a>
+    <a href="#teams-backup" class="toc-item"><span class="toc-num">5</span> Teams Backup & Restore</a>
+    <a href="#onedrive" class="toc-item"><span class="toc-num">6</span> OneDrive for Business</a>
+    <a href="#sharepoint" class="toc-item"><span class="toc-num">7</span> SharePoint Online</a>
+    <a href="#workflows" class="toc-item"><span class="toc-num">8</span> Workflow Automation</a>
+    <a href="#restapi" class="toc-item"><span class="toc-num">9</span> Commvault REST API</a>
+    <a href="#interview" class="toc-item"><span class="toc-num">10</span> Interview Q&amp;A</a>
+  </div>
+</div>
+
+<main class="container">
+
+<!-- ========== SECTION 1: OVERVIEW ========== -->
+<section class="section" id="overview">
+  <div class="section-header">
+    <div class="section-icon icon-blue">📋</div>
+    <div>
+      <h2 class="section-title">Overview &amp; <span class="accent">Prerequisites</span></h2>
+      <p class="section-subtitle">Understanding Microsoft 365 as a SaaS Platform and Commvault's Protection Strategy</p>
+    </div>
+  </div>
+
+  <p>Microsoft 365 (formerly Office 365) is a cloud-based SaaS platform that provides Exchange Online, Microsoft Teams, OneDrive for Business, and SharePoint Online — all without requiring on-premises infrastructure. Because this is a SaaS solution, traditional agent-based backup strategies do not apply. Commvault uses a dedicated <strong>Access Node</strong> model with API-based authentication to protect these workloads.</p>
+
+  <h3 class="subsection">What Microsoft 365 Provides</h3>
+  <div class="card-grid">
+    <div class="card blue-accent">
+      <div class="card-icon">📧</div>
+      <h4>Exchange Online</h4>
+      <p>Cloud-hosted mailbox service. Each licensed user gets a dedicated mailbox with up to 50 GB of storage, accessible via Outlook Web (outlook.office.com).</p>
+    </div>
+    <div class="card green-accent">
+      <div class="card-icon">💬</div>
+      <h4>Microsoft Teams</h4>
+      <p>Collaboration platform with channels, chats, and meetings. Teams content is backed up per channel and can be restored to its original location or as HTML files.</p>
+    </div>
+    <div class="card orange-accent">
+      <div class="card-icon">🗂️</div>
+      <h4>OneDrive for Business</h4>
+      <p>Individual file storage — 1 TB per user by default. Files can be restored granularly or in bulk. Backup agent type: Cloud Apps.</p>
+    </div>
+    <div class="card purple-accent">
+      <div class="card-icon">🌐</div>
+      <h4>SharePoint Online</h4>
+      <p>Team sites for document collaboration and intranet content. Requires a certificate-based authentication and supports both document and full-site restore.</p>
+    </div>
+  </div>
+
+  <!-- Architecture Diagram -->
+  <div class="arch-diagram">
+    <div class="flow-title">🏗️ Commvault Microsoft 365 Protection Architecture</div>
+    <div class="arch-row">
+      <div class="arch-box o365">Microsoft 365<small>Exchange / Teams / OD / SP</small></div>
+      <div class="arch-connector">⟷<span style="font-size:10px;margin:0 4px">HTTPS API</span>⟷</div>
+      <div class="arch-box azure">Azure AD<small>App Registration &amp; Auth</small></div>
+    </div>
+    <div class="arch-divider" data-label="Access Node Layer"></div>
+    <div class="arch-row">
+      <div class="arch-box cv">Access Node<small>Office 365 Package Installed</small></div>
+      <div class="arch-connector">↔</div>
+      <div class="arch-box cv">CommServe<small>Index Server &amp; Job Management</small></div>
+      <div class="arch-connector">↔</div>
+      <div class="arch-box storage">Storage Library<small>Backup Data Destination</small></div>
+    </div>
+  </div>
+
+  <!-- Shared Responsibility Model Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-orange);">
+    <div class="diagram-title">☁️ Microsoft 365 — Shared Responsibility Model</div>
+    <div class="diagram-sub">Who is responsible for what in a SaaS backup strategy</div>
+    <div class="dmatrix">
+      <div class="dmatrix-col">
+        <div class="dmatrix-head m-blue">☁️ Microsoft Manages</div>
+        <div class="dmatrix-body">
+          <div class="dmatrix-item">Infrastructure uptime (99.9% SLA)</div>
+          <div class="dmatrix-item">Platform availability</div>
+          <div class="dmatrix-item">Physical data center security</div>
+          <div class="dmatrix-item">Service patching &amp; updates</div>
+          <div class="dmatrix-item">Geo-redundancy of service</div>
+        </div>
+      </div>
+      <div class="dmatrix-col">
+        <div class="dmatrix-head m-orange">👤 Customer Responsible</div>
+        <div class="dmatrix-body">
+          <div class="dmatrix-item">Data protection &amp; backup</div>
+          <div class="dmatrix-item">Retention compliance</div>
+          <div class="dmatrix-item">Accidental deletion recovery</div>
+          <div class="dmatrix-item">Ransomware &amp; data loss</div>
+          <div class="dmatrix-item">Regulatory &amp; legal hold</div>
+        </div>
+      </div>
+      <div class="dmatrix-col">
+        <div class="dmatrix-head m-cyan">🛡️ Commvault Provides</div>
+        <div class="dmatrix-body">
+          <div class="dmatrix-item">API-based backup via Access Node</div>
+          <div class="dmatrix-item">Granular mailbox &amp; file recovery</div>
+          <div class="dmatrix-item">Retention policy enforcement</div>
+          <div class="dmatrix-item">Long-term archive storage</div>
+          <div class="dmatrix-item">Cross-workload protection</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Key Concepts Before You Start</h3>
+  <div class="card-grid">
+    <div class="card blue-accent">
+      <h4>Access Node</h4>
+      <p>A Windows server with the Office 365 package installed. It acts as the bridge between Commvault and Microsoft's cloud APIs. Linux is <strong>not supported</strong>.</p>
+    </div>
+    <div class="card cyan-accent">
+      <h4>Forever Incremental Jobs</h4>
+      <p>All Microsoft 365 backup jobs run as <strong>incremental</strong> — even the first run. There is no concept of a full backup. The first job captures all existing data.</p>
+    </div>
+    <div class="card orange-accent">
+      <h4>Archive Jobs (Exchange)</h4>
+      <p>Exchange Online and on-premises Exchange backup jobs are called <strong>Archive Jobs</strong>, not Backup Jobs. Teams, OneDrive, and SharePoint show as Backup jobs.</p>
+    </div>
+    <div class="card green-accent">
+      <h4>Two Plans Required</h4>
+      <p>You need both a <strong>Server Plan</strong> (storage, frequency, schedule) and a <strong>Microsoft 365 Plan</strong> (retention for mailboxes). The M365 plan retention takes precedence.</p>
+    </div>
+  </div>
+
+  <!-- Retention Precedence Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-red);">
+    <div class="diagram-title">⚖️ Retention Precedence — Two Plan Architecture</div>
+    <div class="diagram-sub">M365 Plan retention always overrides Server Plan retention for mailbox data</div>
+    <div class="dvs">
+      <div class="dvs-panel panel-info">
+        <div class="panel-head h-blue">📋 Server Plan</div>
+        <div class="panel-row"><span class="row-icon">📦</span> Storage library destination</div>
+        <div class="panel-row"><span class="row-icon">⏰</span> Backup schedule &amp; frequency</div>
+        <div class="panel-row"><span class="row-icon">🗓️</span> Retention (e.g., 30 days)</div>
+        <div class="panel-row"><span class="row-icon">⚠️</span> <strong style="color:var(--accent-orange)">Retention overridden for M365</strong></div>
+      </div>
+      <div class="dvs-badge">+</div>
+      <div class="dvs-panel panel-warn">
+        <div class="panel-head h-orange">📋 Microsoft 365 Plan</div>
+        <div class="panel-row"><span class="row-icon">📧</span> Mailbox-specific retention</div>
+        <div class="panel-row"><span class="row-icon">👑</span> <strong style="color:var(--accent-orange)">Takes precedence always</strong></div>
+        <div class="panel-row"><span class="row-icon">♾️</span> If set to "Indefinitely" → no aging</div>
+        <div class="panel-row"><span class="row-icon">✅</span> Set a definite value (e.g., 12 mo)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <h5>Critical: Retention Precedence</h5>
+      <p>If you define retention in both the Server Plan and the Microsoft 365 Plan, the <strong>Microsoft 365 Plan retention always takes priority</strong>. Setting indefinite retention in the M365 Plan while expecting aging from the Server Plan will cause unlimited storage growth with no reclamation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 2: M365 SETUP ========== -->
+<section class="section" id="m365-setup">
+  <div class="section-header">
+    <div class="section-icon icon-orange">🏢</div>
+    <div>
+      <h2 class="section-title">Microsoft 365 <span class="accent">Subscription Setup</span></h2>
+      <p class="section-subtitle">Creating a Tenant, Users, and Verifying Licensing for Backup</p>
+    </div>
+  </div>
+
+  <p>Before Commvault can protect Microsoft 365 workloads, the target tenant must be configured correctly. This section walks through subscription creation, user setup, and pre-configuration steps.</p>
+
+  <!-- M365 Pre-Config Flow Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-orange);">
+    <div class="diagram-title">🏢 Microsoft 365 Setup — End-to-End Pre-Configuration</div>
+    <div class="diagram-sub">Complete all steps before configuring Commvault protection</div>
+    <div class="dflow">
+      <div class="dnode n-blue">Subscribe to<br>M365 Plan<small>microsoft365.com</small></div>
+      <div class="darrow">→</div>
+      <div class="dnode n-purple">Create Tenant<br>&amp; Admin<small>Global Admin role</small></div>
+      <div class="darrow">→</div>
+      <div class="dnode n-cyan">Assign Licenses<small>Exchange, Teams,<br>OneDrive, SharePoint</small></div>
+      <div class="darrow">→</div>
+      <div class="dnode n-green">Verify Mailbox<small>Exchange Admin<br>Center</small></div>
+      <div class="darrow">→</div>
+      <div class="dnode n-orange">Register<br>Azure App<small>Entra ID</small></div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Step-by-Step: Creating the M365 Environment</h3>
+  <ol class="step-list">
+    <li><strong>Subscribe to Microsoft 365 Business Plan:</strong> Visit microsoft365.com and choose a plan that includes Exchange Online, Teams, OneDrive, and SharePoint. For lab or PoC use, the <em>Business Basic</em> plan is sufficient — it includes 1 TB OneDrive per user and hosted Exchange.</li>
+    <li><strong>Create an Admin Account &amp; Tenant:</strong> During signup, provide a company name (e.g., <code>techcorp</code>). Your tenant name is auto-generated. Microsoft assigns a domain like <code>admin@techcorp295.onmicrosoft.com</code>. This first account is automatically the <em>Global Administrator</em>.</li>
+    <li><strong>Access the Admin Center:</strong> Log in at <code>admin.microsoft.com</code>. Multi-Factor Authentication (MFA) is required on first login. Use Microsoft Authenticator or Google Authenticator to complete the setup.</li>
+    <li><strong>Verify Global Administrator Role:</strong> In the Admin Center under <em>Active Users</em>, click the user and confirm the role is <strong>Global Administrator</strong>. This role is mandatory for the initial Commvault configuration.</li>
+    <li><strong>Verify Exchange Online License:</strong> In the user's <em>Licenses and Apps</em> tab, confirm that <strong>Exchange Online</strong> is assigned. Without this license, the mailbox backup configuration will fail.</li>
+    <li><strong>Disable Multi-Factor Authentication (temporary — Express method only)</strong> If using the <strong>Express</strong> configuration method, navigate to the MFA settings for the service account and disable MFA temporarily during the initial Commvault configuration. Re-enable MFA after configuration is complete. <strong>This step is not required when using the Custom (recommended) method</strong> — the Custom method uses Azure App Registration with scoped permissions and does not require MFA to be disabled.</li>
+    <li><strong>Verify Mailbox in Exchange Admin Center:</strong> Go to <code>admin.exchange.microsoft.com</code> → Mailboxes. Confirm a mailbox was automatically created for your user. Mailboxes are created automatically when Exchange Online license is assigned.</li>
+    <li><strong>Verify Mailbox Access via Outlook:</strong> Browse to <code>outlook.office.com</code> and log in with the admin credentials. Confirm email can be sent and received.</li>
+  </ol>
+
+  <div class="callout note">
+    <span class="callout-icon">📝</span>
+    <div class="callout-body">
+      <h5>Important URL Reference</h5>
+      <ul>
+        <li><code>admin.microsoft.com</code> — Microsoft 365 Admin Center</li>
+        <li><code>admin.exchange.microsoft.com</code> — Exchange Admin Center</li>
+        <li><code>outlook.office.com</code> — Web-based Email Client</li>
+        <li><code>portal.azure.com</code> — Azure Portal (App Registration)</li>
+        <li><code>admin.sharepoint.com</code> — SharePoint Admin Center</li>
+        <li><code>teams.microsoft.com</code> — Microsoft Teams Web Client</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="subsection">Microsoft 365 Plans by Size</h3>
+  <div class="card-grid">
+    <div class="card blue-accent">
+      <div class="card-icon">👤</div>
+      <h4>Business Basic</h4>
+      <p>Up to 300 users. Web &amp; mobile apps, 1 TB OneDrive, Teams, Exchange Online. Suitable for PoC and small deployments.</p>
+    </div>
+    <div class="card green-accent">
+      <div class="card-icon">🏢</div>
+      <h4>Business Standard</h4>
+      <p>Includes full desktop Office apps alongside all Business Basic services. Ideal for mid-sized organizations.</p>
+    </div>
+    <div class="card purple-accent">
+      <div class="card-icon">🌍</div>
+      <h4>Enterprise Plans</h4>
+      <p>E1, E3, E5 tiers for large organizations. Advanced security, compliance, and analytics features. No user limit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 3: AZURE APP REGISTRATION ========== -->
+<section class="section" id="azure-app">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🔐</div>
+    <div>
+      <h2 class="section-title">Azure App <span class="accent">Registration</span></h2>
+      <p class="section-subtitle">Modern Authentication via Custom Configuration Method</p>
+    </div>
+  </div>
+
+  <p>Commvault uses <strong>Modern Authentication</strong> (OAuth 2.0) to connect to Microsoft 365. This requires registering an application in Azure Active Directory (now called <strong>Microsoft Entra ID</strong>) and granting it the necessary API permissions. There are two configuration methods — <em>Express</em> and <em>Custom</em>. The <strong>Custom method is recommended</strong> for production environments.</p>
+
+  <!-- OAuth 2.0 Authentication Flow Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-purple);">
+    <div class="diagram-title">🔐 OAuth 2.0 Authentication Flow — Commvault to Microsoft 365</div>
+    <div class="diagram-sub">How the Access Node authenticates via Azure AD to access M365 APIs</div>
+    <div class="dlayer">
+      <div class="dlayer-row">
+        <div class="dlayer-box l-cyan">Commvault Access Node<small>Office 365 Package</small></div>
+      </div>
+      <div class="dlayer-conn">↓ ① Sends App ID + Secret + Tenant ID</div>
+      <div class="dlayer-row">
+        <div class="dlayer-box l-blue">Microsoft Entra ID<small>(Azure AD) — Token Endpoint</small></div>
+      </div>
+      <div class="dlayer-conn">↓ ② Returns OAuth 2.0 Bearer Token</div>
+      <div class="dlayer-row">
+        <div class="dlayer-box l-cyan">Commvault Access Node<small>Stores token for API calls</small></div>
+      </div>
+      <div class="dlayer-conn">↓ ③ Calls Microsoft Graph / Exchange APIs with Bearer Token</div>
+      <div class="dlayer-row" style="gap: 8px;">
+        <div class="dlayer-box l-orange">Exchange<small>Online</small></div>
+        <div class="dlayer-box l-purple">Teams<small>Channels</small></div>
+        <div class="dlayer-box l-green">OneDrive<small>for Business</small></div>
+        <div class="dlayer-box l-blue">SharePoint<small>Online</small></div>
+      </div>
+      <div class="dlayer-label">Microsoft 365 Workloads</div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Express vs Custom Configuration</h3>
+  <div class="compare-grid">
+    <div class="compare-panel caution">
+      <h4>⚡ Express Configuration (Deprecated)</h4>
+      <ul class="bullet-list">
+        <li>Requires Global Administrator account credentials</li>
+        <li>MFA must be disabled on the service account</li>
+        <li>Simpler but less secure</li>
+        <li>Being phased out — not recommended for new deployments</li>
+        <li>Kept only for backward compatibility</li>
+      </ul>
+    </div>
+    <div class="compare-panel good">
+      <h4>✅ Custom Configuration (Recommended)</h4>
+      <ul class="bullet-list">
+        <li>Does <strong>not</strong> require Global Admin credentials for Commvault</li>
+        <li>MFA does not need to be disabled permanently</li>
+        <li>Uses Azure App Registration with scoped permissions</li>
+        <li>Supports role separation — different teams can configure their parts</li>
+        <li>Recommended by Commvault for all new installations</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="subsection">Azure App Registration — Step by Step</h3>
+
+  <!-- Flow Diagram -->
+  <div class="flow-diagram">
+    <div class="flow-title">🔑 Azure App Registration Flow</div>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="step-num">Step 1</div><div class="step-label">Login to Azure Portal</div><div class="step-sub">portal.azure.com</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 2</div><div class="step-label">Microsoft Entra ID</div><div class="step-sub">App Registrations</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 3</div><div class="step-label">New Registration</div><div class="step-sub">Name + Account Type</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 4</div><div class="step-label">Note App &amp; Tenant ID</div><div class="step-sub">Application ID + Directory ID</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 5</div><div class="step-label">Create Client Secret</div><div class="step-sub">Copy Value Immediately</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 6</div><div class="step-label">Add API Permissions</div><div class="step-sub">Microsoft Graph + Exchange</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 7</div><div class="step-label">Grant Admin Consent</div><div class="step-sub">For your tenant</div></div>
+    </div>
+  </div>
+
+  <ol class="step-list">
+    <li><strong>Login to Azure Portal</strong> Navigate to <code>portal.azure.com</code> using the Global Administrator account associated with your Microsoft 365 tenant.</li>
+    <li><strong>Navigate to Microsoft Entra ID (Azure AD)</strong> Search for "Azure Active Directory" or "Microsoft Entra ID" from the portal search bar. Select <em>App Registrations</em> from the left sidebar.</li>
+    <li><strong>Create New Application Registration</strong> Click <em>New Registration</em>. Provide a meaningful name (e.g., <code>CommvaultPOC-App</code>). For Supported Account Types, select <em>Accounts in this organizational directory only</em> (single tenant). The Redirect URI is optional — leave blank for Exchange Online, but required for Teams.</li>
+    <li><strong>Record Application Credentials</strong> After registration, note the <strong>Application (Client) ID</strong> and <strong>Directory (Tenant) ID</strong>. These are required in Commvault configuration.</li>
+    <li><strong>Create Client Secret</strong> Navigate to <em>Certificates &amp; Secrets</em> → <em>New Client Secret</em>. Set an expiration — choose at least 2 years in production to avoid backup failures. <strong>Copy the secret Value immediately</strong> — it is only shown once.</li>
+    <li><strong>Add API Permissions</strong> Navigate to <em>API Permissions</em> → <em>Add a Permission</em>. Select <em>Microsoft Graph</em> → <em>Application permissions</em>. Add all required permissions from the Commvault documentation for the specific workload.</li>
+    <li><strong>Grant Admin Consent</strong> Click <em>Grant admin consent for [TenantName]</em>. This authorizes all the assigned permissions for your organization.</li>
+  </ol>
+
+  <div class="callout warning">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <h5>Client Secret Value — One-Time Display</h5>
+      <p>The Client Secret <strong>Value</strong> is only displayed once, immediately after creation. If you navigate away before copying it, you must delete the secret and create a new one. This is the most common misconfiguration error. Always use the <em>Value</em> column — not the <em>Secret ID</em>.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Required API Permissions — Exchange Online</h3>
+  <p><span class="tag tag-orange">Microsoft Graph — Application Permissions</span></p>
+  <div class="perm-grid">
+    <div class="perm-item">Mail.Read</div>
+    <div class="perm-item">Mail.ReadWrite</div>
+    <div class="perm-item" title="Verify against current Commvault BOL — standard Microsoft Graph does not include this permission name">MailboxSettings.ReadWrite <em style="font-size:10px;opacity:0.7">(verify in BOL)</em></div>
+    <div class="perm-item">Directory.Read.All</div>
+    <div class="perm-item">Group.Read.All</div>
+    <div class="perm-item">User.Read.All</div>
+  </div>
+  <p style="margin-top:6px"><span class="tag tag-blue">Exchange Online — Application Permissions (via API My Organization Uses)</span></p>
+  <div class="perm-grid">
+    <div class="perm-item">full_access_as_app</div>
+  </div>
+
+  <h3 class="subsection">Required API Permissions — Teams</h3>
+  <p><span class="tag tag-orange">Microsoft Graph — Application Permissions</span></p>
+  <div class="perm-grid">
+    <div class="perm-item">ChannelSettings.ReadWrite.All</div>
+    <div class="perm-item">Group.ReadWrite.All</div>
+    <div class="perm-item">Directory.Read.All</div>
+    <div class="perm-item">User.Read.All</div>
+  </div>
+
+  <h3 class="subsection">Required API Permissions — OneDrive for Business</h3>
+  <div class="perm-grid">
+    <div class="perm-item">Files.ReadWrite.All</div>
+    <div class="perm-item">Directory.Read.All</div>
+    <div class="perm-item">User.Read.All</div>
+  </div>
+
+  <h3 class="subsection">Required API Permissions — SharePoint Online</h3>
+  <p><span class="tag tag-orange">SharePoint — Application Permissions</span></p>
+  <div class="perm-grid">
+    <div class="perm-item">Sites.FullControl.All</div>
+  </div>
+  <p><span class="tag tag-blue">Microsoft Graph — Application Permissions</span></p>
+  <div class="perm-grid">
+    <div class="perm-item">Directory.Read.All</div>
+    <div class="perm-item">User.Read.All</div>
+  </div>
+
+  <!-- Single App Registration Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-blue);">
+    <div class="diagram-title">🔑 Single Azure App — Multi-Workload Permission Model</div>
+    <div class="diagram-sub">One App Registration can serve all four M365 workloads</div>
+    <div class="dlayer">
+      <div class="dlayer-row">
+        <div class="dlayer-box l-blue" style="min-width:280px">Azure App Registration<small>App ID + Tenant ID + Client Secret</small></div>
+      </div>
+      <div class="dlayer-conn">↓ Permissions scoped per workload ↓</div>
+      <div class="dlayer-row" style="gap: 8px;">
+        <div class="dlayer-box l-orange">Exchange<small>Mail.Read, Mail.ReadWrite,<br>full_access_as_app</small></div>
+        <div class="dlayer-box l-purple">Teams<small>ChannelSettings.RW<br>+ Redirect URI</small></div>
+        <div class="dlayer-box l-cyan">OneDrive<small>Files.ReadWrite.All</small></div>
+        <div class="dlayer-box l-green">SharePoint<small>Sites.FullControl<br>+ PFX Certificate</small></div>
+      </div>
+      <div class="dlayer-label">Common: Directory.Read.All + User.Read.All + Admin Consent</div>
+    </div>
+  </div>
+
+  <div class="callout best-practice">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body">
+      <h5>Best Practice: Single App Registration for Multiple Workloads</h5>
+      <p>You can reuse a single Azure App Registration for multiple Microsoft 365 workloads (Exchange, Teams, OneDrive). Simply add the required permissions for each workload to the same app. This reduces administrative overhead and simplifies secret rotation management.</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body">
+      <h5>Always Follow Official Commvault Documentation for Permissions</h5>
+      <p>The Commvault Books Online (BOL) documentation lists the exact API permissions required for each workload version. <strong>Do not rely on third-party sources</strong> for permission lists. Missing a single permission (e.g., <code>Directory.Read.All</code>) will cause discovery and backup failures that are difficult to diagnose without checking the Verify Connection output.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 4: EXCHANGE ONLINE ========== -->
+<section class="section" id="exchange-backup">
+  <div class="section-header">
+    <div class="section-icon icon-orange">📧</div>
+    <div>
+      <h2 class="section-title">Exchange Online <span class="accent">Backup &amp; Restore</span></h2>
+      <p class="section-subtitle">Configuring Archive Jobs, Plans, and Mailbox Recovery</p>
+    </div>
+  </div>
+
+  <p>Commvault protects Exchange Online through <strong>Archive Jobs</strong>. The term "Archive" refers to the <strong>job type label</strong> used for all Exchange workloads — it does not automatically mean production mailbox data is moved or deleted. In a standard backup configuration, Commvault <strong>copies</strong> mailbox data to the storage library without removing it from the production mailbox. Whether data is actually moved and replaced with stubs (archiving) depends on the specific archiving policy configured — consult Commvault documentation for your version to confirm the behaviour for your use case. When stubbed data is accessed by a user, a <em>recall job</em> runs automatically to restore it to the production mailbox.</p>
+
+  <h3 class="subsection">Understanding Archive Jobs vs. Backup Jobs</h3>
+  <div class="card-grid">
+    <div class="card orange-accent">
+      <div class="card-icon">📦</div>
+      <h4>Archive Job (Exchange Online &amp; On-Prem Exchange)</h4>
+      <p>The job type label used for all Exchange Online and on-premises Exchange workloads. In a standard backup configuration, mailbox data is <strong>copied</strong> to the storage library without deletion. Whether data is moved and stubbed depends on the archiving policy configured. All Exchange jobs run as Archive — there is no standard "backup" type for Exchange.</p>
+    </div>
+    <div class="card blue-accent">
+      <div class="card-icon">💾</div>
+      <h4>Backup Job (Teams, OneDrive, SharePoint)</h4>
+      <p>Standard backup job type. Copies data to the storage library without removing it from the source. Always incremental — first job captures all data, subsequent jobs capture changes only.</p>
+    </div>
+  </div>
+
+  <!-- Archive Copy vs Stub/Recall Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-orange);">
+    <div class="diagram-title">📦 Exchange Archive Job — What Actually Happens</div>
+    <div class="diagram-sub">Standard backup configuration copies data — archiving policy stubs and recalls</div>
+    <div class="dvs">
+      <div class="dvs-panel panel-good">
+        <div class="panel-head h-green">✅ Standard Backup (Default)</div>
+        <div class="panel-row"><span class="row-icon">📧</span> Mailbox emails remain intact</div>
+        <div class="panel-row"><span class="row-icon">📋</span> Job label shows "Archive" — cosmetic only</div>
+        <div class="panel-row"><span class="row-icon">📤</span> Data copied to storage library</div>
+        <div class="panel-row"><span class="row-icon">🚫</span> Nothing deleted from production</div>
+        <div class="panel-row" style="font-weight:600; color:var(--accent-green)">→ Most common configuration</div>
+      </div>
+      <div class="dvs-badge">VS</div>
+      <div class="dvs-panel panel-warn">
+        <div class="panel-head h-orange">⚠️ Archiving Policy (Opt-In)</div>
+        <div class="panel-row"><span class="row-icon">📧</span> Emails moved to Commvault storage</div>
+        <div class="panel-row"><span class="row-icon">📎</span> Replaced with lightweight stubs</div>
+        <div class="panel-row"><span class="row-icon">🔄</span> Click stub → recall job restores email</div>
+        <div class="panel-row"><span class="row-icon">⚙️</span> Requires explicit archiving policy setup</div>
+        <div class="panel-row" style="font-weight:600; color:var(--accent-orange)">→ Customer must specifically enable this</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Exchange Online Configuration Workflow</h3>
+  <div class="flow-diagram">
+    <div class="flow-title">⚙️ Exchange Online Backup Setup — End-to-End Flow</div>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="step-num">Pre-req</div><div class="step-label">Install Office 365 Package</div><div class="step-sub">On Access Node</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Pre-req</div><div class="step-label">Create Server Plan</div><div class="step-sub">Storage + Schedule</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Pre-req</div><div class="step-label">Create M365 Plan</div><div class="step-sub">Retention Settings</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Config</div><div class="step-label">Configure Exchange Online App</div><div class="step-sub">App ID, Secret, Tenant ID</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Config</div><div class="step-label">Verify Connection</div><div class="step-sub">Check All Permissions</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Run</div><div class="step-label">Add Mailbox Content</div><div class="step-sub">All or Specific Mailboxes</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Run</div><div class="step-label">Execute Backup</div><div class="step-sub">Archive Job</div></div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Installing the Office 365 Package</h3>
+  <p>The Access Node requires the <strong>Office 365 software package</strong> to communicate with Microsoft cloud services. This is installed via the Commvault installation wizard.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">Installation Path</span>
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div class="code-content"><span class="cmt"># Run the Commvault Setup executable on the Access Node</span>
+<span class="cmd">Setup.exe</span>
+  → Select: <span class="val">Install Packages</span>
+  → Add Package: <span class="str">Applications</span>
+  → Select: <span class="val">Office 365</span>
+  → Follow the wizard to complete installation
+
+<span class="cmt"># Verify installation in Command Center:</span>
+<span class="cmd">System</span> → <span class="val">Infrastructure</span> → <span class="str">Access Nodes</span>
+<span class="cmt"># Office 365 package shows as "Disabled" = Already Installed</span></div>
+  </div>
+
+  <div class="callout note">
+    <span class="callout-icon">📝</span>
+    <div class="callout-body">
+      <h5>Access Node OS Requirements</h5>
+      <ul>
+        <li>Windows Server 2019 or Windows Server 2022 (Recommended)</li>
+        <li>Windows Server 2016 — supported</li>
+        <li><strong>Linux — NOT supported</strong> for the Office 365 Access Node role</li>
+        <li>Minimum RAM and CPU as specified in the Commvault system requirements guide for the specific version</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="subsection">Creating the Microsoft 365 Plan</h3>
+  <p>The Microsoft 365 Plan defines <strong>mailbox retention</strong> — how long archived mailbox data is kept in the Commvault storage library. This plan is distinct from the Server Plan.</p>
+
+  <ol class="step-list">
+    <li><strong>Navigate to Plans</strong> In Command Center: <em>Manage → Plans → Create Microsoft 365 Plan</em></li>
+    <li><strong>Define Plan Name</strong> Use a meaningful name such as <code>M365-ExchangeRetention-1Yr</code></li>
+    <li><strong>Set Retention Period</strong> Define how many days/months/years archived mailbox data is retained. <strong>Avoid setting to "Indefinitely"</strong> unless you have sufficient cloud or tape storage — it will cause uncontrolled storage growth.</li>
+    <li><strong>Optional: Archive Mailbox Settings</strong> Enable backup of archived mailboxes if required by your organization's compliance policy.</li>
+  </ol>
+
+  <div class="callout warning">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <h5>Common Production Mistake: Indefinite Retention</h5>
+      <p>Many organizations set <em>Indefinite Retention</em> in the Microsoft 365 Plan and then wonder why storage keeps growing despite having a short retention in the Server Plan. The M365 Plan retention <strong>overrides</strong> the Server Plan for mailbox data. Always set a definite retention value — use cloud or tape library if long-term retention is required for compliance.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Configuring the Exchange Online App in Command Center</h3>
+  <ol class="step-list">
+    <li><strong>Navigate to Office 365</strong> In Command Center: <em>Protect → Office 365 → Configure Now → Exchange Online</em></li>
+    <li><strong>Provide App Name</strong> Enter a user-friendly name (e.g., <code>ExchangeOnline-PoC</code>)</li>
+    <li><strong>Select Server Plan</strong> Choose the Server Plan that defines storage location and backup frequency</li>
+    <li><strong>Configure Index Server</strong> Create or select an Index Server. The Index Server stores mailbox indexes enabling granular item-level search and restore. Designate the CommServe as the Index Server if no separate server is available.</li>
+    <li><strong>Select Access Node</strong> Select the Windows server where the Office 365 package is installed</li>
+    <li><strong>Enter Azure App Credentials</strong> Provide: <em>Application ID, Application Secret (Value), Directory (Tenant) ID</em></li>
+    <li><strong>Verify Connection</strong> Click <em>Verify Connection</em>. Resolve any permission errors before proceeding.</li>
+  </ol>
+
+  <h3 class="subsection">Running Exchange Online Backup</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">Command Center Navigation</span>
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div class="code-content"><span class="cmt"># Add Mailbox Content</span>
+Protect → Office 365 → [Exchange Online App] → Content → Add
+  → Select: <span class="val">All Mailboxes</span> OR <span class="str">Specific Mailboxes</span>
+  → Assign: <span class="val">Microsoft 365 Plan</span>
+  → Click: <span class="cmd">Submit</span>
+
+<span class="cmt"># Run Backup Job</span>
+Protect → Office 365 → [Exchange Online App] → Back Up Now
+  → Job Type will display as: <span class="str">Archive</span>  (not "Backup")
+  → Two phases: <span class="val">Archive</span> and <span class="val">Archive Index</span></div>
+  </div>
+
+  <h3 class="subsection">Restore Options — Exchange Online</h3>
+  <div class="card-grid">
+    <div class="card blue-accent">
+      <div class="card-icon">📬</div>
+      <h4>Restore Mailbox (In-Place)</h4>
+      <p>Restore the entire mailbox back to its original Microsoft 365 location. Supports overwrite option. Suitable for catastrophic mailbox loss.</p>
+    </div>
+    <div class="card green-accent">
+      <div class="card-icon">✉️</div>
+      <h4>Restore Specific Messages</h4>
+      <p>Browse the indexed mailbox and restore individual emails. Useful for accidental deletion recovery — restores to original inbox location.</p>
+    </div>
+    <div class="card orange-accent">
+      <div class="card-icon">📁</div>
+      <h4>Restore as PST File</h4>
+      <p>Export mailbox or selected messages to a PST file. Useful for legal holds, e-discovery, or importing into other mail clients.</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body">
+      <h5>Restore Decision Is the Administrator's Call</h5>
+      <p>As the Commvault admin, you execute the restore as specified by the <strong>Office 365 Administrator</strong>. Clarify before restoring whether they need: in-place restore, out-of-place restore, specific message recovery, or PST export. Do not assume the restore type.</p>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <h4>Section Summary — Exchange Online</h4>
+    <ul>
+      <li>All Exchange Online backup jobs are Archive jobs — not standard backup jobs</li>
+      <li>Job phases are Archive and Archive Index — no Scan or Backup phase</li>
+      <li>The Microsoft 365 Plan controls retention for archived mailbox data — takes precedence over Server Plan</li>
+      <li>Indefinite retention causes uncontrolled storage growth — always set a definite value</li>
+      <li>Discovery status "Not Available" usually indicates missing API permissions or an incorrect client secret</li>
+      <li>Always verify connection after initial configuration before running backups</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== SECTION 5: TEAMS ========== -->
+<section class="section" id="teams-backup">
+  <div class="section-header">
+    <div class="section-icon icon-purple">💬</div>
+    <div>
+      <h2 class="section-title">Microsoft Teams <span class="accent">Backup &amp; Restore</span></h2>
+      <p class="section-subtitle">Protecting Team Channels and Posts with Cloud Apps Agent</p>
+    </div>
+  </div>
+
+  <p>Microsoft Teams backup in Commvault captures <strong>team channels, posts, and files</strong>. Unlike Exchange Online, Teams uses the <strong>Cloud Apps agent</strong> and the job type is shown as a standard <strong>Backup</strong> (not Archive). Each Teams group is backed up as a channel unit.</p>
+
+  <h3 class="subsection">Creating Teams in Microsoft 365</h3>
+  <p>Before backing up Teams, create the team groups in the Microsoft 365 Admin Center or through the Teams client:</p>
+  <ul class="bullet-list">
+    <li>Admin Center → Teams &amp; Groups → Create a new Team</li>
+    <li>Provide a team name, description, privacy setting (Public/Private), and add members</li>
+    <li>Each team has channels — these are the backup units in Commvault</li>
+    <li>The admin portal is accessible at <code>admin.teams.microsoft.com</code></li>
+    <li>The Teams web client is accessible at <code>teams.microsoft.com</code></li>
+  </ul>
+
+  <h3 class="subsection">Teams — Azure App Registration Differences</h3>
+  <div class="callout note">
+    <span class="callout-icon">📝</span>
+    <div class="callout-body">
+      <h5>Teams Requires a Redirect URI</h5>
+      <p>Unlike Exchange Online (where the Redirect URI field can be left blank), the Teams app registration <strong>requires</strong> a Redirect URI. Enter the Command Center URL: <code>https://[CommServeIPorHostname]/commandcenter</code>. Use the IP address if hostname resolution might not be reliable.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Teams Backup Configuration</h3>
+  <ol class="step-list">
+    <li><strong>Register Azure App for Teams</strong> Follow the same App Registration process, but ensure all Teams-specific permissions are added and admin consent is granted.</li>
+    <li><strong>Configure Teams App in Command Center</strong> Protect → Office 365 → Add App → Teams. Provide app name, storage plan, index server, and access node.</li>
+    <li><strong>Enter Azure Credentials</strong> Provide Application ID, Directory ID, and Application Secret (Value — not Secret ID).</li>
+    <li><strong>Verify Connection</strong> Configuration tab → Verify Connection. Resolve any missing permissions (common: <code>ChannelSettings.ReadWrite.All</code>).</li>
+    <li><strong>Add Content</strong> Browse and discover team channels. Select the channels to protect and assign the Microsoft 365 Plan.</li>
+    <li><strong>Run Backup</strong> The job type will display as <strong>Backup</strong>, and the agent will show as <strong>Cloud Apps</strong>.</li>
+  </ol>
+
+  <h3 class="subsection">Restore Options — Teams</h3>
+  <div class="card-grid">
+    <div class="card purple-accent">
+      <div class="card-icon">🔄</div>
+      <h4>Restore Channel (In-Place)</h4>
+      <p>Restores the entire team channel back to the original Teams tenant. Recreates the channel structure. Posts can optionally be restored as posts in the <em>Posts</em> tab (Option 1) or as HTML files under the <em>Files</em> tab (Option 2).</p>
+    </div>
+    <div class="card cyan-accent">
+      <div class="card-icon">📄</div>
+      <h4>Posts Restored as HTML Files (Default)</h4>
+      <p>Default behavior (Option 2): Posts are restored as HTML files in the channel's <em>Files</em> tab rather than appearing as live posts. To restore posts as live channel messages, explicitly select Option 1 before submitting the restore job.</p>
+    </div>
+  </div>
+
+  <!-- Teams Post Restore Options Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-purple);">
+    <div class="diagram-title">💬 Teams Post Restore — Option 1 vs Option 2</div>
+    <div class="diagram-sub">How restored posts appear depends on the option selected before submitting the restore job</div>
+    <div class="dvs">
+      <div class="dvs-panel panel-purple">
+        <div class="panel-head h-purple">Option 1 — Live Posts</div>
+        <div class="panel-row"><span class="row-icon">💬</span> Posts restored as live channel messages</div>
+        <div class="panel-row"><span class="row-icon">👁️</span> Appear in the <strong>Posts</strong> tab</div>
+        <div class="panel-row"><span class="row-icon">👤</span> Visible to all channel members</div>
+        <div class="panel-row"><span class="row-icon">⚙️</span> Must select this explicitly</div>
+        <div class="panel-row" style="font-weight:600; color:var(--accent-purple)">→ Best for full team communication recovery</div>
+      </div>
+      <div class="dvs-badge">VS</div>
+      <div class="dvs-panel panel-info">
+        <div class="panel-head h-blue">Option 2 — HTML Files (Default)</div>
+        <div class="panel-row"><span class="row-icon">📄</span> Posts saved as HTML files</div>
+        <div class="panel-row"><span class="row-icon">📁</span> Appear in the <strong>Files</strong> tab</div>
+        <div class="panel-row"><span class="row-icon">📥</span> Downloadable as static files</div>
+        <div class="panel-row"><span class="row-icon">🔄</span> Default behavior if no option chosen</div>
+        <div class="panel-row" style="font-weight:600; color:var(--accent-blue)">→ Best for archival / compliance review</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <span class="callout-icon">📝</span>
+    <div class="callout-body">
+      <h5>Teams vs Exchange Agent Type</h5>
+      <ul>
+        <li><strong>Exchange Online:</strong> Agent = <code>Exchange Online</code> | Job Type = <code>Archive</code></li>
+        <li><strong>Teams &amp; OneDrive:</strong> Agent = <code>Cloud Apps</code> | Job Type = <code>Backup</code></li>
+        <li><strong>SharePoint:</strong> Agent = <code>SharePoint Server</code> | Job Type = <code>Backup</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- M365 Workload Comparison Matrix -->
+  <div class="diagram-block" style="border-top-color: var(--accent-cyan);">
+    <div class="diagram-title">📊 Microsoft 365 Workload Comparison Matrix</div>
+    <div class="diagram-sub">Quick reference — agent types, job types, authentication, and restore options across all four workloads</div>
+    <div class="dtable">
+      <div class="dtable-row dtable-5col">
+        <div class="dtable-cell cell-head">Attribute</div>
+        <div class="dtable-cell cell-head" style="color:var(--accent-orange)">📧 Exchange</div>
+        <div class="dtable-cell cell-head" style="color:var(--accent-purple)">💬 Teams</div>
+        <div class="dtable-cell cell-head" style="color:var(--accent-cyan)">🗂️ OneDrive</div>
+        <div class="dtable-cell cell-head" style="color:var(--accent-green)">🌐 SharePoint</div>
+      </div>
+      <div class="dtable-row dtable-5col">
+        <div class="dtable-cell cell-label">Agent Type</div>
+        <div class="dtable-cell" style="color:var(--accent-orange)">Exchange Online</div>
+        <div class="dtable-cell" style="color:var(--accent-purple)">Cloud Apps</div>
+        <div class="dtable-cell" style="color:var(--accent-cyan)">Cloud Apps</div>
+        <div class="dtable-cell" style="color:var(--accent-green)">SharePoint Server</div>
+      </div>
+      <div class="dtable-row dtable-5col">
+        <div class="dtable-cell cell-label">Job Type</div>
+        <div class="dtable-cell" style="color:var(--accent-orange)">Archive</div>
+        <div class="dtable-cell" style="color:var(--accent-purple)">Backup</div>
+        <div class="dtable-cell" style="color:var(--accent-cyan)">Backup</div>
+        <div class="dtable-cell" style="color:var(--accent-green)">Backup</div>
+      </div>
+      <div class="dtable-row dtable-5col">
+        <div class="dtable-cell cell-label">Auth Method</div>
+        <div class="dtable-cell">App ID + Secret</div>
+        <div class="dtable-cell">App ID + Secret + Redirect URI</div>
+        <div class="dtable-cell">App ID + Secret</div>
+        <div class="dtable-cell">App ID + Secret + PFX Cert</div>
+      </div>
+      <div class="dtable-row dtable-5col">
+        <div class="dtable-cell cell-label">Backup Unit</div>
+        <div class="dtable-cell">Mailbox</div>
+        <div class="dtable-cell">Team Channel</div>
+        <div class="dtable-cell">User Drive</div>
+        <div class="dtable-cell">Site Collection</div>
+      </div>
+      <div class="dtable-row dtable-5col">
+        <div class="dtable-cell cell-label">Redirect URI</div>
+        <div class="dtable-cell" style="color:var(--text-muted)">Not Required</div>
+        <div class="dtable-cell" style="color:var(--accent-red)">Required ✦</div>
+        <div class="dtable-cell" style="color:var(--text-muted)">Not Required</div>
+        <div class="dtable-cell" style="color:var(--text-muted)">Not Required</div>
+      </div>
+      <div class="dtable-row dtable-5col">
+        <div class="dtable-cell cell-label">Certificate</div>
+        <div class="dtable-cell" style="color:var(--text-muted)">No</div>
+        <div class="dtable-cell" style="color:var(--text-muted)">No</div>
+        <div class="dtable-cell" style="color:var(--text-muted)">No</div>
+        <div class="dtable-cell" style="color:var(--accent-red)">PFX Required ✦</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Post-Deletion Approval for Team Deletion (v11.36+)</h3>
+  <p>From Commvault version 11.36 onwards, deleting a Teams application from the Command Center triggers an <strong>approval email</strong> to an administrator. Another administrator must approve the deletion request before it is processed. This is a security safeguard against accidental or unauthorized removal of backup configurations.</p>
+
+  <div class="summary-box">
+    <h4>Section Summary — Teams Backup</h4>
+    <ul>
+      <li>Teams backup uses the Cloud Apps agent and shows as a Backup job (not Archive)</li>
+      <li>Teams app registration requires a Redirect URI pointing to the Command Center URL</li>
+      <li>Backup units are team channels — each channel is independently selectable</li>
+      <li>Default post restore behavior: posts are saved as HTML files under the Files tab</li>
+      <li>Select Option 1 explicitly if you need posts restored as live channel messages</li>
+      <li>All Office 365 backups are forever incremental — no full backup concept</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== SECTION 6: ONEDRIVE ========== -->
+<section class="section" id="onedrive">
+  <div class="section-header">
+    <div class="section-icon icon-cyan">🗂️</div>
+    <div>
+      <h2 class="section-title">OneDrive for Business <span class="accent">Backup &amp; Restore</span></h2>
+      <p class="section-subtitle">Per-User File Storage Protection Using Existing App Registration</p>
+    </div>
+  </div>
+
+  <p>OneDrive for Business provides <strong>1 TB of personal cloud storage per licensed user</strong>. Commvault backs up OneDrive using the <strong>Cloud Apps agent</strong>, and the same Azure App Registration used for Teams can be reused — you simply add the required OneDrive permissions to the existing app.</p>
+
+  <h3 class="subsection">OneDrive Configuration Steps</h3>
+  <ol class="step-list">
+    <li><strong>Add OneDrive Permissions to Existing App</strong> In the Azure portal, navigate to your existing app registration. Under <em>API Permissions</em>, add <code>Files.ReadWrite.All</code> from Microsoft Graph (Application permissions). Grant admin consent.</li>
+    <li><strong>Configure OneDrive App in Command Center</strong> Protect → Office 365 → Add App → OneDrive for Business. Provide app name, storage plan, index server, and access node.</li>
+    <li><strong>Enter Azure App Credentials</strong> Reuse the same Application ID, Directory ID, and Application Secret from the existing app registration.</li>
+    <li><strong>Verify Connection</strong> Check configuration tab → Verify Connection. All permissions should show green.</li>
+    <li><strong>Add Content — Select Users</strong> Choose <em>All Users</em> or specific users whose OneDrive should be protected. Each user's OneDrive is backed up as a separate content item.</li>
+    <li><strong>Assign Microsoft 365 Plan</strong> Select the plan that defines retention for OneDrive data.</li>
+    <li><strong>Run Backup</strong> Job type = <strong>Backup (Incremental)</strong>. Agent = <strong>Cloud Apps</strong>.</li>
+  </ol>
+
+  <h3 class="subsection">Restore Options — OneDrive</h3>
+  <div class="card-grid">
+    <div class="card cyan-accent">
+      <div class="card-icon">👤</div>
+      <h4>Restore User (Entire OneDrive)</h4>
+      <p>Restores all files for a specific user's OneDrive back to its original location. Useful for bulk recovery after accidental deletion or ransomware.</p>
+    </div>
+    <div class="card blue-accent">
+      <div class="card-icon">📄</div>
+      <h4>Restore Specific Files</h4>
+      <p>Browse the indexed OneDrive content and select individual files or folders to restore. Supports restore to original location or an alternate file system path.</p>
+    </div>
+  </div>
+
+  <!-- Forever Incremental Model Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-cyan);">
+    <div class="diagram-title">♾️ Forever Incremental — M365 Backup Model</div>
+    <div class="diagram-sub">All M365 jobs are incremental — even the first one captures everything</div>
+    <div class="dflow">
+      <div class="dnode n-green" style="min-width:130px">Job 1 (Day 1)<small>All existing data<br>≈ "Full" capture</small></div>
+      <div class="darrow">→<span>Incremental</span></div>
+      <div class="dnode n-blue" style="min-width:130px">Job 2 (Day 2)<small>New + changed only</small></div>
+      <div class="darrow">→<span>Incremental</span></div>
+      <div class="dnode n-blue" style="min-width:130px">Job 3 (Day 3)<small>New + changed only</small></div>
+      <div class="darrow">→<span>Incremental</span></div>
+      <div class="dnode n-blue" style="min-width:130px">Job N…<small>Always incremental</small></div>
+    </div>
+    <div style="text-align:center; margin-top:14px; font-size:11px; color:var(--text-muted);">No full / differential distinction — all jobs labeled "Incremental" in Commvault job details</div>
+  </div>
+
+  <div class="callout note">
+    <span class="callout-icon">📝</span>
+    <div class="callout-body">
+      <h5>Backup Type Display — Important Clarification</h5>
+      <p>All Microsoft 365 backup jobs display as <strong>Incremental</strong> in the job details, even the very first run. The first job captures <em>all</em> existing data (equivalent to a full backup) but is still labeled as Incremental. This is by design — Microsoft 365 workloads follow a <strong>Forever Incremental</strong> model.</p>
+    </div>
+  </div>
+
+  <div class="callout best-practice">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body">
+      <h5>Filtering Large OneDrive Content</h5>
+      <p>Commvault supports content filters for OneDrive backups, allowing you to exclude files by size, type, or modification date. This is useful when protecting many users with large OneDrive allocations. Consult the Commvault documentation for the specific filter syntax for your version.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 7: SHAREPOINT ========== -->
+<section class="section" id="sharepoint">
+  <div class="section-header">
+    <div class="section-icon icon-green">🌐</div>
+    <div>
+      <h2 class="section-title">SharePoint Online <span class="accent">Backup &amp; Restore</span></h2>
+      <p class="section-subtitle">Certificate-Based Authentication for Site Collection Protection</p>
+    </div>
+  </div>
+
+  <p>SharePoint Online is a web-based platform for team collaboration, document management, and intranet sites. Commvault's SharePoint Online backup is unique because it requires <strong>certificate-based authentication</strong> in addition to the standard app credentials — making it the most involved of all the Microsoft 365 workloads to configure.</p>
+
+  <h3 class="subsection">SharePoint Concepts</h3>
+  <ul class="bullet-list">
+    <li><strong>Team Sites:</strong> Collaboration spaces connected to Microsoft 365 Groups. Suitable for internal team use.</li>
+    <li><strong>Communication Sites:</strong> Broadcast-style sites for publishing content to a broad audience.</li>
+    <li><strong>Site Collections:</strong> A hierarchy of sites — each site collection has a root site and can have subsites.</li>
+    <li><strong>Tenant Admin Site URL:</strong> Format is <code>https://[tenantname]-admin.sharepoint.com</code></li>
+  </ul>
+
+  <h3 class="subsection">SharePoint — Certificate-Based Authentication Flow</h3>
+  <div class="flow-diagram">
+    <div class="flow-title">🔐 SharePoint Online Certificate Setup Flow</div>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="step-num">Step 1</div><div class="step-label">Run PowerShell</div><div class="step-sub">Generate .CER Certificate</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 2</div><div class="step-label">Upload .CER to Azure</div><div class="step-sub">App Registration → Certificates</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 3</div><div class="step-label">Run PowerShell</div><div class="step-sub">Export .PFX with Private Key</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 4</div><div class="step-label">Store .PFX File</div><div class="step-sub">On Access Node</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Step 5</div><div class="step-label">Configure in Commvault</div><div class="step-sub">Upload .PFX + Password</div></div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Step 1 &amp; 3: PowerShell Commands</h3>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">PowerShell — Run on Access Node</span>
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div class="code-content"><span class="cmt"># STEP 1: Generate Self-Signed Certificate (.CER)</span>
+<span class="cmt"># Run this on the Access Node (CommServe in lab)</span>
+$cert = <span class="cmd">New-SelfSignedCertificate</span> `
+    -Subject "<span class="str">CN=CommvaultSPO</span>" `
+    -CertStoreLocation "<span class="str">Cert:\LocalMachine\My</span>" `
+    -KeyExportPolicy Exportable `
+    -KeySpec Signature
+
+<span class="cmd">Export-Certificate</span> `
+    -Cert $cert `
+    -FilePath "<span class="val">C:\Temp\CommvaultSPO.cer</span>"
+
+<span class="cmt"># STEP 3: Export Certificate with Private Key (.PFX)</span>
+$password = <span class="cmd">ConvertTo-SecureString</span> -String "<span class="str">YourP@ssword123</span>" -Force -AsPlainText
+
+<span class="cmd">Export-PfxCertificate</span> `
+    -Cert $cert `
+    -FilePath "<span class="val">C:\Temp\CommvaultSPO.pfx</span>" `
+    -Password $password</div>
+  </div>
+
+  <div class="callout warning">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <h5>Certificate File Types — Critical Distinction</h5>
+      <ul>
+        <li><strong>.CER file</strong> — Public key only. Upload this to the Azure App Registration under <em>Certificates</em>.</li>
+        <li><strong>.PFX file</strong> — Contains both public and private key (password protected). Upload this to Commvault Command Center during SharePoint app configuration.</li>
+        <li>Delete the .CER file from the access node after uploading to Azure. Keep only the .PFX file for Commvault.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CER vs PFX Destination Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-green);">
+    <div class="diagram-title">🔐 Certificate Distribution — Where Each File Goes</div>
+    <div class="diagram-sub">.CER public key to Azure, .PFX private key to Commvault — never mix them up</div>
+    <div class="dlayer">
+      <div class="dlayer-row">
+        <div class="dlayer-box l-cyan" style="min-width:200px">Access Node (PowerShell)<small>Generates both .CER and .PFX</small></div>
+      </div>
+      <div class="dlayer-conn">↓ Exports two files ↓</div>
+      <div class="dlayer-row" style="gap: 28px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div class="dlayer-box l-blue">.CER File<small>Public Key Only</small></div>
+          <div class="dlayer-conn">↓</div>
+          <div class="dlayer-box l-blue">Azure App Registration<small>Certificates &amp; Secrets → Upload</small></div>
+          <div style="font-size:10px;color:var(--accent-green);font-weight:600;margin-top:4px">✓ Delete from node after upload</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div class="dlayer-box l-orange">.PFX File<small>Public + Private Key (Password)</small></div>
+          <div class="dlayer-conn">↓</div>
+          <div class="dlayer-box l-orange">Commvault Command Center<small>SharePoint App Config → Upload</small></div>
+          <div style="font-size:10px;color:var(--accent-orange);font-weight:600;margin-top:4px">✓ Keep on Access Node</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection">SharePoint App Configuration in Command Center</h3>
+  <ol class="step-list">
+    <li><strong>Navigate to Add SharePoint Online App</strong> Protect → Office 365 → Add App → SharePoint Online</li>
+    <li><strong>Enter Tenant Admin Site URL</strong> Retrieve from the SharePoint Admin Center URL: <code>https://[tenant]-admin.sharepoint.com</code></li>
+    <li><strong>Enter Azure App Credentials</strong> Application ID, Directory ID, and Application Secret (same as other workloads)</li>
+    <li><strong>Upload PFX Certificate</strong> Browse and upload the .PFX file generated in Step 3 above</li>
+    <li><strong>Enter Certificate Password</strong> The password set during the <code>Export-PfxCertificate</code> command</li>
+    <li><strong>Select Index Server and Access Node</strong> Can reuse existing index server and CommServe-as-access-node</li>
+    <li><strong>Verify Connection</strong> Configuration tab → Verify Connection. Status should show Authorized.</li>
+  </ol>
+
+  <h3 class="subsection">Adding SharePoint Content and Running Backup</h3>
+  <ul class="bullet-list">
+    <li>Go to the SharePoint app → Content → Add</li>
+    <li>Browse site collections — filter by type: Team Sites, Communication Sites, or Custom</li>
+    <li>Select target sites (e.g., <em>Commvault PoC</em> team site created earlier)</li>
+    <li>Assign a Microsoft 365 Plan for retention</li>
+    <li>Click Submit and run an ad-hoc backup or wait for the scheduled job</li>
+    <li>Agent type after backup = <strong>SharePoint Server</strong></li>
+  </ul>
+
+  <h3 class="subsection">Restore Options — SharePoint Online</h3>
+  <div class="card-grid">
+    <div class="card green-accent">
+      <div class="card-icon">📄</div>
+      <h4>Restore Document</h4>
+      <p>Browse the site content and restore individual documents to the original library or an alternate location/file system path.</p>
+    </div>
+    <div class="card blue-accent">
+      <div class="card-icon">🌐</div>
+      <h4>Restore Site (In-Place)</h4>
+      <p>Restores the entire site collection to its original URL. Uses overwrite option if the site exists. If the site was deleted to the recycle bin, it must be either restored from the recycle bin or wait until it is permanently deleted before an in-place restore can succeed.</p>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <span class="callout-icon">📝</span>
+    <div class="callout-body">
+      <h5>SharePoint Recycle Bin Behavior</h5>
+      <p>When you delete a SharePoint site, Microsoft retains it in the recycle bin for <strong>93 days</strong> before permanent deletion. During this period, you cannot restore to the same URL using Commvault in-place restore. To work around this, either restore the site from Microsoft's own recycle bin (to make it active again), or wait for the 93-day retention to expire. You cannot manually override this Microsoft-enforced retention.</p>
+    </div>
+  </div>
+
+  <!-- SharePoint Restore Decision Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-green);">
+    <div class="diagram-title">🗑️ SharePoint Site Deletion → Restore Decision Flow</div>
+    <div class="diagram-sub">What happens when a SharePoint site is deleted and how to restore it</div>
+    <div class="dlayer">
+      <div class="dlayer-row">
+        <div class="dlayer-box l-red">SharePoint Site Deleted<small>By admin or user</small></div>
+      </div>
+      <div class="dlayer-conn">↓</div>
+      <div class="dlayer-row">
+        <div class="dlayer-box l-orange" style="min-width: 240px;">Microsoft Recycle Bin<small>Site held for 93 days — URL is reserved</small></div>
+      </div>
+      <div class="dlayer-conn">↓ Two paths available ↓</div>
+      <div class="dlayer-row" style="gap: 28px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div class="dlayer-box l-blue">Path A: Restore from<br>MS Recycle Bin<small>Site goes back to active</small></div>
+          <div class="dlayer-conn">↓</div>
+          <div class="dlayer-box l-green">Site Active Again<small>Then use Commvault for data</small></div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div class="dlayer-box l-purple">Path B: Wait 93 Days<small>URL becomes available</small></div>
+          <div class="dlayer-conn">↓</div>
+          <div class="dlayer-box l-green">Commvault In-Place<br>Restore Succeeds<small>Restores to original URL</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <h4>Section Summary — SharePoint Online</h4>
+    <ul>
+      <li>SharePoint Online is the most complex M365 workload — requires certificate-based auth in addition to app credentials</li>
+      <li>Generate a self-signed .CER certificate on the Access Node using PowerShell</li>
+      <li>Upload .CER to Azure App Registration (Certificates tab) — not Secrets</li>
+      <li>Generate .PFX (private key + cert) and upload to Commvault Command Center configuration</li>
+      <li>Backup unit is the Site Collection — agent shows as SharePoint Server</li>
+      <li>Deleted sites remain in Microsoft's recycle bin for 93 days — in-place restore to same URL is blocked during this period</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== SECTION 8: WORKFLOWS ========== -->
+<section class="section" id="workflows">
+  <div class="section-header">
+    <div class="section-icon icon-cyan">⚙️</div>
+    <div>
+      <h2 class="section-title">Commvault <span class="accent">Workflow Automation</span></h2>
+      <p class="section-subtitle">Creating Custom Workflows to Automate Repetitive and Complex Operations</p>
+    </div>
+  </div>
+
+  <p>Commvault Workflows are visual, configurable automation scripts that allow administrators to <strong>standardize repetitive tasks, enable self-service, reduce human errors, and enforce compliance</strong> without requiring end users to understand the Commvault interface. Workflows can be created for complex multi-step processes and exposed as simple single-click operations.</p>
+
+  <h3 class="subsection">Why Use Workflows?</h3>
+  <div class="card-grid">
+    <div class="card blue-accent">
+      <div class="card-icon">🔁</div>
+      <h4>Automate Repetitive Tasks</h4>
+      <p>MSP environments with hundreds of customers need the same onboarding steps for each client. A workflow can automate tenant creation, plan assignment, and user setup — replacing manual work that would otherwise require dedicated staff for each customer.</p>
+    </div>
+    <div class="card green-accent">
+      <div class="card-icon">🧑‍💻</div>
+      <h4>Self-Service for Application Teams</h4>
+      <p>DBA teams, VMware admins, and application owners can run ad-hoc backups, restores, or readiness checks without Commvault training. You provide a workflow with limited scope — they click and execute.</p>
+    </div>
+    <div class="card orange-accent">
+      <div class="card-icon">🛡️</div>
+      <h4>Reduce Human Errors</h4>
+      <p>Standardized workflows enforce correct configuration every time. For example, always assigning a specific retention plan to new tenants without giving the user a choice of other plans.</p>
+    </div>
+    <div class="card purple-accent">
+      <div class="card-icon">🔗</div>
+      <h4>Third-Party Integration</h4>
+      <p>Workflows can include REST API calls to integrate Commvault with ServiceNow ticketing, cloud platforms, and custom portals — enabling automated alert escalation and ticket creation.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Predefined vs Custom Workflows</h3>
+  <div class="compare-grid">
+    <div class="compare-panel good">
+      <h4>📦 Predefined Workflows</h4>
+      <ul class="bullet-list">
+        <li>Provided by Commvault out-of-the-box</li>
+        <li>Available in Developer Tools → Workflows within Command Center</li>
+        <li>Also downloadable from <code>store.commvault.com</code></li>
+        <li>Example: Enable Warm Storage Mode, Decommission Client, etc.</li>
+        <li>Can be used as-is or as templates for custom workflows</li>
+      </ul>
+    </div>
+    <div class="compare-panel caution">
+      <h4>🛠️ Custom Workflows</h4>
+      <ul class="bullet-list">
+        <li>Created from scratch in the Workflow Designer</li>
+        <li>Drag-and-drop activity-based design</li>
+        <li>Can include logic, conditions, loops, and email notifications</li>
+        <li>Tailored to specific organizational requirements</li>
+        <li>Deployed to CommServe and accessible in Command Center</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="subsection">Workflow Designer Overview</h3>
+  <p>The Workflow Designer in Command Center (Developer Tools → Workflows → New Workflow) provides a visual canvas with three main areas:</p>
+  <div class="card-grid">
+    <div class="card blue-accent">
+      <h4>Activities Panel (Left)</h4>
+      <p>Predefined activities organized by category: Control Flow, Operations, Utilities, Q Commands. Drag activities onto the canvas to build the workflow.</p>
+    </div>
+    <div class="card cyan-accent">
+      <h4>Design Canvas (Center)</h4>
+      <p>The work area where activities are placed and connected via transitions (arrows). Each arrow is a transition that can have conditions.</p>
+    </div>
+    <div class="card green-accent">
+      <h4>Properties Panel (Bottom)</h4>
+      <p>Shows configuration options for the selected activity — display name, inputs, outputs, continue-on-error settings, and maximum restarts.</p>
+    </div>
+  </div>
+
+  <!-- Workflow Designer Layout Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-cyan);">
+    <div class="diagram-title">🖥️ Workflow Designer — IDE Layout</div>
+    <div class="diagram-sub">Visual drag-and-drop interface with three main areas</div>
+    <div style="display:grid; grid-template-columns: 140px 1fr; grid-template-rows: 1fr 80px; gap: 6px; min-height: 220px;">
+      <div style="background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.25); border-radius:8px; padding:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; grid-row: 1 / 3;">
+        <div style="font-size:10px; font-weight:700; color:var(--accent-blue); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Activities<br>Panel</div>
+        <div style="font-size:10px; color:var(--text-muted);">Control Flow</div>
+        <div style="font-size:10px; color:var(--text-muted);">Operations</div>
+        <div style="font-size:10px; color:var(--text-muted);">Utilities</div>
+        <div style="font-size:10px; color:var(--text-muted);">Q Commands</div>
+        <div style="font-size:9px; color:var(--accent-blue); margin-top:6px;">↕ Drag to canvas →</div>
+      </div>
+      <div style="background:rgba(57,208,216,0.06); border:1px solid rgba(57,208,216,0.2); border-radius:8px; padding:14px; display:flex; align-items:center; justify-content:center; text-align:center; position:relative;">
+        <div>
+          <div style="font-size:10px; font-weight:700; color:var(--accent-cyan); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Design Canvas</div>
+          <div style="display:flex; align-items:center; gap:6px; justify-content:center; flex-wrap:wrap;">
+            <div style="background:rgba(63,185,80,0.15); border:1px solid rgba(63,185,80,0.3); border-radius:5px; padding:4px 8px; font-size:9px; color:var(--accent-green);">Start</div>
+            <span style="color:var(--text-muted);font-size:10px;">→</span>
+            <div style="background:rgba(88,166,255,0.15); border:1px solid rgba(88,166,255,0.3); border-radius:5px; padding:4px 8px; font-size:9px; color:var(--accent-blue);">Activity</div>
+            <span style="color:var(--text-muted);font-size:10px;">→</span>
+            <div style="background:rgba(240,136,62,0.15); border:1px solid rgba(240,136,62,0.3); border-radius:5px; padding:4px 8px; font-size:9px; color:var(--accent-orange);">Decision</div>
+            <span style="color:var(--text-muted);font-size:10px;">→</span>
+            <div style="background:rgba(248,81,73,0.15); border:1px solid rgba(248,81,73,0.3); border-radius:5px; padding:4px 8px; font-size:9px; color:var(--accent-red);">End</div>
+          </div>
+          <div style="font-size:9px; color:var(--text-muted); margin-top:6px;">Arrows = transitions (can have conditions)</div>
+        </div>
+      </div>
+      <div style="background:rgba(63,185,80,0.06); border:1px solid rgba(63,185,80,0.2); border-radius:8px; padding:10px; display:flex; align-items:center; justify-content:center; text-align:center;">
+        <div>
+          <div style="font-size:10px; font-weight:700; color:var(--accent-green); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Properties Panel</div>
+          <div style="font-size:9px; color:var(--text-muted);">Display Name · Inputs · Outputs · Continue on Error · Max Restarts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Practical Example: Check Readiness Workflow</h3>
+  <p>This example creates a workflow that allows application team members to run a client readiness check, then receive an email notification with the result — without needing any Commvault knowledge.</p>
+
+  <div class="flow-diagram">
+    <div class="flow-title">🔄 Check Readiness Workflow — Logic Flow</div>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="step-num">Start</div><div class="step-label">Workflow Starts</div><div class="step-sub">Auto-generated</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Input</div><div class="step-label">User Selects Client</div><div class="step-sub">From drop-down list</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="step-num">Execute</div><div class="step-label">Check Readiness Activity</div><div class="step-sub">Runs on selected client</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-decision"><div class="step-num">Condition</div><div class="step-label">Exit Code = 0?</div></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:30px;justify-content:center;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="color:var(--accent-green);font-weight:700">TRUE (Success)</span>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><div class="step-num">Notify</div><div class="step-label">Success Email</div><div class="step-sub">To workflow executor</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><div class="step-num">End</div><div class="step-label">Workflow End</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="color:var(--accent-red);font-weight:700">FALSE (Fail)</span>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><div class="step-num">Notify</div><div class="step-label">Failure Email</div><div class="step-sub">With Job ID for troubleshooting</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><div class="step-num">End</div><div class="step-label">Workflow End</div></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Building the Workflow — Step by Step</h3>
+  <ol class="step-list">
+    <li><strong>Create New Workflow</strong> Developer Tools → Workflows → New Workflow. The <em>Start</em> activity is automatically added. In the Properties panel, enter the Workflow Name (e.g., <code>CheckReadiness-WF</code>) and description.</li>
+    <li><strong>Define Input Variable</strong> In Inputs, add variable: Name = <code>ClientName</code>, Type = <em>Client Entity</em>. Leave the value blank so Commvault dynamically fetches all accessible clients for the drop-down.</li>
+    <li><strong>Add Check Readiness Activity</strong> From Activities → Operations, drag <em>Check Readiness</em> onto the canvas. Set Display Name, and in the Inputs section select the input source as <em>Workflow Inputs → ClientName</em>. Set <em>Continue on Error = True</em> so the workflow proceeds even on failure to send the notification.</li>
+    <li><strong>Add Decision Activity</strong> From Control Flow, drag <em>Decision</em> onto the canvas. Label it <em>Report Ready?</em>. In the Expression, enter the condition: Exit code of Check Readiness = 0 (success).</li>
+    <li><strong>Add Success Email Activity</strong> From Utilities, drag <em>Send Email</em> onto the canvas. Label it <em>Success Email</em>. Configure: To = <code>Workflow Executor (Username)</code>, Subject = <code>Client Readiness Passed: [ClientName]</code>, Body = HTML report variable.</li>
+    <li><strong>Add Failure Email Activity</strong> Add another <em>Send Email</em> activity. Label it <em>Failure Email</em>. Configure: To = <code>Workflow Executor</code>, Subject = <code>ALERT: Readiness Check Failed: [ClientName]</code>, Body = include <em>Job ID</em> variable so the executor can pass this to the Commvault admin for investigation.</li>
+    <li><strong>Add Workflow End Activity</strong> Add a <em>Workflow End</em> activity at the conclusion of both the Success and Failure paths. <strong>This is required</strong> — without Workflow End, the job will remain in Pending state and never complete successfully.</li>
+    <li><strong>Configure Transitions (Connectors)</strong> Draw transitions: Start → Input → Check Readiness → Decision. Then Decision (True) → Success Email → Workflow End. Decision (False) → Failure Email → Workflow End.</li>
+    <li><strong>Save and Deploy</strong> Click Save, then Deploy. Select the CommServe as the Workflow Engine. The workflow is now available in Command Center under the Workflows section.</li>
+  </ol>
+
+  <!-- Workflow Deployment Lifecycle Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-cyan);">
+    <div class="diagram-title">🔄 Workflow Lifecycle — Design → Deploy → Execute</div>
+    <div class="diagram-sub">The three phases every custom workflow goes through</div>
+    <div class="dflow">
+      <div class="dnode n-blue">Design<small>Drag activities<br>Configure properties</small></div>
+      <div class="darrow">→<span>Save</span></div>
+      <div class="dnode n-cyan">Validate<small>Check transitions<br>Verify Workflow End</small></div>
+      <div class="darrow">→<span>Deploy</span></div>
+      <div class="dnode n-purple">Deploy<small>Select CommServe<br>as Workflow Engine</small></div>
+      <div class="darrow">→<span>Available</span></div>
+      <div class="dnode n-green">Execute<small>User selects client<br>Submits workflow</small></div>
+      <div class="darrow">→<span>Job created</span></div>
+      <div class="dnode n-yellow">Monitor<small>Jobs panel<br>Email notification</small></div>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <h5>Missing Workflow End = Perpetual Pending State</h5>
+      <p>A common mistake is building the complete logic without adding a <strong>Workflow End</strong> activity. Without it, the workflow job enters a <em>Pending</em> state after the last activity completes and never transitions to <em>Succeeded</em>. Always add Workflow End at the terminal point of every execution path.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Configuring SMTP for Email Notifications</h3>
+  <p>Email activities in workflows require a configured SMTP server. Set this up before deploying the workflow:</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">Command Center — SMTP Configuration</span>
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div class="code-content"><span class="cmt"># Navigate to SMTP settings in Command Center</span>
+Manage → Console → Email Settings
+
+<span class="cmt"># For Gmail SMTP Configuration:</span>
+SMTP Server:  <span class="str">smtp.gmail.com</span>
+Port:         <span class="val">465</span>  (SSL)  or  <span class="val">587</span>  (TLS)
+Auth Type:    <span class="str">Classic</span>  (username + app password)
+
+<span class="cmt"># IMPORTANT: Gmail requires an App Password, not your regular password</span>
+<span class="cmt"># Enable 2FA on Gmail → Generate App Password under Security settings</span>
+Username:     <span class="str">yourname@gmail.com</span>
+Password:     <span class="val">[App Password — 16 character code from Gmail]</span>
+
+<span class="cmt"># Test the email configuration using the "Send Test Email" button</span></div>
+  </div>
+
+  <h3 class="subsection">Executing the Workflow</h3>
+  <ul class="bullet-list">
+    <li>Command Center → Developer Tools → Workflows → Search for your workflow name</li>
+    <li>Click the workflow — it will present the input form (client selection drop-down)</li>
+    <li>Select the target client and click Submit</li>
+    <li>A workflow job is created — monitor in the Jobs panel</li>
+    <li>The email notification is sent to the user who executed the workflow</li>
+  </ul>
+
+  <div class="summary-box">
+    <h4>Section Summary — Workflows</h4>
+    <ul>
+      <li>Workflows automate repetitive tasks, enable self-service, and reduce human errors</li>
+      <li>Three main use cases: MSP customer onboarding, self-service for app teams, third-party integration</li>
+      <li>Workflow designer uses drag-and-drop activities with configurable properties</li>
+      <li>Input variables with Client Entity type auto-populate accessible client drop-downs</li>
+      <li>Decision activity provides true/false branching logic for conditional execution paths</li>
+      <li>Workflow End activity is mandatory — without it, jobs stay in Pending state</li>
+      <li>Gmail SMTP requires App Password (not account password) for authentication</li>
+      <li>Pre-defined workflows from Commvault can be imported from store.commvault.com</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== SECTION 9: REST API ========== -->
+<section class="section" id="restapi">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🔌</div>
+    <div>
+      <h2 class="section-title">Commvault <span class="accent">REST API</span></h2>
+      <p class="section-subtitle">API Fundamentals, Authentication, and Postman Integration for Commvault Administrators</p>
+    </div>
+  </div>
+
+  <p>Commvault provides a comprehensive REST API that allows programmatic access to all backup operations, job management, client management, and reporting functions. As a Commvault administrator or implementation engineer, REST API knowledge is essential for troubleshooting API integrations, supporting third-party tool integrations, and enabling automation scenarios.</p>
+
+  <h3 class="subsection">Why REST API Knowledge Matters for Admins</h3>
+  <div class="card-grid">
+    <div class="card blue-accent">
+      <div class="card-icon">🔍</div>
+      <h4>Troubleshooting API Issues</h4>
+      <p>When a third-party tool reports Commvault API failures, use Postman to reproduce the exact API call. If results are correct, the issue lies with the third-party tool or network — not Commvault.</p>
+    </div>
+    <div class="card green-accent">
+      <div class="card-icon">🔗</div>
+      <h4>Third-Party Integration</h4>
+      <p>Provide ServiceNow, monitoring tools, or custom dashboards with the correct API endpoints to pull backup job statuses, alerts, and storage metrics from Commvault.</p>
+    </div>
+    <div class="card orange-accent">
+      <div class="card-icon">🤖</div>
+      <h4>Private Cloud Automation</h4>
+      <p>When customers build private cloud portals to self-manage their backups, you provide the correct API endpoints for operations like running backup, assigning plans, and triggering restores.</p>
+    </div>
+    <div class="card purple-accent">
+      <div class="card-icon">📊</div>
+      <h4>Reporting Automation</h4>
+      <p>Pull job summaries, client properties, storage utilization, and SLA data through APIs and integrate with BI tools or custom dashboards for operational visibility.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">REST API Core Concepts</h3>
+
+  <div class="card-grid">
+    <div class="card blue-accent">
+      <h4>🌐 Endpoint</h4>
+      <p>The base URL for all API calls. For modern Commvault: <code>https://[hostname]/commandcenter/api</code>. Port 443 only in v11.x+.</p>
+    </div>
+    <div class="card cyan-accent">
+      <h4>📂 Resource</h4>
+      <p>The path appended to the endpoint identifying the operation. Example: <code>/login</code>, <code>/Client</code>, <code>/Job</code>, <code>/Subclient</code>. The resource specifies <em>what</em> you are acting upon.</p>
+    </div>
+    <div class="card green-accent">
+      <h4>⚡ HTTP Method</h4>
+      <p>The action verb. In Commvault: <strong>GET</strong> (read), <strong>POST</strong> (create/trigger), <strong>PUT</strong> (update/modify), <strong>DELETE</strong> (remove). POST covers most operations, but PUT is used in certain update endpoints — always check the API reference for the correct method.</p>
+    </div>
+    <div class="card orange-accent">
+      <h4>🏷️ Header</h4>
+      <p>Metadata sent with each request. Defines content type (<code>application/json</code> or <code>application/xml</code>) and includes the auth token after login.</p>
+    </div>
+  </div>
+
+  <!-- REST API Request Lifecycle Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-purple);">
+    <div class="diagram-title">🔌 REST API Session Lifecycle — Login → Execute → Logout</div>
+    <div class="diagram-sub">Every API session follows this pattern: authenticate, operate, then release the token</div>
+    <div class="dflow">
+      <div class="dnode n-purple">Client<small>(Postman / Portal)</small></div>
+      <div class="darrow">→<span>POST /login</span></div>
+      <div class="dnode n-blue">CommServe<small>Validates credentials</small></div>
+      <div class="darrow">→<span>Returns token</span></div>
+      <div class="dnode n-green">Token Stored<small>QSDK eyJ... (30 min)</small></div>
+    </div>
+    <div style="text-align:center; color:var(--text-muted); font-size:12px; margin: 12px 0;">↓ Token included in Authtoken header for all subsequent calls ↓</div>
+    <div class="dflow">
+      <div class="dnode n-cyan">GET /Client<small>List all clients</small></div>
+      <div class="darrow">|</div>
+      <div class="dnode n-cyan">POST /Subclient<small>Trigger backup</small></div>
+      <div class="darrow">|</div>
+      <div class="dnode n-cyan">GET /Job<small>Check status</small></div>
+      <div class="darrow">|</div>
+      <div class="dnode n-red">POST /Logout<small>Release token</small></div>
+    </div>
+  </div>
+
+  <!-- CRUD Diagram -->
+  <div class="flow-diagram">
+    <div class="flow-title">📊 CRUD Operations in Commvault REST API</div>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="step-num">CREATE</div><div class="step-label">POST Method</div><div class="step-sub">Create clients, plans, subclients, schedules</div></div>
+      <div class="flow-arrow">|</div>
+      <div class="flow-step"><div class="step-num">READ</div><div class="step-label">GET Method</div><div class="step-sub">Fetch jobs, client info, storage, reports</div></div>
+      <div class="flow-arrow">|</div>
+      <div class="flow-step"><div class="step-num">UPDATE</div><div class="step-label">POST Method</div><div class="step-sub">Modify plans, rename clients, change schedules</div></div>
+      <div class="flow-arrow">|</div>
+      <div class="flow-step"><div class="step-num">DELETE</div><div class="step-label">DELETE Method</div><div class="step-sub">Remove clients, subclients, schedules</div></div>
+    </div>
+  </div>
+
+  <h3 class="subsection">Authentication — Token-Based Login</h3>
+  <p>Every Commvault REST API session starts with a <code>/login</code> request. The CommServe responds with an <strong>auth token</strong> that must be included in the header of all subsequent requests. The token expires (default: 30 minutes, configurable up to 60+ minutes).</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">POST — Login Request (JSON)</span>
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div class="code-content"><span class="cmt"># Method: POST</span>
+<span class="cmt"># Resource: /login</span>
+<span class="cmt"># Endpoint: https://[CommServeIP]/commandcenter/api/login</span>
+
+<span class="cmt"># Header:</span>
+Content-Type: <span class="val">application/json</span>
+Accept:       <span class="val">application/json</span>
+
+<span class="cmt"># Body (JSON):</span>
+{
+  <span class="key">"username"</span>: <span class="str">"cvadmin"</span>,
+  <span class="key">"password"</span>: <span class="str">"Y3ZhZG1pbjEyMw=="</span>,  <span class="cmt">← Base64 encoded password</span>
+  <span class="key">"timeout"</span>:  <span class="val">60</span>
+}
+
+<span class="cmt"># Successful Response (200 OK):</span>
+{
+  <span class="key">"token"</span>: <span class="str">"QSDK eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."</span>
+}
+<span class="cmt"># Save this token — include in all further request headers</span></div>
+  </div>
+
+  <div class="callout note">
+    <span class="callout-icon">📝</span>
+    <div class="callout-body">
+      <h5>Password Must Be Base64 Encoded</h5>
+      <p>The login API requires the password in <strong>Base64 encoded format</strong> — not plain text. Use an online encoder (e.g., base64encode.org) or a Postman pre-request script to encode it. Username can be entered as plain text.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Common API Operations</h3>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">Common API Calls — Commvault v11.x</span>
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div class="code-content"><span class="cmt"># GET — List All Clients</span>
+<span class="cmd">GET</span>  <span class="url">/Client</span>
+Headers: Authtoken: [token]
+
+<span class="cmt"># GET — Job Summary (All Jobs)</span>
+<span class="cmd">GET</span>  <span class="url">/Job</span>
+Headers: Authtoken: [token]
+
+<span class="cmt"># GET — Agents on a Specific Client</span>
+<span class="cmd">GET</span>  <span class="url">/Agent?clientId=[ClientID]</span>
+Headers: Authtoken: [token]
+
+<span class="cmt"># GET — Index Servers</span>
+<span class="cmd">GET</span>  <span class="url">/AnalyticsServer</span>
+Headers: Authtoken: [token]
+
+<span class="cmt"># POST — Trigger Backup on Subclient</span>
+<span class="cmd">POST</span> <span class="url">/Subclient/[SubclientID]/action/backup</span>
+Headers: Authtoken: [token], Content-Type: application/json
+Body: { <span class="key">"backupLevel"</span>: <span class="str">"Incremental"</span> }
+
+<span class="cmt"># DELETE — Delete a Client</span>
+<span class="cmd">DELETE</span> <span class="url">/Client/[ClientID]</span>
+Headers: Authtoken: [token]
+
+<span class="cmt"># POST — Logout</span>
+<span class="cmd">POST</span> <span class="url">/Logout</span>
+Headers: Authtoken: [token]</div>
+  </div>
+
+  <h3 class="subsection">HTTP Response Codes</h3>
+  <div class="card-grid">
+    <div class="card green-accent">
+      <h4>✅ 200 OK</h4>
+      <p>Request was accepted and processed successfully. For a backup trigger POST, 200 means the job was <em>initiated</em> — not that the backup succeeded. Run a separate GET Job call to check job completion status.</p>
+    </div>
+    <div class="card orange-accent">
+      <h4>⚠️ 401 Unauthorized</h4>
+      <p>Invalid or expired credentials. Either the username/password is wrong during login, or the auth token has expired in subsequent requests. Re-authenticate to get a new token.</p>
+    </div>
+    <div class="card red-accent" style="border-left:3px solid var(--accent-red)">
+      <h4>❌ 404 Not Found</h4>
+      <p>The resource URL is incorrect, or the resource does not exist. Check the endpoint URL and resource path. Also check if the Client ID or Job ID exists.</p>
+    </div>
+    <div class="card purple-accent">
+      <h4>🔒 403 Forbidden</h4>
+      <p>The authenticated user does not have permission to perform the requested action. Check the Commvault user's role and associated capabilities.</p>
+    </div>
+  </div>
+
+  <div class="callout exam">
+    <span class="callout-icon">🎓</span>
+    <div class="callout-body">
+      <h5>Interview Tip: 200 Does NOT Mean Job Success</h5>
+      <p>A common misconception: HTTP 200 from a backup trigger API means the <em>API request</em> was accepted and the job was queued. It does <strong>not</strong> mean the backup job completed successfully. To verify job completion, you must poll the <code>GET /Job/[JobID]</code> endpoint and check the job status field.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Setting Up Postman for Commvault</h3>
+
+  <ol class="step-list">
+    <li><strong>Download and Install Postman</strong> Free version available at <code>postman.com/downloads</code>. Sign in with Google or create a free account.</li>
+    <li><strong>Fork the Commvault Public Collection</strong> Visit the Commvault Public Workspace in Postman. Click <em>Fork</em> to import the entire collection of pre-built Commvault APIs into your workspace.</li>
+    <li><strong>Create an Environment</strong> In Postman, create a new environment. Define variables:
+      <code>server_url</code> = <code>https://[CommServeIP]/commandcenter/api</code>,
+      <code>username</code> = <code>cvadmin</code>,
+      <code>password</code> = [Base64 encoded password],
+      <code>token</code> = (leave blank — auto-populated on login).</li>
+    <li><strong>Run Login Request</strong> Navigate to the login API in the collection. Click Send. The response body will contain the auth token. Click <em>Persist</em> to save the token to your environment variables.</li>
+    <li><strong>Execute API Calls</strong> With the token saved, all subsequent API calls will automatically use it from the environment variable. No manual token entry required.</li>
+  </ol>
+
+  <!-- Postman Setup Flow Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-blue);">
+    <div class="diagram-title">📮 Postman Setup → First API Call Flow</div>
+    <div class="diagram-sub">One-time setup then all API calls auto-authenticate using environment variables</div>
+    <div class="dflow">
+      <div class="dnode n-blue">Install Postman<small>postman.com</small></div>
+      <div class="darrow">→</div>
+      <div class="dnode n-purple">Fork CV Collection<small>Public Workspace</small></div>
+      <div class="darrow">→</div>
+      <div class="dnode n-cyan">Create Environment<small>server_url, username…</small></div>
+      <div class="darrow">→</div>
+      <div class="dnode n-green">POST /login<small>Get token → Persist</small></div>
+      <div class="darrow">→</div>
+      <div class="dnode n-yellow">Execute APIs<small>{{token}} auto-injected</small></div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">Postman — Environment Variable Setup</span>
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div class="code-content"><span class="cmt"># Postman Environment Variables (Manage Environments)</span>
+Variable:       <span class="key">server_url</span>
+Current Value:  <span class="str">https://192.168.10.100/commandcenter/api</span>
+
+Variable:       <span class="key">username</span>
+Current Value:  <span class="str">cvadmin</span>
+
+Variable:       <span class="key">password</span>
+Current Value:  <span class="str">Y3ZhZG1pbjEyMw==</span>   <span class="cmt"># Base64 encoded</span>
+
+Variable:       <span class="key">token</span>
+Current Value:  <span class="cmt"># Auto-populated after login — click Persist</span>
+
+Variable:       <span class="key">timeout</span>
+Current Value:  <span class="val">60</span>   <span class="cmt"># Minutes</span>
+
+<span class="cmt"># Reference variables in API URLs using double-braces:</span>
+<span class="url">{{server_url}}/login</span>
+<span class="url">{{server_url}}/Client</span>
+<span class="url">{{server_url}}/Job</span></div>
+  </div>
+
+  <h3 class="subsection">Getting a Backup Trigger API from Command Center</h3>
+  <p>Commvault provides a useful shortcut: you can capture the exact API call for any operation directly from the Command Center UI.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">Command Center — Capture API for Any Operation</span>
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div class="code-content"><span class="cmt"># To get the API equivalent of any UI operation:</span>
+1. Navigate to the operation in Command Center
+   <span class="val">Example:</span> Protect → [Client] → [Subclient] → Back Up
+
+2. Before clicking Submit, look for the <span class="str">"API"</span> or <span class="str">"Try API"</span> option
+   → Command Center shows the equivalent POST endpoint + JSON body
+
+3. Copy the API endpoint URL and JSON body
+   → Paste into Postman as a POST request
+
+4. Add the Authtoken header from your environment variable
+   → Send the request
+
+<span class="cmt"># The response will include the triggered Job ID:</span>
+{
+  <span class="key">"jobIds"</span>: [{ <span class="key">"jobId"</span>: <span class="val">8029</span> }]
+}
+
+<span class="cmt"># Now poll this Job ID to check status:</span>
+<span class="cmd">GET</span> <span class="url">{{server_url}}/Job/8029</span></div>
+  </div>
+
+  <!-- Command Center API Capture Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-cyan);">
+    <div class="diagram-title">🎯 Command Center → API Capture → Postman — Shortcut Flow</div>
+    <div class="diagram-sub">Capture the exact API call for any UI operation without writing code</div>
+    <div class="dflow">
+      <div class="dnode n-blue">Command Center<small>Navigate to operation</small></div>
+      <div class="darrow">→<span>Click "Try API"</span></div>
+      <div class="dnode n-cyan">API Revealed<small>POST endpoint + JSON</small></div>
+      <div class="darrow">→<span>Copy</span></div>
+      <div class="dnode n-purple">Paste in Postman<small>Add Authtoken header</small></div>
+      <div class="darrow">→<span>Send</span></div>
+      <div class="dnode n-green">Job Triggered<small>Returns jobId</small></div>
+    </div>
+    <div style="text-align:center; margin-top:14px;">
+      <div class="dflow" style="justify-content:center;">
+        <div class="dnode n-yellow" style="min-width:200px">Poll GET /Job/[jobId]<small>Check completion status</small></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection">API Reference Guide</h3>
+  <p>The official Commvault API reference is available at <code>api.commvault.com</code>. This site lists every available API operation organized by category:</p>
+  <ul class="bullet-list">
+    <li><strong>Authentication:</strong> Login, logout, token renewal</li>
+    <li><strong>Client Operations:</strong> List clients, get client properties, install agents</li>
+    <li><strong>Backup &amp; Restore:</strong> Trigger jobs, get job summary, restore operations</li>
+    <li><strong>Plans &amp; Policies:</strong> Create, modify, assign plans</li>
+    <li><strong>Storage:</strong> Library management, storage pool operations</li>
+    <li><strong>Reports &amp; Monitoring:</strong> Job reports, SLA reports, storage utilization</li>
+    <li><strong>Database Operations:</strong> Oracle, SQL Server, SAP HANA instance management</li>
+    <li><strong>Compliance &amp; Security:</strong> Activate, compliance search, clean room recovery</li>
+  </ul>
+
+  <!-- API Troubleshooting Decision Diagram -->
+  <div class="diagram-block" style="border-top-color: var(--accent-orange);">
+    <div class="diagram-title">🔍 API Integration Troubleshooting — Decision Flow</div>
+    <div class="diagram-sub">When a third-party reports API failures, use this systematic approach</div>
+    <div class="dlayer">
+      <div class="dlayer-row">
+        <div class="dlayer-box l-red">Third-Party Reports API Failure<small>"Commvault API returns incorrect data"</small></div>
+      </div>
+      <div class="dlayer-conn">↓</div>
+      <div class="dlayer-row">
+        <div class="dlayer-box l-blue" style="min-width:260px">Reproduce in Postman<small>Same endpoint + params + auth token</small></div>
+      </div>
+      <div class="dlayer-conn">↓ Check Postman result ↓</div>
+      <div class="dlayer-row" style="gap: 28px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div class="dlayer-box l-green">Postman = Correct Data<small>API working fine</small></div>
+          <div class="dlayer-conn">↓</div>
+          <div class="dlayer-box l-green">Issue is in<br>Third-Party Code<small>Share Postman results as evidence</small></div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div class="dlayer-box l-orange">Postman = Same Error<small>API issue confirmed</small></div>
+          <div class="dlayer-conn">↓</div>
+          <div class="dlayer-box l-orange">Raise Commvault<br>Support Case<small>Include API call + response body</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body">
+      <h5>Troubleshooting REST API Issues — Logs to Check</h5>
+      <ul>
+        <li><strong>Web Server Log:</strong> Located on CommServe. Contains all incoming API requests and response codes.</li>
+        <li><strong>QSDK.log:</strong> Detailed SDK-level logging of API processing. Useful for diagnosing authentication and permission issues.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <h4>Section Summary — REST API</h4>
+    <ul>
+      <li>REST API knowledge is required for troubleshooting integrations, supporting developers, and enabling automation</li>
+      <li>Commvault API primarily uses GET (read), POST (create/trigger), PUT (update), and DELETE (remove) — always check the API reference for the correct method per operation</li>
+      <li>Authentication is token-based — login with POST /login, use the token in all subsequent request headers</li>
+      <li>Token expires (default 30 min) — re-authenticate or extend timeout to 60 min in environment variables</li>
+      <li>HTTP 200 = request accepted successfully — does NOT mean the backup job completed</li>
+      <li>Base64 encode the password before sending the login API request</li>
+      <li>Postman environment variables allow centralized management of server URL, credentials, and token</li>
+      <li>Commvault Public Workspace on Postman provides the full pre-built API collection via Fork</li>
+      <li>api.commvault.com is the official reference for all API operations and request/response formats</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== SECTION 10: INTERVIEW Q&A ========== -->
+<section class="section" id="interview">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🎓</div>
+    <div>
+      <h2 class="section-title">Scenario-Based <span class="accent">Interview Q&amp;A</span></h2>
+      <p class="section-subtitle">Common Questions on Microsoft 365 Backup, Workflows, and REST API</p>
+    </div>
+  </div>
+
+  <div class="callout exam">
+    <span class="callout-icon">🎓</span>
+    <div class="callout-body">
+      <h5>Exam Tip</h5>
+      <p>These questions reflect real-world scenarios you will encounter in Commvault implementation and support roles. Review the answers and understand the reasoning — memorizing answers without understanding the concepts will not help in practical scenarios.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Microsoft 365 Backup Questions</h3>
+
+  <div class="qa-block">
+    <div class="qa-q">Your Exchange Online backup job completed successfully, but the storage utilization on the backup library is not decreasing despite a 1-month retention policy in the Server Plan. What is the likely cause?</div>
+    <div class="qa-a">The <strong>Microsoft 365 Plan</strong> assigned to the Exchange Online app has retention set to <em>Indefinitely</em>. The M365 Plan retention takes precedence over the Server Plan retention for Exchange mailboxes. The Server Plan's 1-month retention is not honored for mailbox data. To fix this, edit the M365 Plan and set a definite retention value (e.g., 12 months). Communicate to the customer that cloud or tape storage may be needed if compliance requires long-term retention.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">After configuring Exchange Online backup in Commvault, the discovery status shows "Not Available" and displays the error: "Azure apps with insufficient permissions or MFA is enabled." How do you troubleshoot this?</div>
+    <div class="qa-a">1. Navigate to the Exchange Online app → Configuration → <em>Verify Connection</em>. The error details will specify which permission is missing or if credentials are incorrect. 2. If a specific permission is missing (e.g., <code>Directory.Read.All</code>, <code>Group.Read.All</code>), add it in the Azure portal under the app's API Permissions and re-grant admin consent. 3. If the error is "invalid client secret," regenerate a new client secret in the Azure portal, copy the <em>Value</em> column (not the Secret ID), and update the Commvault configuration. 4. Re-run Verify Connection until all permissions are authorized.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A customer wants to protect their Exchange Online, Teams, and OneDrive with Commvault. Do they need three separate Azure App Registrations?</div>
+    <div class="qa-a">No. A <strong>single Azure App Registration</strong> can be reused for all three workloads. The key is to add all the required permissions for each workload (Exchange, Teams, OneDrive) to the same app, and grant admin consent for all. This simplifies management — only one Client Secret to rotate and one App ID to track. Teams requires a Redirect URI in the app registration, so ensure this is configured. SharePoint Online requires a separate certificate-based configuration but can also reuse the same app registration.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">Why does the Exchange Online backup job show as an "Archive" type rather than "Backup"? Does this mean data is being deleted from the mailbox?</div>
+    <div class="qa-a">
+      There are two separate things to understand here — the <strong>job type label</strong> and the <strong>actual operation being performed</strong>.
+      <div style="margin-top:10px"><strong>Why "Archive" instead of "Backup"?</strong> Commvault uses the label <em>Archive</em> for all Exchange and Exchange Online jobs — this is simply how Commvault classifies the job type for Exchange workloads. It is a fixed label, not a description of what happens to the data.</div>
+      <div style="margin-top:10px"><strong>Does it delete data from the mailbox?</strong> No — not by default. In a standard <em>backup</em> configuration, Commvault reads mailbox data and copies it to the storage library. The original emails remain untouched in the production mailbox. Nothing is moved or deleted.</div>
+      <div style="margin-top:10px"><strong>When does data actually get removed?</strong> Only if the customer has specifically configured a Commvault <em>archiving</em> policy. In that case, emails meeting the archiving criteria (e.g., older than X days) are moved to the Commvault storage library and replaced with a <em>stub</em> — a lightweight pointer in the mailbox. When a user clicks a stubbed email, a <em>recall job</em> retrieves the original message automatically. This is an active customer choice, not a default behaviour.</div>
+      <div style="margin-top:10px"><strong>In summary:</strong> The "Archive" job label does not mean data is deleted. Whether mailbox data is moved and stubbed depends entirely on whether an archiving policy has been configured. If unsure, check the subclient archiving settings or consult Commvault documentation.</div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">During SharePoint Online backup configuration, what is the purpose of the .CER and .PFX certificate files, and where is each used?</div>
+    <div class="qa-a">The <strong>.CER file</strong> contains only the <em>public key</em> of the self-signed certificate. It is uploaded to the Azure App Registration under <em>Certificates</em> to establish trust between Commvault and SharePoint Online. The <strong>.PFX file</strong> contains both the public and private keys (password protected) and is uploaded to the Commvault Command Center during SharePoint Online app configuration. Commvault uses the private key in the PFX to authenticate with SharePoint Online. Both files are generated from the same PowerShell commands run on the Access Node.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A SharePoint site was deleted and a restore was attempted. The restore fails with "URL exists in the recycle bin." How do you resolve this?</div>
+    <div class="qa-a">Microsoft retains deleted SharePoint sites in its own recycle bin for <strong>93 days</strong> before permanent deletion. During this period, you cannot restore via Commvault to the same URL because the URL is considered "in use" by the recycle bin entry. Options: 1) Restore the site from Microsoft's own recycle bin in the SharePoint Admin Center (admin.sharepoint.com → Active sites → Deleted sites) to make the site active, then overwrite it using Commvault. 2) Wait for the 93-day Microsoft retention to expire, then perform the Commvault restore. You cannot manually override this Microsoft behavior.</div>
+  </div>
+
+  <h3 class="subsection">Workflow Questions</h3>
+
+  <div class="qa-block">
+    <div class="qa-q">A workflow was built and deployed, but all workflow jobs remain in "Pending" state after the check readiness activity completes. What is the likely cause?</div>
+    <div class="qa-a">The workflow is missing the <strong>Workflow End</strong> activity. Without a Workflow End activity at the conclusion of each execution path, Commvault does not know when the workflow is complete and leaves the job in Pending state indefinitely. Add the Workflow End activity as the final step in each branch (success path and failure path), reconnect the transitions, and redeploy the workflow.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">An MSP with 200 customers wants to automate tenant onboarding in Commvault. What workflow components would you recommend and what advantages does this provide?</div>
+    <div class="qa-a">Design a <em>Customer Onboarding</em> workflow with: (1) Input variables for customer name, storage plan, and retention requirement. (2) Activities to create a new CommCell tenant/company, assign a storage plan, create access user accounts, and configure default backup settings. (3) Email notification to the technical account manager with onboarding summary. Advantages: eliminates the need for a dedicated admin per customer, ensures consistent configuration standards across all customers, reduces human errors from manual setup, and reduces onboarding time from hours to minutes.</div>
+  </div>
+
+  <h3 class="subsection">REST API Questions</h3>
+
+  <div class="qa-block">
+    <div class="qa-q">A REST API developer reports that the Commvault API for pulling job summaries is returning incorrect data. As the Commvault admin, how do you verify whether the issue is with Commvault or the developer's code?</div>
+    <div class="qa-a">Open Postman and execute the <strong>same API call</strong> (same endpoint, same parameters, same auth token) that the developer is using. If Postman returns the correct, expected data, the issue is not with Commvault — it is with the developer's code, network configuration, or how they are parsing the JSON response. Show the Postman results to the developer as evidence and ask them to investigate their implementation. If Postman also returns incorrect data, raise a Commvault support case with the API call details and response body.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">What is the difference between an HTTP 200 response to a backup trigger API and a successful backup job? How do you determine if the backup job actually succeeded?</div>
+    <div class="qa-a">HTTP <strong>200</strong> from a backup trigger POST request means the API request was received and a backup job was <em>initiated</em> — it does not indicate job completion or success. The response body will contain the <code>jobId</code> of the created job. To check if the backup job succeeded, you must run a separate <strong>GET /Job/[JobID]</strong> call and inspect the job status field in the response. Wait until the status transitions to "Completed" with a success state before confirming a successful backup.</div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-q">A customer is building a private cloud portal and wants to trigger Commvault backups, assign plans to clients, and check job status through the portal. What is your role as the Commvault admin in this scenario?</div>
+    <div class="qa-a">As the Commvault admin, your role is to <strong>provide the correct API endpoints</strong> to the portal development team. This includes: the endpoint URL and authentication method, the POST API for triggering backups with the correct request body format, the POST/PUT API for assigning a plan to a client or subclient, and the GET API for polling job status. Use Postman to test and validate each API before providing it to the developers. You are not expected to write the portal code — that is the developer's responsibility. Verify that each API returns the expected response before handing over to the development team.</div>
+  </div>
+
+</section>
+
+</main>
+</div><!-- end page-content -->
+</div><!-- end page-wrapper -->
+
+<!-- AUTHOR SECTION -->
+<div class="author-section" id="author">
+  <div class="container">
+    <h2 style="font-family:var(--font-heading);font-size:22px;color:var(--text-primary);margin-bottom:24px;text-align:center;">About the <span style="color:var(--accent-blue)">Author</span></h2>
+    <div class="author-card">
+      <div class="author-avatar">👨‍💻</div>
+      <div>
+        <div class="author-name">Mohammed Abdul</div>
+        <div class="author-title">Data Protection Architect — 15+ Years Experience</div>
+        <p class="author-bio">Mohammed Abdul is a Data Protection Architect with more than 15 years of experience in Hybrid Cloud and has worked with global clients across various industries. With extensive expertise in enterprise backup and recovery solutions, Mohammed specializes in Commvault, Veeam, NetBackup, and NetApp technologies, helping organizations design and implement robust data protection strategies.</p>
+        <div class="author-badges">
+          <span class="author-badge">🛡️ Commvault</span>
+          <span class="author-badge">☁️ Veeam</span>
+          <span class="author-badge">💾 NetBackup</span>
+          <span class="author-badge">🗄️ NetApp</span>
+          <span class="author-badge">🌐 Hybrid Cloud</span>
+          <span class="author-badge">🔐 Data Protection</span>
+        </div>
+        <a href="mailto:abdul.md.20000102@gmail.com" class="email-card">
+          <span>✉️</span>
+          abdul.md.20000102@gmail.com
+        </a>
+        <div style="margin-top:20px">
+          <div class="callout note" style="margin:0">
+            <span class="callout-icon">📋</span>
+            <div class="callout-body">
+              <h5>Disclaimer</h5>
+              <p>This content is for educational purposes and tutorial material. The Commvault software versions used across these articles are <strong>v11.32</strong> and <strong>v11.36</strong>. Always refer to official Commvault documentation and follow your organization's procedures for production implementations. IP addresses, hostnames, and other environment-specific parameters used in examples are illustrative only — replace with values appropriate for your environment.</p>
+            </div>
+          </div>
+        </div>
+      </div><!-- end inner div -->
+    </div><!-- end author-card -->
+  </div><!-- end container -->
+</div><!-- end author-section -->
+
+</body>
+</html>
